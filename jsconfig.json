@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/atoms": ["components/atoms"],
+      "@/layouts/*": ["components/layouts/*"],
+      "@/*": ["/*"],
+      "@/firebase/*": ["firebase/*"],
+      "@/hooks/*": ["hooks/*"],
+      "@/admin/components/*": ["pages/admin/components/*"],
+      "@/admin/atoms*": ["pages/admin/components/atoms*"],
+      "@/admin/layouts*": ["pages/admin/components/layouts*"],
+      "@/admin/store/*": ["pages/admin/store/*"],
+      "@/admin/utils/*": ["pages/admin/utils/*"]
+    }
+  }
+}
