@@ -46,7 +46,7 @@ const Create = () => {
   } = useForm()
 
   useEffect(() => {
-    setImgURL('')
+    // setImgURL('')
     type &&
       getSchemaByType(type).then(res => {
         setSchema(res[0])
@@ -105,7 +105,6 @@ const Create = () => {
   }
 
   const renderSwitch = ({ name, type, isRequired }) => {
-    console.log(name, type, isRequired)
     switch (type) {
       case 'longtext':
         return (

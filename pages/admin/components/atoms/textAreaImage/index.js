@@ -31,6 +31,10 @@ const TextAreaImage = ({ name, isRequired }) => {
   } = useForm()
 
   useEffect(() => {
+    return () => setImgURL('')
+  }, [])
+
+  useEffect(() => {
     if (task) {
       setUpload(true)
       let onProgress = snapshot => {

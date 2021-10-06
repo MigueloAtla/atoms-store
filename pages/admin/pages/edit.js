@@ -52,7 +52,7 @@ const Edit = () => {
   } = useForm()
 
   useEffect(() => {
-    setImgURL('')
+    // setImgURL('')
     setLoading(true)
     fetchOneByType(id, type).then(res => {
       setContent(res)

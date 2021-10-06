@@ -67,7 +67,6 @@ describe('Input Image', () => {
     render(<StoreWrapper />)
     const fileDropzone = screen.getByTestId('dropimage')
     const fileDropEvent = createEvent.drop(fileDropzone)
-    // const fileList = [file]
 
     Object.defineProperty(fileDropEvent, 'dataTransfer', {
       value: {
