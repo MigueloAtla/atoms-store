@@ -1,25 +1,49 @@
 
 # AtomsCMS
 
-## Instalation
+## Getting Started:
 
-## Configuration
+### Configuration of __Firebase project__
 
-Create a firebase project.
+1. Create a firebase project.
 
-Go to console.
+2. Create a __firestore__ instance.
 
-Create a bucket storeage.
+3. Go to __Storage__: create a folder called "images".
 
-Create a firestore instance.
+4. Update project to __Blaze plan__.  
+A credit card is needed, but plan is free.
 
-Replace .env.example with .env.local and introduce your firebase project data.
+5. Replace .env.example with .env.local and introduce your firebase project data.
 
-## Getting Started
+6. Activate firebase functions.  
+
+### Configuration of __Firebase functions__
+
+In terminal install: 
+
+```
+npm install -g firebase-tools
+```
+Log into your firebase account:
+```
+firebase login  
+```
+Go to functions folder: 
+
+```
+npm install
+```
+
+Deploy the functions to firebase:
+
+```
+firebase deploy --only functions
+```
+
+### Run the project
 
 ```bash
-npm run dev
-# or
 yarn dev
 ```
 
