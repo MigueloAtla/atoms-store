@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "jest --watch"
+    "test": "jest --watch",
+    "generate:pages": "node ./generators/pages.js"
   },
   "dependencies": {
     "@chakra-ui/icons": "^1.0.15",

@@ -114,7 +114,7 @@ export const withTheme = doc => {
       let Comp = components[key]
 
       // Richt text mapping
-      if (key === 'content') {
+      if (value.type === 'richtext') {
         let contentMarkup = []
         const root = parse(value.value)
         root.childNodes.map(node => {
@@ -148,7 +148,7 @@ export const withTheme = doc => {
             return <Comp key={i} />
           })
         }
-      } else if (key === 'image') {
+      } else if (value.type === 'image') {
         response[capitalize(key)] = () => (
           <ImageWrapper>
             <ImageStyled
