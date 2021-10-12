@@ -33,7 +33,7 @@ const MenuBar = ({ editor }) => {
 
   return (
     <MenuStyled mb='15px'>
-      <Box>
+      <Box w='calc(100% - 30px)'>
         {/* <span>Formating text</span>
         <br /> */}
 
@@ -384,13 +384,17 @@ const MenuBar = ({ editor }) => {
   )
 }
 
-const TipTap = ({ value, setEditorContent, onSubmit }) => {
+const TipTap = ({ value, setEditorContent, onSubmit, setUpdate = null }) => {
   const editor = useEditor({
     extensions: [StarterKit, Image, Typography],
     content: value
   })
+
   useEffect(() => {
-    if (editor) setEditorContent(editor.getHTML())
+    if (editor) {
+      setEditorContent(s => editor.getHTML())
+      setUpdate && setUpdate(true)
+    }
   }, [onSubmit])
 
   return (

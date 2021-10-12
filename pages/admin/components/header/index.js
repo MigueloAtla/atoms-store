@@ -4,6 +4,7 @@ import { useHistory } from 'react-router-dom'
 // UI
 import { IconButton, Flex } from '@chakra-ui/react'
 import { ChevronLeftIcon } from '@chakra-ui/icons'
+import { HStack } from '@chakra-ui/layout'
 
 // Styles
 import { HeaderStyled } from './styles'
@@ -29,9 +30,9 @@ const Header = ({ back, title, children }) => {
       <Flex justifyContent='center'>
         <h3>{title}</h3>
       </Flex>
-      <Flex justify='end' pr='20px'>
+      <HStack pr='20px' spacing='14px'>
         {children}
-      </Flex>
+      </HStack>
     </HeaderStyled>
   )
 }

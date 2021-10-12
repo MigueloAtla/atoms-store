@@ -41,7 +41,7 @@ const ModalImages = ({ setImgURL }) => {
           onOpen()
         }}
       >
-        add image from Media Library
+        image from Media Library
       </Button>
       <Modal onClose={onClose} isOpen={isOpen} isCentered>
         <ModalOverlay />

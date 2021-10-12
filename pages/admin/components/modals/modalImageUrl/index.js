@@ -41,7 +41,7 @@ const ModalImageUrl = ({ setImgURL }) => {
           onOpen()
         }}
       >
-        add image from URL
+        image from URL
       </Button>
       <Modal onClose={onClose} isOpen={isOpen} isCentered>
         <ModalOverlay />

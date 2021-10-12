@@ -1,9 +1,9 @@
 import styled from 'styled-components'
 import { Box } from '../box'
 
-import { compose, lineHeight } from 'styled-system'
+import { compose, lineHeight, color } from 'styled-system'
 
-const composedHelpers = compose(lineHeight)
+const composedHelpers = compose(lineHeight, color)
 
 export const Typography = styled(Box)`
   ${composedHelpers}

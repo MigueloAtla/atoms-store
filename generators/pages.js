@@ -17,13 +17,25 @@
 
   const snapshot = await db.collection('collectionList').get()
   let collections = []
+  let result
   snapshot.forEach(doc => {
-    const result = doc.data()
+    result = doc.data()
     collections = Object.keys(result)
   })
 
   if (collections.length > 0) {
-    collections.map(collection => {
+    collections.map(async collection => {
+      let schema = Object.keys(result[collection].schema)
+
+      let capitalizedSchema = schema.map(s => capitalizeFirstLetter(s))
+
+      let comps = capitalizedSchema.map(comp => {
+        if (comp === 'Content') {
+          return `{${comp}()}`
+        }
+        return `<${comp} />`
+      })
+
       if (!fs.existsSync(`./pages/${collection}`)) {
         fs.mkdir(`./pages/${collection}`, { recursive: true }, function (err) {
           if (err) {
@@ -39,24 +51,26 @@
                 `
                 import React from 'react'
                 import { getCollection, getDocByID } from '@/firebase/client'
-                
-                import { withTheme, PostWrapperStyled } from '@/theme'
-                
-                import styled from 'styled-components'
+
+                import { GlobalStyles, getComponents } from '@/theme'
+
                 import { LayoutStyled } from '@/layouts/postLayout'
+                import { Column, Row, AutoColumns } from '@/layouts/index'
                 
                 export default function ${capitalizeFirstLetter(
                   collection
                 ).slice(0, -1)} ({ ${collection.slice(0, -1)} }) {
-                    const { Title, Description, Image, Content } = withTheme(${collection.slice(
-                      0,
-                      -1
-                    )})
+                    const {${capitalizedSchema.join(
+                      ', '
+                    )}} = getComponents(${collection.slice(0, -1)})
                       
                       return (
-                        <>
-                        <h1>${capitalizeFirstLetter(collection)}</h1>
-                        </>
+                        <LayoutStyled width='100%'>
+                          <GlobalStyles />
+                          <Column center>
+                          ${comps.join(' ')}
+                          </Column>
+                        </LayoutStyled>
                         )
                       }
                       
@@ -64,7 +78,7 @@
                         const ${collection.slice(
                           0,
                           -1
-                        )} = await getDocByID('${collection.slice(0, -1)}', id)
+                        )} = await getDocByID('${collection}', id)
                           
                           return {
                             props: {

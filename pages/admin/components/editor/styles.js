@@ -8,6 +8,9 @@ export const Styles = styled.div`
     padding: 20px;
     min-height: 300px;
   }
+  img {
+    max-width: 500px;
+  }
 `
 export const MenuStyled = styled(Box)`
   position: sticky;

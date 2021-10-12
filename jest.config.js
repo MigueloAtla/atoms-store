@@ -23,8 +23,12 @@ module.exports = {
     '^@/admin/layouts(.*)$': '<rootDir>/pages/admin/components/layouts$1',
     '^@/admin/store(.*)$': '<rootDir>/pages/admin/store$1',
     '^@/admin/utils(.*)$': '<rootDir>/pages/admin/utils$1',
+    '^@/admin(.*)$': '<rootDir>/pages/admin$1',
     '^@/firebase(.*)$': '<rootDir>/firebase$1',
-    '^@/hooks(.*)$': '<rootDir>/hooks$1'
+    '^@/hooks(.*)$': '<rootDir>/hooks$1',
+    '^@/layouts(.*)$': '<rootDir>/components/layouts$1',
+    '^@/atoms(.*)$': '<rootDir>/components/atoms$1',
+    '^@/(.*)$': '<rootDir>/$1'
   },
   testPathIgnorePatterns: ['<rootDir>/node_modules/', '<rootDir>/.next/'],
   testEnvironment: 'jsdom',

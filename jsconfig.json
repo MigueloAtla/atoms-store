@@ -11,7 +11,8 @@
       "@/admin/atoms*": ["pages/admin/components/atoms*"],
       "@/admin/layouts*": ["pages/admin/components/layouts*"],
       "@/admin/store/*": ["pages/admin/store/*"],
-      "@/admin/utils/*": ["pages/admin/utils/*"]
+      "@/admin/utils/*": ["pages/admin/utils/*"],
+      "@/admin/*": ["pages/admin/*"]
     }
   }
 }

@@ -1,25 +1,25 @@
 import React from 'react'
-// import Image from 'next/image'
 import { getCollection, getDocByID } from '@/firebase/client'
 
-import { withTheme, PostWrapperStyled } from '@/theme'
+import { GlobalStyles, getComponents } from '@/theme'
 
-// import { Box } from 'rebass/styled-components'
-// import { Box } from '@/atoms'
-import styled from 'styled-components'
 import { LayoutStyled } from '@/layouts/postLayout'
+import { Column, Row, AutoColumns } from '@/layouts/index'
 
 export default function Post ({ post }) {
-  const { Title, Description, Featuredimage, Content } = withTheme(post)
+  const { Title, Description, Featuredimage, Content } = getComponents(post)
 
   return (
-    <LayoutStyled width={['80%', '70%', '60%']}>
-      <PostWrapperStyled mt='100px'>
-        <Title as='h2' mt={[4, 5, 6]} fontSize={[4, 5, 7]} />
-        <Featuredimage />
+    <LayoutStyled width='100%'>
+      <GlobalStyles />
+      <Column center>
+        <Title as='h1' fontSize={[4, 5, 7]} color='antiquewhite' />
         <Description />
-        {Content()}
-      </PostWrapperStyled>
+        <Featuredimage />
+        <AutoColumns mt='20px' gap={3}>
+          {Content()}
+        </AutoColumns>
+      </Column>
     </LayoutStyled>
   )
 }

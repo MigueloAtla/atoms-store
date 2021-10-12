@@ -9,9 +9,11 @@ import { fetchOneByType, updateOneByType } from '@/firebase/client'
 import UpdateButton from '@/admin/atoms/UpdateButton'
 import PageTransitionAnimation from '@/admin/atoms/pageTransitionAnimation'
 import LoaderScreen from '@/admin/atoms/loadScreen'
+import PreviewDrawer from '@/admin/atoms/previewDrawer'
+import Preview from '@/admin/components/preview'
 import EditDataTypeInputWrapper from '@/admin/layouts/editDataTypeInputWrapper'
 
-import { Textarea, Input, Box, useToast } from '@chakra-ui/react'
+import { Textarea, Input, Box, useToast, Button } from '@chakra-ui/react'
 
 // Components
 import TipTap from '../components/editor'
@@ -32,15 +34,20 @@ import { useForm } from 'react-hook-form'
 
 const Edit = () => {
   const [content, setContent] = useState(null)
+  const [canUpdate, setCanUpdate] = useState(false)
+  const [update, setUpdate] = useState(false)
   const imgURL = useStore(state => state.imgURL)
   const setImgURL = useStore(state => state.setImgURL)
-  const [editorContent, setEditorContent] = useState()
+  const [editorContent, setEditorContent] = useState(null)
   const [onSubmit, setOnSubmit] = useState()
   const { id, type } = useParams()
   const contentCloned = useRef(null)
   const haveEditor = useRef(false)
-
   const setLoading = useStore(state => state.setLoading)
+  const selectedCollectionName = useStore(state => state.selectedCollectionName)
+  const setSelectedCollectionName = useStore(
+    state => state.setSelectedCollectionName
+  )
   const loading = useStore(state => state.loading)
 
   const toast = useToast()
@@ -52,7 +59,9 @@ const Edit = () => {
   } = useForm()
 
   useEffect(() => {
-    // setImgURL('')
+    if (selectedCollectionName === '') {
+      setSelectedCollectionName(type)
+    }
     setLoading(true)
     fetchOneByType(id, type).then(res => {
       setContent(res)
@@ -70,35 +79,14 @@ const Edit = () => {
     }
   }, [content])
 
-  // Get data from TipTap editor after submit and update
-  // the doc on firebase
   useEffect(() => {
     if (contentCloned.current) {
       contentCloned.current['content'].value = editorContent
-      updateOneByType(id, type, contentCloned.current)
-
-      toast({
-        title: 'Content Updated Successfully',
-        position: 'bottom-right',
-        variant: 'subtle',
-        description: 'Now go home, bro.',
-        // status: 'success',
-        duration: 5000,
-        isClosable: true
-      })
     }
   }, [editorContent])
 
-  const handleSubmit = data => {
-    contentCloned.current = content
-    Object.keys(contentCloned.current).map(key => {
-      if (contentCloned.current[key].type === 'image') {
-        contentCloned.current[key].value = imgURL || ''
-      } else contentCloned.current[key].value = data[key]
-    })
-
-    if (haveEditor.current === true) setOnSubmit(!onSubmit)
-    else {
+  useEffect(() => {
+    if (canUpdate === true && update === true) {
       updateOneByType(id, type, contentCloned.current)
       toast({
         title: 'Content updated successfully',
@@ -109,6 +97,27 @@ const Edit = () => {
         duration: 5000,
         isClosable: true
       })
+      setCanUpdate(false)
+    } else {
+      setContent(s => contentCloned.current)
+    }
+  }, [update])
+
+  const handleSubmit = data => {
+    if (update) setUpdate(false)
+    if (contentCloned.current === null) contentCloned.current = content
+    Object.keys(contentCloned.current).map(key => {
+      if (contentCloned.current[key].type === 'image') {
+        contentCloned.current[key].value = imgURL || ''
+      } else if (contentCloned.current[key].type === 'richtext') {
+      } else contentCloned.current[key].value = data[key]
+    })
+
+    setCanUpdate(true)
+
+    if (haveEditor.current === true) setOnSubmit(!onSubmit)
+    else {
+      setUpdate(true)
     }
   }
 
@@ -151,6 +160,7 @@ const Edit = () => {
             value={value}
             onSubmit={onSubmit}
             setEditorContent={setEditorContent}
+            setUpdate={setUpdate}
           />
         )
       }
@@ -178,9 +188,28 @@ const Edit = () => {
       : 'Unknown document'
     : ''
 
+  const onPreview = data => {
+    if (contentCloned.current === null) contentCloned.current = content
+    Object.keys(contentCloned.current).map(key => {
+      if (contentCloned.current[key].type === 'image') {
+        contentCloned.current[key].value = imgURL || ''
+      } else if (contentCloned.current[key].type === 'richtext') {
+      } else contentCloned.current[key].value = data[key]
+    })
+
+    if (haveEditor.current === true) {
+      setOnSubmit(!onSubmit)
+      setOnSubmit(!onSubmit)
+    }
+  }
+
   return (
     <Box minH='calc(100% - 50px)'>
       <Header back={true} title={`Editing ${type.slice(0, -1)}: ${title}`}>
+        <PreviewDrawer
+          onClick={handleSubmitHook(onPreview)}
+          content={content}
+        />
         <UpdateButton type={type} />
       </Header>
 
@@ -190,7 +219,7 @@ const Edit = () => {
         <PageTransitionAnimation>
           {content && (
             <>
-              <Box m='20px'>
+              <Box m='80px'>
                 <form id='edit-form' onSubmit={handleSubmitHook(handleSubmit)}>
                   {Object.keys(content).map((key, i) => {
                     return (
