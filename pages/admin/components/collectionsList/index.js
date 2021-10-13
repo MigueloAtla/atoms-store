@@ -45,6 +45,7 @@ const CollectionsList = () => {
       <IconLink to={`/admin/new-collection`}>
         <AddIcon />
       </IconLink>
+      <Link to='/admin/media-library'>Media Library</Link>
     </Flex>
   )
 }

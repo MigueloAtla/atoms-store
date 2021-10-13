@@ -20,6 +20,7 @@ import NewCollection from './pages/newCollection'
 import UserPage from './pages/user'
 import User from '@/admin/components/userLink'
 import CollectionList from './pages/collectionList'
+import MediaLibrary from './pages/mediaLibrary'
 
 // Assets
 import firebase from '../../public/firebase.svg'
@@ -199,6 +200,9 @@ const Settings = styled.div`
 
 const AdminRoutes = () => (
   <Switch>
+    <Route path='/admin/media-library'>
+      <MediaLibrary />
+    </Route>
     <Route path='/admin/user-profile'>
       <UserPage />
     </Route>

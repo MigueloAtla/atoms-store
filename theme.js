@@ -139,7 +139,6 @@ const components = {
 }
 
 export const getComponents = doc => {
-  console.log(doc)
   const response = {}
   for (let [key, value] of Object.entries(doc)) {
     if (key !== 'id' && key !== 'createdAt') {
@@ -183,8 +182,6 @@ export const getComponents = doc => {
           }
         } else response[capitalize(key)] = () => ''
       } else if (value.type === 'image') {
-        // console.log(key)
-        // console.log(value.value)
         if (value.value !== '') {
           response[capitalize(key)] = () => (
             <ImageWrapper>

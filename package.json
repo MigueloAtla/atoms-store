@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "test": "jest --watch",
-    "generate:pages": "node ./generators/pages.js"
+    "generate:pages": "node ./generators/pages.js",
+    "generate:atom": "node ./generators/atom.js"
   },
   "dependencies": {
     "@chakra-ui/icons": "^1.0.15",

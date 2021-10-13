@@ -100,6 +100,30 @@ export const getImages = async () => {
   // return all resolved promises
   return Promise.all(urlPromises)
 }
+export const getImagesData = async () => {
+  const storageRef = firebase.storage().ref(`images`)
+
+  let result = await storageRef.listAll()
+  let urlPromises = result.items.map(imageRef => imageRef.getDownloadURL())
+  let metadataPromises = result.items.map(imageRef => imageRef.getMetadata())
+  let metadata = await Promise.all(metadataPromises)
+  let urls = await Promise.all(urlPromises)
+  return { metadata, urls }
+}
+
+export const deleteImage = name => {
+  console.log(name)
+  var storageRef = firebase.storage().ref('images')
+  var imageRef = storageRef.child(`${name}`)
+  imageRef
+    .delete()
+    .then(function () {
+      console.log('deleted')
+    })
+    .catch(function (error) {
+      console.log('error: ', error)
+    })
+}
 
 export const getCollection = collection => {
   return db
