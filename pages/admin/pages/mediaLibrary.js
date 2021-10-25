@@ -4,6 +4,8 @@ import { Flex, Grid, Box, Button } from '@chakra-ui/react'
 import { getImagesData, deleteImage } from '@/firebase/client'
 import PageTransitionAnimation from '../components/atoms/pageTransitionAnimation'
 import LoadScreen from '@/admin/atoms/loadScreen'
+import ImageWithPlaceholder from '@/admin/components/imageWithPlaceholder'
+import Img from 'react-cool-img'
 
 import {
   Drawer,
@@ -64,7 +66,12 @@ const MediaLibrary = () => {
                       onOpen()
                     }}
                   >
-                    <Image
+                    <Img
+                      style={{
+                        backgroundColor: '#efefef',
+                        width: '480',
+                        height: '320'
+                      }}
                       width='200px'
                       height='200px'
                       src={image}
@@ -85,7 +92,7 @@ const MediaLibrary = () => {
             {isOpen && (
               <>
                 <ImageExpanded>
-                  <Image
+                  <img
                     src={image.url}
                     alt='opened image'
                     width='500px'

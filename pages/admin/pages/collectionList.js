@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { useParams } from 'react-router-dom'
 
 import { getCollection } from '@/firebase/client'
+import Img from 'react-cool-img'
 
 import styled from 'styled-components'
 
@@ -77,6 +78,7 @@ const CollectionList = () => {
         if (m[k].type === 'image' && m[k].value) {
           dataObj[k] = (
             <TableImage
+              style={{ backgroundColor: '#efefef', width: '90', height: '90' }}
               quality='50'
               src={m[k].value}
               alt='main image'
@@ -118,6 +120,7 @@ const CollectionList = () => {
 
 export default CollectionList
 
-const TableImage = styled(Image)`
+const TableImage = styled(Img)`
   border-radius: 50%;
+  height: 100%;
 `

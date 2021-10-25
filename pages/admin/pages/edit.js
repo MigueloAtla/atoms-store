@@ -22,6 +22,7 @@ import TextAreaImage from '@/admin/components/atoms/textAreaImage'
 
 // Styles
 import { Label } from '../styles'
+import { TextInputStyled, TextAreaStyled } from '@/admin/atoms/textInput/styles'
 
 // Utils
 import { capitalizeFirstLetter } from '../utils/utils'
@@ -127,7 +128,7 @@ const Edit = () => {
       case 'longtext':
         return (
           <>
-            <Textarea
+            <TextAreaStyled
               rows='6'
               name={key}
               defaultValue={value}
@@ -141,8 +142,7 @@ const Edit = () => {
       case 'text':
         return (
           <>
-            <Input
-              name={key}
+            <TextInputStyled
               defaultValue={value}
               {...register(key, {
                 required: isRequired && 'Write in this field, son of a bitch'

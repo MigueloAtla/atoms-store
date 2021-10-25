@@ -2,8 +2,6 @@ const fs = require('fs')
 
 const atom = 'generated'
 
-console.log(process.argv.atom)
-
 const capitalizeFirstLetter = string => {
   return string.charAt(0).toUpperCase() + string.slice(1)
 }

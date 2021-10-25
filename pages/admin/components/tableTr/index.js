@@ -19,7 +19,7 @@ export default function TableTr ({ onClick, row }) {
     >
       {row.cells.map((cell, i) => {
         return (
-          <td key={i} {...cell.getCellProps()}>
+          <td style={{ height: '110px' }} key={i} {...cell.getCellProps()}>
             {cell.render('Cell')}
           </td>
         )

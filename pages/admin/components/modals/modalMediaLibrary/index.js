@@ -37,6 +37,9 @@ const ModalImages = ({ setImgURL }) => {
       <Button
         variant='outline'
         m='5px'
+        // position='absolute'
+        // top='5px'
+        // right='15px'
         onClick={() => {
           onOpen()
         }}
