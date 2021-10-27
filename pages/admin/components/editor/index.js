@@ -384,7 +384,7 @@ const MenuBar = ({ editor }) => {
   )
 }
 
-const TipTap = ({ value, setEditorContent, onSubmit, setUpdate = null }) => {
+const TipTap = ({ value, editorContent, onSubmit }) => {
   const editor = useEditor({
     extensions: [StarterKit, Image, Typography],
     content: value
@@ -392,8 +392,7 @@ const TipTap = ({ value, setEditorContent, onSubmit, setUpdate = null }) => {
 
   useEffect(() => {
     if (editor) {
-      setEditorContent(s => editor.getHTML())
-      setUpdate && setUpdate(true)
+      editorContent.current = editor.getHTML()
     }
   }, [onSubmit])
 

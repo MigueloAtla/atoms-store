@@ -10,10 +10,9 @@ import UpdateButton from '@/admin/atoms/UpdateButton'
 import PageTransitionAnimation from '@/admin/atoms/pageTransitionAnimation'
 import LoaderScreen from '@/admin/atoms/loadScreen'
 import PreviewDrawer from '@/admin/atoms/previewDrawer'
-import Preview from '@/admin/components/preview'
 import EditDataTypeInputWrapper from '@/admin/layouts/editDataTypeInputWrapper'
 
-import { Textarea, Input, Box, useToast, Button } from '@chakra-ui/react'
+import { Input, Box, useToast } from '@chakra-ui/react'
 
 // Components
 import TipTap from '../components/editor'
@@ -35,15 +34,14 @@ import { useForm } from 'react-hook-form'
 
 const Edit = () => {
   const [content, setContent] = useState(null)
-  const [canUpdate, setCanUpdate] = useState(false)
-  const [update, setUpdate] = useState(false)
   const imgURL = useStore(state => state.imgURL)
   const setImgURL = useStore(state => state.setImgURL)
-  const [editorContent, setEditorContent] = useState(null)
+  const editorContent = useRef(null)
   const [onSubmit, setOnSubmit] = useState()
   const { id, type } = useParams()
   const contentCloned = useRef(null)
   const haveEditor = useRef(false)
+  const updateRef = useRef(false)
   const setLoading = useStore(state => state.setLoading)
   const selectedCollectionName = useStore(state => state.selectedCollectionName)
   const setSelectedCollectionName = useStore(
@@ -58,6 +56,16 @@ const Edit = () => {
     handleSubmit: handleSubmitHook,
     formState: { errors }
   } = useForm()
+
+  const updateContent = data => {
+    if (contentCloned.current === null) contentCloned.current = content
+    Object.keys(contentCloned.current).map(key => {
+      if (contentCloned.current[key].type === 'image') {
+        contentCloned.current[key].value = imgURL || ''
+      } else if (contentCloned.current[key].type === 'richtext') {
+      } else contentCloned.current[key].value = data[key]
+    })
+  }
 
   useEffect(() => {
     if (selectedCollectionName === '') {
@@ -81,45 +89,35 @@ const Edit = () => {
   }, [content])
 
   useEffect(() => {
-    if (contentCloned.current) {
-      contentCloned.current['content'].value = editorContent
+    if (haveEditor.current && contentCloned.current) {
+      contentCloned.current['content'].value = editorContent.current
     }
-  }, [editorContent])
-
-  useEffect(() => {
-    if (canUpdate === true && update === true) {
+    if (updateRef.current === true) {
       updateOneByType(id, type, contentCloned.current)
       toast({
         title: 'Content updated successfully',
         position: 'bottom-right',
         variant: 'subtle',
         description: 'Alright!',
-        // status: 'success',
         duration: 5000,
         isClosable: true
       })
-      setCanUpdate(false)
-    } else {
-      setContent(s => contentCloned.current)
+      updateRef.current = false
     }
-  }, [update])
+  }, [onSubmit])
 
   const handleSubmit = data => {
-    if (update) setUpdate(false)
-    if (contentCloned.current === null) contentCloned.current = content
-    Object.keys(contentCloned.current).map(key => {
-      if (contentCloned.current[key].type === 'image') {
-        contentCloned.current[key].value = imgURL || ''
-      } else if (contentCloned.current[key].type === 'richtext') {
-      } else contentCloned.current[key].value = data[key]
-    })
+    updateContent(data)
+    updateRef.current = true
+    setOnSubmit(!onSubmit)
+  }
 
-    setCanUpdate(true)
-
-    if (haveEditor.current === true) setOnSubmit(!onSubmit)
-    else {
-      setUpdate(true)
+  const onPreview = data => {
+    updateContent(data)
+    if (haveEditor.current === true) {
+      setOnSubmit(!onSubmit)
     }
+    setContent(contentCloned.current)
   }
 
   const renderDataInput = (obj, key) => {
@@ -159,8 +157,7 @@ const Edit = () => {
           <TipTap
             value={value}
             onSubmit={onSubmit}
-            setEditorContent={setEditorContent}
-            setUpdate={setUpdate}
+            editorContent={editorContent}
           />
         )
       }
@@ -187,21 +184,6 @@ const Edit = () => {
       ? content.name.value
       : 'Unknown document'
     : ''
-
-  const onPreview = data => {
-    if (contentCloned.current === null) contentCloned.current = content
-    Object.keys(contentCloned.current).map(key => {
-      if (contentCloned.current[key].type === 'image') {
-        contentCloned.current[key].value = imgURL || ''
-      } else if (contentCloned.current[key].type === 'richtext') {
-      } else contentCloned.current[key].value = data[key]
-    })
-
-    if (haveEditor.current === true) {
-      setOnSubmit(!onSubmit)
-      setOnSubmit(!onSubmit)
-    }
-  }
 
   return (
     <Box minH='calc(100% - 50px)'>
