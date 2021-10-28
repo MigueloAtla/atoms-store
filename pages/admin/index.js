@@ -41,4 +41,13 @@ const Styles = styled.div`
   h3 {
     font-size: 30px;
   }
+  img {
+    border: 2px solid transparent;
+  }
+  img.ProseMirror-selectednode {
+    border: 2px solid #333;
+    border-radius: 5px;
+    transition: border 0.2s ease-in-out, opacity 0.2s ease-in-out;
+    opacity: 0.8;
+  }
 `

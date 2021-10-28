@@ -47,6 +47,7 @@ const Edit = () => {
   const setSelectedCollectionName = useStore(
     state => state.setSelectedCollectionName
   )
+  const [schemaSorted, setSchemaSorted] = useState(null)
   const loading = useStore(state => state.loading)
 
   const toast = useToast()
@@ -185,6 +186,15 @@ const Edit = () => {
       : 'Unknown document'
     : ''
 
+  useEffect(() => {
+    if (content) {
+      let schemaSortedArr = Object.entries(content).sort(
+        (a, b) => a[1].order - b[1].order
+      )
+      setSchemaSorted(schemaSortedArr)
+    }
+  }, [content])
+
   return (
     <Box minH='calc(100% - 50px)'>
       <Header back={true} title={`Editing ${type.slice(0, -1)}: ${title}`}>
@@ -203,16 +213,19 @@ const Edit = () => {
             <>
               <Box m='80px'>
                 <form id='edit-form' onSubmit={handleSubmitHook(handleSubmit)}>
-                  {Object.keys(content).map((key, i) => {
-                    return (
-                      <EditDataTypeInputWrapper key={i}>
-                        <Label w='100%' key={i}>
-                          {capitalizeFirstLetter(key)}
-                        </Label>
-                        {renderDataInput(content[key], key)}
-                      </EditDataTypeInputWrapper>
-                    )
-                  })}
+                  {schemaSorted &&
+                    schemaSorted.map((el, i) => {
+                      let name = el[0]
+                      let key = el[1]
+                      return (
+                        <EditDataTypeInputWrapper key={i}>
+                          <Label w='100%' key={i}>
+                            {capitalizeFirstLetter(name)}
+                          </Label>
+                          {renderDataInput(key, name)}
+                        </EditDataTypeInputWrapper>
+                      )
+                    })}
                 </form>
               </Box>
             </>

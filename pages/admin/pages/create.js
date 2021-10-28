@@ -1,6 +1,6 @@
 // React / Next
 import React, { useEffect, useState, useRef } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useHistory } from 'react-router-dom'
 
 // Styles
 import { Label } from '../styles'
@@ -32,12 +32,15 @@ const Create = () => {
   const [schema, setSchema] = useState()
   const imgURL = useStore(state => state.imgURL)
   const setImgURL = useStore(state => state.setImgURL)
-  const [editorContent, setEditorContent] = useState()
+  // const [editorContent, setEditorContent] = useState()
+  const editorContent = useRef(null)
   const [onSubmit, setOnSubmit] = useState()
   const newContent = useRef(null)
   const haveEditor = useRef(false)
   const toast = useToast()
   const { type } = useParams()
+  const [schemaSorted, setSchemaSorted] = useState(null)
+  const history = useHistory()
 
   const {
     register,
@@ -46,7 +49,6 @@ const Create = () => {
   } = useForm()
 
   useEffect(() => {
-    // setImgURL('')
     type &&
       getSchemaByType(type).then(res => {
         setSchema(res[0])
@@ -55,7 +57,7 @@ const Create = () => {
 
   useEffect(() => {
     if (newContent.current) {
-      newContent.current['content'].value = editorContent
+      newContent.current['content'].value = editorContent.current
       addByCollectionType(type, newContent.current)
 
       toast({
@@ -63,12 +65,12 @@ const Create = () => {
         position: 'bottom-right',
         variant: 'subtle',
         description: 'Alright!',
-        // status: 'success',
         duration: 5000,
         isClosable: true
       })
+      history.goBack()
     }
-  }, [editorContent])
+  }, [editorContent.current])
 
   const handleSubmit = data => {
     newContent.current = {}
@@ -78,13 +80,15 @@ const Create = () => {
         newContent.current[s] = {
           type: schema[s].type,
           value: imgURL || '',
-          isRequired: schema[s].isRequired
+          isRequired: schema[s].isRequired,
+          order: schema[s].order
         }
       } else {
         newContent.current[s] = {
           type: schema[s].type,
           value: data[s] || '',
-          isRequired: schema[s].isRequired
+          isRequired: schema[s].isRequired,
+          order: schema[s].order
         }
       }
     })
@@ -101,6 +105,7 @@ const Create = () => {
         duration: 5000,
         isClosable: true
       })
+      history.goBack()
     }
   }
 
@@ -139,12 +144,21 @@ const Create = () => {
           <TipTap
             id='editor'
             onSubmit={onSubmit}
-            setEditorContent={setEditorContent}
+            editorContent={editorContent}
           />
         )
       }
     }
   }
+
+  useEffect(() => {
+    if (schema) {
+      let schemaSortedArr = Object.entries(schema).sort(function (a, b) {
+        return a[1].order - b[1].order
+      })
+      setSchemaSorted(schemaSortedArr)
+    }
+  }, [schema])
 
   return (
     <>
@@ -155,7 +169,22 @@ const Create = () => {
         {schema && (
           <Box m='20px'>
             <form id='create-doc' onSubmit={handleSubmitHook(handleSubmit)}>
-              {Object.keys(schema).map((key, i) => {
+              {schemaSorted &&
+                schemaSorted.map((el, i) => {
+                  let name = el[0]
+                  let type = el[1].type
+                  let isRequired = el[1].isRequired
+                  let order = el[1].order
+                  return (
+                    <EditDataTypeInputWrapper key={i}>
+                      <Label w='100%' key={i}>
+                        {capitalizeFirstLetter(name)}
+                      </Label>
+                      {renderSwitch({ name, type, isRequired, order })}
+                    </EditDataTypeInputWrapper>
+                  )
+                })}
+              {/* {Object.keys(schema).map((key, i) => {
                 let name = key
                 let type = schema[key].type
                 let isRequired = schema[key].isRequired
@@ -167,7 +196,7 @@ const Create = () => {
                     {renderSwitch({ name, type, isRequired })}
                   </EditDataTypeInputWrapper>
                 )
-              })}
+              })} */}
             </form>
           </Box>
         )}

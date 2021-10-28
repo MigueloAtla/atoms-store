@@ -11,6 +11,7 @@ const DeleteRowButton = ({
   }
 }) => {
   const selectedCollectionName = useStore(state => state.selectedCollectionName)
+  const setRerender = useStore(state => state.setRerender)
   return (
     <div
       style={{
@@ -20,6 +21,7 @@ const DeleteRowButton = ({
       onClick={e => {
         e.stopPropagation()
         deletePost(id, selectedCollectionName)
+        setRerender(s => !s)
       }}
     >
       <DeleteIcon />

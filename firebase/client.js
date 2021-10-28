@@ -58,15 +58,12 @@ export const onAuthStateChange = ({ setUser, setAdmin, setLoading }) => {
 }
 
 export const addByCollectionType = (type, content) => {
-  console.log(type)
-  console.log(`content`, content)
   return db.collection(type).add(
     content
     // createdAt: firebase.firestore.Timestamp.fromDate(new Date())
   )
 }
 export const addPost = ({ content }) => {
-  console.log('bleh', content)
   return db.collection('posts').add({
     content,
     createdAt: firebase.firestore.Timestamp.fromDate(new Date())
@@ -112,7 +109,6 @@ export const getImagesData = async () => {
 }
 
 export const deleteImage = name => {
-  console.log(name)
   var storageRef = firebase.storage().ref('images')
   var imageRef = storageRef.child(`${name}`)
   imageRef
@@ -243,9 +239,6 @@ export const createCollection = async collection => {
     .update(collection)
 
   db.collection(collection[Object.keys(collection)[0]].name)
-
-  // console.log(collection[Object.keys(collection)[0]].name)
-  // console.log('not creating a collection yet ')
 }
 
 // CLIENT

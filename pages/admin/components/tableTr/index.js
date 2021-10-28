@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import styled from 'styled-components'
 
 export default function TableTr ({ onClick, row }) {
   const [scale, setScale] = useState(1)
@@ -19,11 +20,20 @@ export default function TableTr ({ onClick, row }) {
     >
       {row.cells.map((cell, i) => {
         return (
-          <td style={{ height: '110px' }} key={i} {...cell.getCellProps()}>
+          <TdStyled key={i} {...cell.getCellProps()}>
             {cell.render('Cell')}
-          </td>
+          </TdStyled>
         )
       })}
     </tr>
   )
 }
+
+const TdStyled = styled.td`
+  max-width: 100px;
+  max-height: 100px;
+  height: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import Image from 'next/image'
 
 import { useParams } from 'react-router-dom'
@@ -26,6 +26,7 @@ import useStore from '@/admin/store/store'
 import { capitalizeFirstLetter } from '@/admin/utils/utils'
 
 const CollectionList = () => {
+  // const [collectionDataSorted, setCollectionDataSorted] = useState(null)
   const collectionData = useStore(state => state.collectionData)
   const selectedCollectionName = useStore(state => state.selectedCollectionName)
   const setSelectedCollectionName = useStore(
@@ -33,27 +34,41 @@ const CollectionList = () => {
   )
   const loading = useStore(state => state.loading)
   const setCollectionData = useStore(state => state.setCollectionData)
+  const rerender = useStore(state => state.rerender)
 
   const { type } = useParams()
 
   useEffect(() => {
-    // When reload the page collection is not defined, so it takes from the url
-    if (collectionData.length <= 0) {
-      getCollection(type).then(c => {
-        setCollectionData(c)
-      })
-    }
+    getCollection(type).then(c => {
+      setCollectionData(c)
+    })
     if (selectedCollectionName === '') {
       setSelectedCollectionName(type)
     }
-  }, [])
+  }, [rerender])
+
+  // useEffect(() => {
+  //   // When reload the page collection is not defined, so it takes from the url
+  //   if (collectionData.length <= 0) {
+  //     getCollection(type).then(c => {
+  //       setCollectionData(c)
+  //     })
+  //   }
+  //   if (selectedCollectionName === '') {
+  //     setSelectedCollectionName(type)
+  //   }
+  // }, [])
 
   // Prepare columns for the table
   let arr = []
 
   if (collectionData.length > 0) {
-    let fields = Object.keys(collectionData[0])
-    fields.map(f => {
+    // let fields = Object.keys(collectionData[0])
+    const cols_order = Object.entries(collectionData[0]).sort(
+      (a, b) => a[1].order - b[1].order
+    )
+    const fields_ordered = cols_order.map(m => m[0])
+    fields_ordered.map(f => {
       arr.push({
         Header: f,
         accessor: f
@@ -93,7 +108,21 @@ const CollectionList = () => {
     dataArr.push(dataObj)
   })
 
-  const data = React.useMemo(() => dataArr, [collectionData])
+  // useEffect(() => {
+  //   if (collectionData) {
+  //     let collectionDataSortedArr = Object.entries(collectionData).sort(
+  //       function (a, b) {
+  //         // console.log(a)
+  //         // console.log(b)
+  //         return a[1].order - b[1].order
+  //       }
+  //     )
+  //     console.log(collectionDataSortedArr)
+  //     setCollectionDataSorted(collectionDataSortedArr)
+  //   }
+  // }, [collectionData])
+
+  const data = React.useMemo(() => dataArr, [collectionData, rerender])
 
   return (
     <S.ContentStyled>

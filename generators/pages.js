@@ -106,6 +106,13 @@
                   console.log(
                     `Page component: ${collection}/[id].js successfully created.`
                   )
+                  // add page components to preview
+                  fs.appendFileSync(
+                    './pages/admin/previews.js',
+                    `export { default as ${capitalizeFirstLetter(
+                      collection
+                    ).slice(0, -1)} } from '../../pages/${collection}/[id]'\n`
+                  )
                 }
               )
             } else {

@@ -25,6 +25,7 @@ export default function NewCollection () {
     let t = {}
     let value = ''
     let key
+    let order = 0
     Array.from(e.currentTarget).map((field, i) => {
       if (!field.name) return
 
@@ -44,12 +45,15 @@ export default function NewCollection () {
       if (field.name === 'required') {
         t[value] = {
           ...t[value],
-          isRequired: field.value === 'true'
+          isRequired: field.value === 'true',
+          order
         }
         formData[key]['schema'] = t
         value = ''
+        order++
       }
     })
+    // activate this
     createCollection(formData)
   }
 
@@ -123,8 +127,6 @@ export default function NewCollection () {
                     </Flex>
                   )
                 })}
-              {/* <Button onClick={addField}>Add Field</Button>
-            <Button type='submit'>Create collection</Button> */}
             </Flex>
           </form>
         </Box>

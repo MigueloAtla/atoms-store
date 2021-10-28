@@ -7,35 +7,35 @@
                 import { LayoutStyled } from '@/layouts/postLayout'
                 import { Column, Row, AutoColumns } from '@/layouts/index'
                 
-                export default function Product ({ product }) {
-                    const {Title, Desc} = getComponents(product)
+                export default function Albu ({ Albu }) {
+                    const {Title, Cover} = getComponents(Albu)
                       
                       return (
                         <LayoutStyled width='100%'>
                           <GlobalStyles />
                           <Column center>
-                          <Title /> <Desc />
+                          <Title /> <Cover />
                           </Column>
                         </LayoutStyled>
                         )
                       }
                       
                       export async function getStaticProps ({ params: { id } }) {
-                        const product = await getDocByID('products', id)
+                        const Albu = await getDocByID('Album', id)
                           
                           return {
                             props: {
-                              product
+                              Albu
                             }
                           }
                         }
                         
                         export async function getStaticPaths () {
-                          const products = await getCollection('products')
+                          const Album = await getCollection('Album')
                           return {
                             paths:
-                            products &&
-                            products.map(el => ({
+                            Album &&
+                            Album.map(el => ({
                               params: { id: String(el.id) }
                             })),
                             fallback: false
