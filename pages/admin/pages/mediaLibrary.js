@@ -6,6 +6,7 @@ import PageTransitionAnimation from '../components/atoms/pageTransitionAnimation
 import LoadScreen from '@/admin/atoms/loadScreen'
 import ImageWithPlaceholder from '@/admin/components/imageWithPlaceholder'
 import Img from 'react-cool-img'
+import Masonry from 'react-masonry-css'
 
 import {
   Drawer,
@@ -20,6 +21,7 @@ import { useDisclosure } from '@chakra-ui/hooks'
 // State
 import useStore from '@/admin/store/store'
 import styled from 'styled-components'
+import Header from '../components/header'
 
 const MediaLibrary = () => {
   const setLoading = useStore(state => state.setLoading)
@@ -42,9 +44,17 @@ const MediaLibrary = () => {
     loadImages()
   }, [])
 
+  const breakpointColumnsObj = {
+    default: 5,
+    1400: 4,
+    1100: 3,
+    880: 2,
+    600: 1
+  }
+
   return (
-    <Box m='50px'>
-      <h2>Media Library</h2>
+    <Box>
+      <Header back={true} title='Media Library' />
       {loading ? (
         <LoadScreen />
       ) : (
@@ -52,35 +62,41 @@ const MediaLibrary = () => {
           <GridStyled
             justifyItems='center'
             templateColumns='repeat(auto-fit, minmax(200px, 1fr))'
+            templateRows='masonry'
           >
-            {images?.urls &&
-              images.urls.map((image, i) => {
-                return (
-                  <ImageWrapperStyled
-                    key={i}
-                    direction='column'
-                    p='10px'
-                    w='200px'
-                    onClick={() => {
-                      setImage({ url: image, metadata: images.metadata[i] })
-                      onOpen()
-                    }}
-                  >
-                    <Img
-                      style={{
-                        backgroundColor: '#efefef',
-                        width: '480',
-                        height: '320'
+            <MasonryStyled
+              breakpointCols={breakpointColumnsObj}
+              columnClassName='my-masonry-grid_column'
+            >
+              {images?.urls &&
+                images.urls.map((image, i) => {
+                  return (
+                    <ImageWrapperStyled
+                      key={i}
+                      direction='column'
+                      p='10px'
+                      w='200px'
+                      onClick={() => {
+                        setImage({ url: image, metadata: images.metadata[i] })
+                        onOpen()
                       }}
-                      width='200px'
-                      height='200px'
-                      src={image}
-                      alt={`media-library-${i}`}
-                    />
-                    <p>{images.metadata[i].name.replace(/\.[^/.]+$/, '')}</p>
-                  </ImageWrapperStyled>
-                )
-              })}
+                    >
+                      <Img
+                        style={{
+                          backgroundColor: '#efefef',
+                          width: '480',
+                          height: '320'
+                        }}
+                        width='200px'
+                        height='200px'
+                        src={image}
+                        alt={`media-library-${i}`}
+                      />
+                      <p>{images.metadata[i].name.replace(/\.[^/.]+$/, '')}</p>
+                    </ImageWrapperStyled>
+                  )
+                })}
+            </MasonryStyled>
           </GridStyled>
         </PageTransitionAnimation>
       )}
@@ -132,6 +148,10 @@ const ImageWrapperStyled = styled(Flex)`
   padding: 10px;
   width: 200px;
   cursor: pointer;
+  background-color: white;
+  margin: 20px;
+  border-radius: 10px;
+  padding: 20px;
   p {
     width: 200px;
     white-space: nowrap;
@@ -154,7 +174,12 @@ const OverlayStyled = styled(DrawerOverlay)`
   backdrop-filter: blur(2px);
 `
 const GridStyled = styled(Grid)`
-  background-color: white;
+  /* background-color: white; */
   border-radius: 10px;
   padding: 20px;
+`
+const MasonryStyled = styled(Masonry)`
+  display: flex;
+  margin-left: -30px; /* gutter size offset */
+  width: auto;
 `

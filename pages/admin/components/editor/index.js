@@ -8,7 +8,7 @@ import Image from '@tiptap/extension-image'
 import Typography from '@tiptap/extension-typography'
 
 // UI
-import { Box } from '@chakra-ui/react'
+import { Box, Button } from '@chakra-ui/react'
 import ModalMediaLibrary from '@/admin/components/modals/modalMediaLibrary'
 import ModalURL from '@/admin/components/modals/modalImageUrl'
 import ModalShortcuts from '@/admin/components/modals/modalShortcuts'
@@ -16,7 +16,13 @@ import ModalShortcuts from '@/admin/components/modals/modalShortcuts'
 // Styles
 import { Styles, MenuStyled, EditorButton } from './styles'
 
+// Store
+import useStore from '@/admin/store/store'
+
 const MenuBar = ({ editor }) => {
+  const setSmallImageEditor = useStore(state => state.setSmallImageEditor)
+  const smallImageEditor = useStore(state => state.smallImageEditor)
+
   if (!editor) {
     return null
   }
@@ -378,6 +384,13 @@ const MenuBar = ({ editor }) => {
         >
           {'->'}
         </EditorButton> */}
+        <Button
+          onClick={() => {
+            setSmallImageEditor(!smallImageEditor)
+          }}
+        >
+          small
+        </Button>
         <ModalShortcuts />
       </Box>
     </MenuStyled>

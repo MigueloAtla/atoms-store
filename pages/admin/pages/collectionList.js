@@ -11,6 +11,7 @@ import styled from 'styled-components'
 import * as S from '../styles'
 
 // Components
+import { Box } from '@chakra-ui/layout'
 import Header from '@/admin/components/header'
 import NewButton from '@/admin/atoms/newButton'
 import PageTransitionAnimation from '@/admin/atoms/pageTransitionAnimation'
@@ -92,15 +93,27 @@ const CollectionList = () => {
       else {
         if (m[k].type === 'image' && m[k].value) {
           dataObj[k] = (
-            <TableImage
-              style={{ backgroundColor: '#efefef', width: '90', height: '90' }}
-              quality='50'
-              src={m[k].value}
-              alt='main image'
-              width='90px'
-              height='90px'
-              layout='fixed'
-            />
+            <Box
+              border='1px solid #333'
+              borderRadius='50%'
+              w='80px'
+              h='80px'
+              overflow='hidden'
+            >
+              <TableImage
+                style={{
+                  backgroundColor: '#efefef',
+                  width: '90',
+                  height: '90'
+                }}
+                quality='50'
+                src={m[k].value}
+                alt='main image'
+                width='90px'
+                height='90px'
+                layout='fixed'
+              />
+            </Box>
           )
         } else dataObj[k] = m[k].value
       }
@@ -150,6 +163,11 @@ const CollectionList = () => {
 export default CollectionList
 
 const TableImage = styled(Img)`
-  border-radius: 50%;
+  /* border-radius: 50%;
+  height: 100%; */
+  overflow: hidden;
+  object-fit: cover;
   height: 100%;
+  width: 100%;
+  transform: scale(1.1);
 `

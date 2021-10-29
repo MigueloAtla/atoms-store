@@ -2,7 +2,7 @@ import { Box } from '@chakra-ui/layout'
 import styled from 'styled-components'
 import { DRAG_IMAGE_STATES } from './dragImageState'
 
-export const TextAreaImageStyled = styled.textarea`
+export const TextAreaImageStyled = styled.div`
   width: 100%;
   height: 380px;
   border: ${props =>

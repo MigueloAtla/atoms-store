@@ -5,10 +5,12 @@ import AdminLayout from './AdminLayout'
 import { ChakraProvider, Flex, Spinner } from '@chakra-ui/react'
 
 import styled from 'styled-components'
+import useStore from '@/admin/store/store'
 
 export default function Admin () {
   const [user, admin, loading] = useUser()
   const router = useRouter()
+  const smallImageEditor = useStore(state => state.smallImageEditor)
 
   useEffect(() => {
     if (!loading && !admin) {
@@ -18,7 +20,7 @@ export default function Admin () {
 
   return (
     <ChakraProvider>
-      <Styles>
+      <Styles smallImageEditor={smallImageEditor}>
         {loading ? (
           <Flex w='100vw' h='100vh' justify='center' align='center'>
             <Spinner size='xl' />
@@ -49,5 +51,8 @@ const Styles = styled.div`
     border-radius: 5px;
     transition: border 0.2s ease-in-out, opacity 0.2s ease-in-out;
     opacity: 0.8;
+  }
+  .ProseMirror img {
+    height: ${({ smallImageEditor }) => smallImageEditor && '180px'};
   }
 `

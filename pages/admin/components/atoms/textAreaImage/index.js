@@ -88,6 +88,10 @@ const TextAreaImage = ({ name, isRequired }) => {
           onDragEnter={handleDragEnter}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
+          onDragEnd={e => e.preventDefault()}
+          onDragOver={e => e.preventDefault()}
+          onDrag={e => e.preventDefault()}
+          onDragStart={e => e.preventDefault()}
           {...register(name, {
             required: isRequired && 'Write in this field, son of a bitch'
           })}

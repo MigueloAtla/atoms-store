@@ -9,7 +9,8 @@ import * as S from './styles'
 import { AddIcon } from '@chakra-ui/icons'
 import { Flex } from '@chakra-ui/react'
 import { IconLink } from '@/admin/atoms/menuLink/styles'
-
+import { Icon } from '@chakra-ui/react'
+import { FaImages } from 'react-icons/fa'
 // Firebase functions
 import { getCollection } from '@/firebase/client'
 
@@ -42,10 +43,22 @@ const CollectionsList = () => {
             </Link>
           )
         })}
-      <IconLink to={`/admin/new-collection`}>
+      <IconLink
+        to={`/admin/new-collection`}
+        onClick={() => {
+          setSelectedCollectionName('')
+        }}
+      >
         <AddIcon />
       </IconLink>
-      <Link to='/admin/media-library'>Media Library</Link>
+      <IconLink
+        to='/admin/media-library'
+        onClick={() => {
+          setSelectedCollectionName('')
+        }}
+      >
+        <Icon as={FaImages} color='white' />
+      </IconLink>
     </Flex>
   )
 }
