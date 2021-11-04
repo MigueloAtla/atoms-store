@@ -10,142 +10,137 @@ import {
   Button,
   Input,
   Spacer,
-  Box
+  Box,
+  Text
 } from '@chakra-ui/react'
 import Header from '@/admin/components/header'
 
 import PageTransitionAnimation from '@/admin/atoms/pageTransitionAnimation'
 
-import { useForm } from 'react-hook-form'
+import { useForm, useFieldArray, Controller, useWatch } from 'react-hook-form'
 
 export default function NewCollection () {
   const [fields, setFields] = useState([])
 
   const {
     register,
+    control,
     handleSubmit: handleSubmitHook,
+    reset,
     formState: { errors }
-  } = useForm()
+  } = useForm({
+    defaultValues: {
+      fieldArr: [{ name: '', type: '', order: '', isRequired: false }]
+    }
+  })
 
-  const handleSubmit = e => {
-    // e.preventDefault()
+  const { fields: fieldsControls, append, remove, move } = useFieldArray({
+    control,
+    name: 'fieldArr'
+  })
 
-    // console.log(data)
-    // console.log(data)
-
-    const formData = {}
-    let t = {}
-    let value = ''
+  const onSubmit = data => {
+    let formData = {}
     let key
-    let order = 0
-    Array.from(e.currentTarget).map((field, i) => {
-      // Array.from(data).map((field, i) => {
-      if (!field.name) return
-
-      if (field.name === 'collection-name') {
-        key = field.value
-        formData[key] = { name: field.value }
+    let new_entry = {}
+    Object.entries(data).map((field, i) => {
+      if (field[0] === 'collection-name') {
+        key = field[1]
+        formData[key] = { ...formData[key], name: key }
       }
-
-      if (field.name === 'collection-field-name') {
-        value = field.value
-      }
-      if (field.name === 'type') {
-        t[value] = {
-          type: field.value
-        }
-      }
-      if (field.name === 'required') {
-        t[value] = {
-          ...t[value],
-          isRequired: field.value === 'true',
-          order
-        }
-        formData[key]['schema'] = t
-        value = ''
-        order++
+      if (field[0] === 'fieldArr') {
+        data['fieldArr'].map((f, i) => {
+          const { name, order, ...entries } = f
+          new_entry[name] = {
+            ...entries,
+            order: i
+          }
+        })
+        let key = data['collection-name']
+        formData[key] = { ...formData[key], schema: new_entry }
       }
     })
-    // activate this
     createCollection(formData)
-  }
-
-  const newField = {
-    name: <Input name='collection-field-name' placeholder='name' />,
-    type: (
-      <Select name='type' placeholder='Select type'>
-        <option value='text'>text</option>
-        <option value='longtext'>long text</option>
-        <option value='richtext'>rich text</option>
-        <option value='image'>image</option>
-      </Select>
-    ),
-    required: (
-      <Select name='required' placeholder='Is required?'>
-        <option value={true}>true</option>
-        <option value={false}>false</option>
-      </Select>
-    )
-  }
-
-  const addField = () => {
-    setFields(s => [...s, newField])
   }
 
   return (
     <Box minH='calc(100% - 50px)'>
       <Header back={true} title='Create a new collection type'>
-        <Button onClick={addField}>Add Field</Button>
-        <Button form='new-collection' type='submit'>
+        <Button
+          type='button'
+          onClick={() => {
+            append({ name: '', type: '', order: '', isRequired: false })
+          }}
+        >
+          Add field
+        </Button>
+        <Button form='create-collection' type='submit'>
           Create collection
         </Button>
       </Header>
       <PageTransitionAnimation>
         <Box m='20px'>
-          <form onSubmit={handleSubmit} id='new-collection'>
-            <Flex direction='column'>
-              <Box
-                bg='white'
-                borderRadius='10px'
-                p='20px'
-                mt='30px'
-                position='relative'
-              >
-                <FormLabel>Collection Name</FormLabel>
-                <Flex>
-                  <Input
-                    name='collection-name'
-                    placeholder='New collection name...'
-                    {...register('collection-name', {
-                      required: 'Write in this field, son of a bitch'
-                    })}
-                  />
-                  {errors['collection-name'] &&
-                    errors['collection-name'].message}
-                </Flex>
-              </Box>
-              {fields.length > 0 &&
-                fields.map((field, i) => {
-                  return (
-                    <Flex
-                      direction='column'
-                      bg='white'
-                      borderRadius='10px'
-                      p='20px'
-                      mt='30px'
-                      position='relative'
-                      key={i}
-                      height='200'
-                    >
-                      {field.name}
-                      <Spacer />
-                      {field.type}
-                      <Spacer />
-                      {field.required}
+          <form id='create-collection' onSubmit={handleSubmitHook(onSubmit)}>
+            <Input
+              name='collection-name'
+              placeholder='New collection name...'
+              {...register('collection-name', {
+                required: 'Write in this field, son of a bitch'
+              })}
+            />
+            {errors['collection-name'] && errors['collection-name'].message}
+            {fieldsControls.map((item, index) => {
+              return (
+                <Flex borderRadius='10px' mt='30px' key={item.id}>
+                  <Flex bg='white' p='30' borderRadius='10px'>
+                    <Flex minW='150' direction='column'>
+                      <FormLabel>Name</FormLabel>
+                      <Input
+                        placeholder='Name of the field'
+                        {...register(`fieldArr.${index}.name`, {
+                          required: 'write sometheng'
+                        })}
+                      />
+                      {errors.fieldArr?.[index]?.name &&
+                        errors.fieldArr?.[index]?.name.message}
                     </Flex>
-                  )
-                })}
-            </Flex>
+                    <FormLabel>Type</FormLabel>
+
+                    <Flex minW='150' direction='column'>
+                      <Select
+                        name='type'
+                        placeholder='Select type'
+                        {...register(`fieldArr.${index}.type`, {
+                          required: 'select a type'
+                        })}
+                      >
+                        <option value='text'>text</option>
+                        <option value='longtext'>long text</option>
+                        <option value='richtext'>rich text</option>
+                        <option value='image'>image</option>
+                      </Select>
+                      {errors.fieldArr?.[index]?.type && (
+                        <Text>{errors.fieldArr?.[index]?.type.message}</Text>
+                      )}
+                    </Flex>
+
+                    <FormLabel>Is required?</FormLabel>
+                    <Select
+                      w='90px'
+                      name='isRequired'
+                      placeholder='Is required?'
+                      {...register(`fieldArr.${index}.isRequired`)}
+                    >
+                      <option value={true}>true</option>
+                      <option value={false}>false</option>
+                    </Select>
+                  </Flex>
+                  <Button type='button' onClick={() => remove(index)}>
+                    Delete
+                  </Button>
+                </Flex>
+              )
+            })}
           </form>
         </Box>
       </PageTransitionAnimation>
