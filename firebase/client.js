@@ -4,6 +4,7 @@ import 'firebase/auth'
 import 'firebase/firestore'
 import 'firebase/storage'
 import 'firebase/functions'
+import _ from 'lodash'
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_ANALYTICS_ID_API_KEY,
@@ -177,6 +178,41 @@ export const getSchemaByType = type => {
       })
     })
 }
+export const getFullSchemaByType = type => {
+  return db
+    .collection('collectionList')
+    .get()
+    .then(snapshot => {
+      return snapshot.docs.map(doc => {
+        let data = doc.data()
+        return data[type]
+      })
+    })
+}
+
+// export const getCollectionSchema = collection => {
+//   console.log(collection)
+//   return db
+//     .collection('collectionList')
+//     .doc()
+//     .get()
+//     .then(snapshot => {
+//       let data = doc.data()
+//       console.log(snapshot.data())
+//       return snapshot.data()
+//     })
+//   // .then(snapshot => {
+//   //   return snapshot.docs.map(doc => {
+//   //     const data = doc.data()
+//   //     const id = doc.id
+//   //     console.log(data)
+//   //     return {
+//   //       id,
+//   //       ...data
+//   //     }
+//   //   })
+//   // })
+// }
 
 export const fetchOneByType = (id, type) => {
   return db
@@ -207,16 +243,9 @@ export const makeAdmin = adminEmail => {
 }
 
 export const updateOneByType = (id, type, formData) => {
-  // const { content } = formData
   db.collection(type)
     .doc(id)
     .update(formData)
-}
-export const updatePost = (id, formData) => {
-  const { content } = formData
-  db.collection('posts')
-    .doc(id)
-    .update({ content })
 }
 
 // export const signIn = () => {
@@ -231,6 +260,101 @@ export const updatePost = (id, formData) => {
 //       const errorMessage = error.message
 //     })
 // }
+
+// Updates the schema, not the docs
+export const updateSchema = async data => {
+  await db
+    .collection('collectionList')
+    .doc('OjUAtyfsIW6ECoryEovP')
+    .update(data)
+}
+// Update docs
+export const updateDocs = async (new_data, old_data, type) => {
+  // update Schema
+  console.log(new_data)
+  await db
+    .collection('collectionList')
+    .doc('OjUAtyfsIW6ECoryEovP')
+    .update({ [type]: new_data[type] })
+
+  // batched update of the Docs
+  const users = await db.collection(type).get()
+
+  const batches = _.chunk(users.docs, 500).map(userDocs => {
+    const batch = db.batch()
+    userDocs.forEach(doc => {
+      console.log(doc.data())
+      Object.keys(old_data[0].schema).map(f => {
+        console.log(f)
+        if (
+          old_data[0].schema[f].isRequired !==
+          new_data[type].schema[f].isRequired
+        ) {
+          console.log('if passed')
+          batch.set(
+            doc.ref,
+            {
+              [f]: {
+                ...old_data[0].schema[f],
+                isRequired: new_data[type].schema[f].isRequired
+              }
+            },
+            { merge: true }
+          )
+        }
+      })
+    })
+    return batch.commit()
+  })
+
+  await Promise.all(batches)
+}
+
+export const deleteFields = async (name, type) => {
+  console.log(`deleting field ${name} on ${type} docs...`)
+
+  const deleted = await db
+    .collection('collectionList')
+    .doc('OjUAtyfsIW6ECoryEovP')
+    .get()
+
+  const deleted_data = deleted.data()[type].schema
+
+  console.log(deleted_data)
+
+  delete deleted_data[name]
+
+  const new_data = {
+    name: type,
+    schema: deleted_data
+  }
+
+  // update test ** need to update test.schema
+  await db
+    .collection('collectionList')
+    .doc('OjUAtyfsIW6ECoryEovP')
+    .update({
+      [type]: new_data
+    })
+
+  const users = await db.collection(type).get()
+
+  const batches = _.chunk(users.docs, 500).map(userDocs => {
+    const batch = db.batch()
+    userDocs.forEach(doc => {
+      batch.set(
+        doc.ref,
+        {
+          [name]: firebase.firestore.FieldValue.delete()
+        },
+        { merge: true }
+      )
+    })
+    return batch.commit()
+  })
+
+  await Promise.all(batches)
+}
 
 export const createCollection = async collection => {
   await db

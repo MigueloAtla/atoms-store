@@ -3,7 +3,11 @@ import React, { useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 
 // Firebase
-import { fetchOneByType, updateOneByType } from '@/firebase/client'
+import {
+  getSchemaByType,
+  fetchOneByType,
+  updateOneByType
+} from '@/firebase/client'
 
 // Components
 import UpdateButton from '@/admin/atoms/UpdateButton'
@@ -33,6 +37,7 @@ import useStore from '../store/store'
 import { useForm } from 'react-hook-form'
 
 const Edit = () => {
+  const [schema, setSchema] = useState()
   const [content, setContent] = useState(null)
   const imgURL = useStore(state => state.imgURL)
   const setImgURL = useStore(state => state.setImgURL)
@@ -73,6 +78,9 @@ const Edit = () => {
       setSelectedCollectionName(type)
     }
     setLoading(true)
+    getSchemaByType(type).then(res => {
+      setSchema(res[0])
+    })
     fetchOneByType(id, type).then(res => {
       setContent(res)
       setLoading(false)
@@ -188,7 +196,15 @@ const Edit = () => {
 
   useEffect(() => {
     if (content) {
-      let schemaSortedArr = Object.entries(content).sort(
+      let contentWithUnusedFields = content
+
+      for (var [key, value] of Object.entries(schema)) {
+        if (!content[key]) {
+          contentWithUnusedFields[key] = schema[key]
+        }
+      }
+
+      let schemaSortedArr = Object.entries(contentWithUnusedFields).sort(
         (a, b) => a[1].order - b[1].order
       )
       setSchemaSorted(schemaSortedArr)

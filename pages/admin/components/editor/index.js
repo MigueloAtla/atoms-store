@@ -348,13 +348,6 @@ const MenuBar = ({ editor }) => {
         <ModalURL setImgURL={addImage} />
       </Box>
 
-      {/* <Box>
-        <span>Images</span>
-        <br />
-        <ModalMediaLibrary setImgURL={addImage} />
-        <ModalURL setImgURL={addImage} />
-      </Box> */}
-
       <Box>
         {/* <span>Actions</span>
         <br />

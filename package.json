@@ -25,6 +25,7 @@
     "dotenv": "^10.0.0",
     "firebase": "^8.6.8",
     "framer-motion": "^4",
+    "lodash": "^4.17.21",
     "match-sorter": "^6.3.0",
     "next": "11.0.0",
     "prop-types": "^15.7.2",

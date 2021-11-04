@@ -44,7 +44,7 @@ const CollectionsList = () => {
           )
         })}
       <IconLink
-        to={`/admin/new-collection`}
+        to={`/admin/collections`}
         onClick={() => {
           setSelectedCollectionName('')
         }}

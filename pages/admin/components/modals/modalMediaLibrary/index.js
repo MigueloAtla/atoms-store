@@ -18,6 +18,8 @@ import {
 
 import { getImages } from '@/firebase/client'
 
+import Masonry from 'react-masonry-css'
+
 const ModalImages = ({ setImgURL }) => {
   const [images, setImages] = useState(null)
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -31,6 +33,14 @@ const ModalImages = ({ setImgURL }) => {
       loadImages()
     }
   }, [isOpen])
+
+  const breakpointColumnsObj = {
+    default: 5,
+    1270: 4,
+    1100: 3,
+    900: 2,
+    600: 1
+  }
 
   return (
     <>
@@ -52,7 +62,14 @@ const ModalImages = ({ setImgURL }) => {
           <ModalHeader>Images in Media Library</ModalHeader>
           <ModalCloseButton />
           <ModalBody my='50' mx='10' bg='#efefef5e' p='40px' borderRadius='5px'>
-            <Flex wrap='wrap'>
+            {/* <Flex wrap='wrap'> */}
+            <Masonry
+              style={{
+                display: 'flex'
+              }}
+              breakpointCols={breakpointColumnsObj}
+              // columnClassName='my-masonry-grid_column'
+            >
               {images &&
                 images.map((image, i) => {
                   return (
@@ -63,22 +80,28 @@ const ModalImages = ({ setImgURL }) => {
                       }}
                       key={i}
                       w='100px'
-                      h='100px'
+                      h='auto'
                       position='relative'
                     >
-                      <Image
-                        quality='1'
+                      <img
+                        style={{
+                          objectFit: 'cover',
+                          width: '100%',
+                          height: 'auto'
+                        }}
+                        // quality='1'
                         src={image}
-                        layout='fill'
-                        objectFit='cover'
+                        // layout='fill'
+                        // objectFit='cover'
                         loading='eager'
-                        priority
+                        // priority
                         alt={`image ${i} from media library`}
                       />
                     </ImageWrapper>
                   )
                 })}
-            </Flex>
+            </Masonry>
+            {/* </Flex> */}
           </ModalBody>
         </ModalContentStyled>
       </Modal>
@@ -90,8 +113,7 @@ export default ModalImages
 
 const ImageWrapper = styled(Box)`
   border: 2px solid transparent;
-  margin: 10px;
-  padding: 5px;
+  width: 100%;
   cursor: pointer;
   transition: border 0.2s linear, opacity 0.3s linear;
   :hover {

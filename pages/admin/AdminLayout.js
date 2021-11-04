@@ -17,6 +17,8 @@ import Edit from './pages/edit'
 import Create from './pages/create'
 import Home from './pages/home'
 import NewCollection from './pages/newCollection'
+import Collections from './pages/collections'
+import CollectionSchema from './pages/collectionSchema'
 import UserPage from './pages/user'
 import User from '@/admin/components/userLink'
 import CollectionList from './pages/collectionList'
@@ -147,22 +149,6 @@ export default function AdminLayout () {
               <S.ContentDataLayout>
                 <AdminRoutes />
               </S.ContentDataLayout>
-              {/* <S.DataLayout
-                areas={areas.content}
-                templateCols='1fr'
-                templateRows='100px 1fr'
-              >
-                {Areas => (
-                  <>
-                    <Areas.ContentHeader>
-                      <ContentHeader />
-                    </Areas.ContentHeader>
-                    <Areas.ContentData as={S.ContentDataLayout}>
-                    <AdminRoutes />
-                    </Areas.ContentData>
-                  </>
-                )}
-              </S.DataLayout> */}
             </Areas.Content>
           </>
         )}
@@ -208,6 +194,12 @@ const AdminRoutes = () => (
     </Route>
     <Route path='/admin/new-collection'>
       <NewCollection />
+    </Route>
+    <Route path='/admin/collections'>
+      <Collections />
+    </Route>
+    <Route path='/admin/collection/:type'>
+      <CollectionSchema />
     </Route>
     <Route path='/admin/:type/create'>
       <Create />

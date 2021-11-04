@@ -16,17 +16,30 @@ import Header from '@/admin/components/header'
 
 import PageTransitionAnimation from '@/admin/atoms/pageTransitionAnimation'
 
+import { useForm } from 'react-hook-form'
+
 export default function NewCollection () {
   const [fields, setFields] = useState([])
 
+  const {
+    register,
+    handleSubmit: handleSubmitHook,
+    formState: { errors }
+  } = useForm()
+
   const handleSubmit = e => {
-    e.preventDefault()
+    // e.preventDefault()
+
+    // console.log(data)
+    // console.log(data)
+
     const formData = {}
     let t = {}
     let value = ''
     let key
     let order = 0
     Array.from(e.currentTarget).map((field, i) => {
+      // Array.from(data).map((field, i) => {
       if (!field.name) return
 
       if (field.name === 'collection-name') {
@@ -103,7 +116,12 @@ export default function NewCollection () {
                   <Input
                     name='collection-name'
                     placeholder='New collection name...'
+                    {...register('collection-name', {
+                      required: 'Write in this field, son of a bitch'
+                    })}
                   />
+                  {errors['collection-name'] &&
+                    errors['collection-name'].message}
                 </Flex>
               </Box>
               {fields.length > 0 &&

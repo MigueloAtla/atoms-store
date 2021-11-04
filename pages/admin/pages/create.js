@@ -153,6 +153,7 @@ const Create = () => {
 
   useEffect(() => {
     if (schema) {
+      console.log(schema)
       let schemaSortedArr = Object.entries(schema).sort(function (a, b) {
         return a[1].order - b[1].order
       })
