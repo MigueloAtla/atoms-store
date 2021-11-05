@@ -6,7 +6,8 @@ import {
   Input,
   Spacer,
   Box,
-  FormLabel
+  FormLabel,
+  Text
 } from '@chakra-ui/react'
 
 import Header from '@/admin/components/header'
@@ -63,7 +64,7 @@ const EditCollectionForm = ({ schema, type }) => {
       formData[key] = { ...formData[key], schema: new_entry }
     })
     console.log(schema)
-    // updateDocs(formData, schema, type)
+    updateDocs(formData, schema, type)
   }
 
   return (
@@ -105,20 +106,24 @@ const EditCollectionForm = ({ schema, type }) => {
                       required: 'write sometheng'
                     })}
                   />
-
+                  {errors.fieldArr?.[index]?.name && (
+                    <Text>{errors.fieldArr?.[index]?.name.message}</Text>
+                  )}
                   <Flex minW='150' direction='column'>
-                    <Select
-                      name='type'
-                      placeholder='Select type'
-                      {...register(`fieldArr.${index}.type`, {
-                        required: 'write sometheng'
-                      })}
-                    >
-                      <option value='text'>text</option>
-                      <option value='longtext'>long text</option>
-                      <option value='richtext'>rich text</option>
-                      <option value='image'>image</option>
-                    </Select>
+                    {fieldArr[index] ? (
+                      <Text>{fieldArr[index]['type']}</Text>
+                    ) : (
+                      <Select
+                        name='type'
+                        placeholder='Select type'
+                        {...register(`fieldArr.${index}.type`)}
+                      >
+                        <option value='text'>text</option>
+                        <option value='longtext'>long text</option>
+                        <option value='richtext'>rich text</option>
+                        <option value='image'>image</option>
+                      </Select>
+                    )}
                   </Flex>
 
                   <FormLabel>Is required?</FormLabel>
@@ -128,18 +133,23 @@ const EditCollectionForm = ({ schema, type }) => {
                       name='isRequired'
                       placeholder='Select type'
                       {...register(`fieldArr.${index}.isRequired`, {
-                        required: 'write sometheng'
+                        required: 'select an option'
                       })}
                     >
                       <option value={true}>true</option>
                       <option value={false}>false</option>
                     </Select>
+                    {errors.fieldArr?.[index]?.isRequired && (
+                      <Text>
+                        {errors.fieldArr?.[index]?.isRequired.message}
+                      </Text>
+                    )}
                   </Flex>
                 </>
                 {fieldArr[index] ? (
                   <Button
                     onClick={() => {
-                      deleteFields(s[0], type)
+                      deleteFields(fieldArr[index].name, type)
                     }}
                   >
                     Delete field from DB
