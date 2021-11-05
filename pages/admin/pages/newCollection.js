@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useHistory } from 'react-router-dom'
 
 import { createCollection } from '@/firebase/client'
 
@@ -11,17 +12,23 @@ import {
   Input,
   Spacer,
   Box,
-  Text
+  Text,
+  useToast
 } from '@chakra-ui/react'
 import Header from '@/admin/components/header'
 
 import PageTransitionAnimation from '@/admin/atoms/pageTransitionAnimation'
 
+// State
+import useStore from '@/admin/store/store'
+
 import { useForm, useFieldArray } from 'react-hook-form'
 
 export default function NewCollection () {
-  const [fields, setFields] = useState([])
+  const setRerender = useStore(state => state.setRerender)
 
+  const history = useHistory()
+  const toast = useToast()
   const {
     register,
     control,
@@ -60,7 +67,30 @@ export default function NewCollection () {
         formData[key] = { ...formData[key], schema: new_entry }
       }
     })
-    createCollection(formData)
+    try {
+      createCollection(formData)
+      toast({
+        title: 'Collection created successfully',
+        position: 'bottom-right',
+        type: 'success',
+        variant: 'subtle',
+        description: 'Alright!',
+        duration: 5000,
+        isClosable: true
+      })
+      setRerender(s => !s)
+      history.goBack()
+    } catch (err) {
+      toast({
+        title: 'Something went wrong, please retry',
+        position: 'bottom-right',
+        type: 'error',
+        variant: 'subtle',
+        description: 'Alright!',
+        duration: 5000,
+        isClosable: true
+      })
+    }
   }
 
   return (

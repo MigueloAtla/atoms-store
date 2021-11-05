@@ -1,14 +1,5 @@
-import React, { useEffect, useState } from 'react'
-import {
-  Select,
-  Flex,
-  Button,
-  Input,
-  Spacer,
-  Box,
-  FormLabel,
-  Text
-} from '@chakra-ui/react'
+import React from 'react'
+import { Select, Flex, Button, Input, FormLabel, Text } from '@chakra-ui/react'
 
 import Header from '@/admin/components/header'
 import { capitalizeFirstLetter } from '@/admin/utils/utils'

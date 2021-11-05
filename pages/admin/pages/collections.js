@@ -4,22 +4,31 @@ import { Link } from 'react-router-dom'
 
 import PageTransitionAnimation from '@/admin/atoms/pageTransitionAnimation'
 import LoaderScreen from '@/admin/atoms/loadScreen'
-import { Flex, Box, Text, Button } from '@chakra-ui/react'
+import { Flex, Text, Button } from '@chakra-ui/react'
 import Header from '../components/header'
+
+import { getCollections } from '@/firebase/client'
 
 // Utils
 import { capitalizeFirstLetter } from '../utils/utils'
 
 // State
 import useStore from '@/admin/store/store'
+import { useEffect } from 'react'
 
 const CollectionsList = () => {
   const collections = useStore(state => state.collections)
-  const setCollectionData = useStore(state => state.setCollectionData)
-  const setSelectedCollectionName = useStore(
-    state => state.setSelectedCollectionName
-  )
-  const selectedCollectionName = useStore(state => state.selectedCollectionName)
+  const setCollections = useStore(state => state.setCollections)
+  const rerender = useStore(state => state.rerender)
+
+  useEffect(() => {
+    if (collections.length > 0) {
+      getCollections().then(c => {
+        setCollections(c[0])
+      })
+    }
+  }, [rerender])
+
   return (
     <Flex direction='column' height='100%'>
       <Header title='Collections types'>
