@@ -17,7 +17,7 @@ import Header from '@/admin/components/header'
 
 import PageTransitionAnimation from '@/admin/atoms/pageTransitionAnimation'
 
-import { useForm, useFieldArray, Controller, useWatch } from 'react-hook-form'
+import { useForm, useFieldArray } from 'react-hook-form'
 
 export default function NewCollection () {
   const [fields, setFields] = useState([])
