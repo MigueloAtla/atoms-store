@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
 // Hooks
-import { useForm } from 'react-hook-form'
+import { useForm, useFormContext } from 'react-hook-form'
 
 // Firebase
 import { uploadImage } from '@/firebase/client'
@@ -16,7 +16,7 @@ import { Box, Flex, Text } from '@chakra-ui/layout'
 import { Spinner } from '@chakra-ui/spinner'
 
 // Components
-import ImageWithPlaceholder from '@/admin/components/imageWithPlaceholder'
+// import ImageWithPlaceholder from '@/admin/components/imageWithPlaceholder'
 
 import ModalMediaLibrary from '@/admin/components/modals/modalMediaLibrary'
 
@@ -29,10 +29,8 @@ const TextAreaImage = ({ name, isRequired }) => {
   const setImgURL = useStore(state => state.setImgURL)
   const [upload, setUpload] = useState(false)
   const [progress, setProgress] = useState(0)
-  const {
-    register,
-    formState: { errors }
-  } = useForm()
+
+  const { register, errors, setValue } = useFormContext()
 
   useEffect(() => {
     if (upload) setUpload(false)
@@ -57,6 +55,10 @@ const TextAreaImage = ({ name, isRequired }) => {
       task.on('state_changed', onProgress, onError, onComplete)
     }
   }, [task])
+
+  useEffect(() => {
+    setValue(name, imgURL)
+  }, [imgURL])
 
   const handleDragEnter = e => {
     e.preventDefault()
@@ -84,7 +86,8 @@ const TextAreaImage = ({ name, isRequired }) => {
           data-testid='dropimage'
           drag={drag}
           rows='2'
-          name={name}
+          // name={name}
+          value={imgURL}
           onDragEnter={handleDragEnter}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
@@ -92,19 +95,28 @@ const TextAreaImage = ({ name, isRequired }) => {
           onDragOver={e => e.preventDefault()}
           onDrag={e => e.preventDefault()}
           onDragStart={e => e.preventDefault()}
+          // {...register(name, {
+          //   required: isRequired && 'Write in this field, son of a bitch'
+          // })}
+        />
+
+        <input
+          type='hidden'
+          name={name}
+          value={imgURL}
           {...register(name, {
-            required: isRequired && 'Write in this field, son of a bitch'
+            required: isRequired && 'Select an image, son of a bitch'
           })}
         />
         {isRequired && errors[name] && errors[name].message}
         {imgURL && drag !== DRAG_IMAGE_STATES.DRAG_OVER && (
           <Box
-            w='500px'
             h='300px'
             mt='40px'
             ml='40px'
             position='absolute'
             top='80px'
+            display='flex'
           >
             <UploadedImage
               draggable={false}
@@ -116,6 +128,11 @@ const TextAreaImage = ({ name, isRequired }) => {
               alt={`image from media library`}
               loading='eager'
               priority
+            />
+            <RemoveImageButton
+              onClick={() => {
+                setImgURL('')
+              }}
             />
             {upload && (
               <Flex justify='center' align='center' w='100%' h='100%'>
@@ -136,6 +153,21 @@ const UploadedImage = styled.img`
   height: 290px;
   opacity: ${props => (props.drag === DRAG_IMAGE_STATES.DRAG_OVER ? 0.5 : 1)};
   transition: opacity 0.2s linear;
-  /* position: absolute;
-  top: 68px; */
+`
+const RemoveImageButton = styled.div`
+  cursor: pointer;
+  width: 20px;
+  height: 20px;
+  background-color: grey;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  margin-left: -12px;
+  margin-top: -7px;
+  ::after {
+    content: 'x';
+    height: 27px;
+  }
 `

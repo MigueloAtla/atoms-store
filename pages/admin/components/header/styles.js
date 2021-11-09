@@ -12,4 +12,5 @@ export const HeaderStyled = styled.header`
   top: 0;
   z-index: 10;
   backdrop-filter: blur(20px);
+  display: ${({ expanded }) => (expanded ? 'none' : 'grid')};
 `

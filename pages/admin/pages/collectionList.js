@@ -82,6 +82,8 @@ const CollectionList = () => {
     Cell: DeleteRowButton
   })
 
+  console.log(arr)
+
   const columns = React.useMemo(() => arr, [arr])
 
   // Prepare data for the table

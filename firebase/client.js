@@ -89,6 +89,46 @@ export const uploadImage = file => {
   return task
 }
 
+export const uploadImages = ({
+  imageFile,
+  setProgress,
+  setUpload,
+  setCurrent,
+  i
+}) => {
+  return new Promise(function (resolve, reject) {
+    const ref = firebase.storage().ref(`images/${imageFile.name}`)
+    const task = ref.put(imageFile)
+
+    let u = []
+    u[i] = true
+    setUpload(u)
+
+    setCurrent(i)
+
+    task.on(
+      'state_changed',
+      snapshot => {
+        let p = []
+        p[i] = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+        setProgress(p)
+
+        if (p[i] === 100) {
+          let u = []
+          u[i] = false
+
+          setTimeout(() => {
+            setUpload(u)
+          }, 200)
+        }
+      },
+      () => {},
+      () => {}
+    )
+    resolve(task)
+  })
+}
+
 export const getImages = async () => {
   const storageRef = firebase.storage().ref(`images`)
 

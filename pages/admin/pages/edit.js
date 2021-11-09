@@ -34,7 +34,7 @@ import { capitalizeFirstLetter } from '../utils/utils'
 import useStore from '../store/store'
 
 // Hooks
-import { useForm } from 'react-hook-form'
+import { useForm, FormProvider } from 'react-hook-form'
 
 const Edit = () => {
   const [schema, setSchema] = useState()
@@ -55,12 +55,15 @@ const Edit = () => {
   const [schemaSorted, setSchemaSorted] = useState(null)
   const loading = useStore(state => state.loading)
 
+  const expandedEditor = useStore(state => state.expandedEditor)
+
   const toast = useToast()
 
   const {
     register,
     handleSubmit: handleSubmitHook,
-    formState: { errors }
+    formState: { errors },
+    setValue
   } = useForm()
 
   const updateContent = data => {
@@ -129,6 +132,8 @@ const Edit = () => {
     setContent(contentCloned.current)
   }
 
+  console.log(errors)
+
   const renderDataInput = (obj, key) => {
     let { type, value, isRequired } = obj
     switch (type) {
@@ -159,7 +164,14 @@ const Edit = () => {
           </>
         )
       case 'image':
-        return <TextAreaImage name={key} isRequired={isRequired} />
+        return (
+          <TextAreaImage
+            name={key}
+            isRequired={isRequired}
+            register={register}
+            errors={errors}
+          />
+        )
       case 'richtext': {
         haveEditor.current = true
         return (
@@ -228,21 +240,29 @@ const Edit = () => {
           {content && (
             <>
               <Box m='80px'>
-                <form id='edit-form' onSubmit={handleSubmitHook(handleSubmit)}>
-                  {schemaSorted &&
-                    schemaSorted.map((el, i) => {
-                      let name = el[0]
-                      let key = el[1]
-                      return (
-                        <EditDataTypeInputWrapper key={i}>
-                          <Label w='100%' key={i}>
-                            {capitalizeFirstLetter(name)}
-                          </Label>
-                          {renderDataInput(key, name)}
-                        </EditDataTypeInputWrapper>
-                      )
-                    })}
-                </form>
+                <FormProvider {...{ register, errors, setValue }}>
+                  <form
+                    id='edit-form'
+                    onSubmit={handleSubmitHook(handleSubmit)}
+                  >
+                    {schemaSorted &&
+                      schemaSorted.map((el, i) => {
+                        let name = el[0]
+                        let key = el[1]
+                        let expanded =
+                          expandedEditor && el[1].type === 'richtext'
+                        console.log(el)
+                        return (
+                          <EditDataTypeInputWrapper key={i} expanded={expanded}>
+                            <Label w='100%' key={i}>
+                              {capitalizeFirstLetter(name)}
+                            </Label>
+                            {renderDataInput(key, name)}
+                          </EditDataTypeInputWrapper>
+                        )
+                      })}
+                  </form>
+                </FormProvider>
               </Box>
             </>
           )}

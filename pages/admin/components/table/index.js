@@ -160,6 +160,7 @@ function Table ({ columns, data, type }) {
           </thead>
           <tbody {...getTableBodyProps()}>
             {page.map((row, i) => {
+              console.log(row)
               prepareRow(row)
               return (
                 <TableTr

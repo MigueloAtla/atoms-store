@@ -21,7 +21,9 @@ import useStore from '@/admin/store/store'
 
 const MenuBar = ({ editor }) => {
   const setSmallImageEditor = useStore(state => state.setSmallImageEditor)
+  const setExpandedEditor = useStore(state => state.setExpandedEditor)
   const smallImageEditor = useStore(state => state.smallImageEditor)
+  const expandedEditor = useStore(state => state.expandedEditor)
 
   if (!editor) {
     return null
@@ -38,7 +40,7 @@ const MenuBar = ({ editor }) => {
   }
 
   return (
-    <MenuStyled mb='15px'>
+    <MenuStyled expanded={expandedEditor} mb='15px'>
       <Box w='calc(100% - 30px)'>
         {/* <span>Formating text</span>
         <br /> */}
@@ -383,6 +385,13 @@ const MenuBar = ({ editor }) => {
           }}
         >
           small
+        </Button>
+        <Button
+          onClick={() => {
+            setExpandedEditor(!expandedEditor)
+          }}
+        >
+          expand
         </Button>
         <ModalShortcuts />
       </Box>

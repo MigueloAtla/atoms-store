@@ -6,14 +6,18 @@ import { IconButton, Flex } from '@chakra-ui/react'
 import { ChevronLeftIcon } from '@chakra-ui/icons'
 import { HStack } from '@chakra-ui/layout'
 
+// State
+import useStore from '@/admin/store/store'
+
 // Styles
 import { HeaderStyled } from './styles'
 
 const Header = ({ back, title, children }) => {
+  const expandedEditor = useStore(state => state.expandedEditor)
   let history = useHistory()
 
   return (
-    <HeaderStyled data-testid='header'>
+    <HeaderStyled expanded={expandedEditor} data-testid='header'>
       {back ? (
         <Flex pl='20px'>
           <IconButton

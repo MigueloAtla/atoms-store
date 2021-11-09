@@ -68,7 +68,6 @@ export default function AdminLayout () {
     <Router>
       <S.Layout
         areas={areas.layout}
-        // gap={20}
         templateCols='90px 1fr'
         templateColsXsDown='80px 1fr'
         templateRows='1fr'

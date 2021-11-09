@@ -11,6 +11,8 @@ const store = set => ({
   imgURL: null,
   rerender: false,
   smallImageEditor: false,
+  expandedEditor: false,
+  mediaLibraryView: 'table',
   // actions
   setCollections: data => set({ collections: data }),
   setCollectionData: data => set({ collectionData: data }),
@@ -21,7 +23,11 @@ const store = set => ({
   setRerender: data => set({ rerender: data }),
   setSmallImageEditor: data => {
     return set({ smallImageEditor: data })
-  }
+  },
+  setExpandedEditor: data => {
+    return set({ expandedEditor: data })
+  },
+  setMediaLibraryView: data => set({ mediaLibraryView: data })
 })
 
 const useStore = create(devtools(store))
