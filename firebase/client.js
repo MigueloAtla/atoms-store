@@ -94,7 +94,9 @@ export const uploadImages = ({
   setProgress,
   setUpload,
   setCurrent,
-  i
+  setCompleted,
+  i,
+  total
 }) => {
   return new Promise(function (resolve, reject) {
     const ref = firebase.storage().ref(`images/${imageFile.name}`)
@@ -119,6 +121,9 @@ export const uploadImages = ({
 
           setTimeout(() => {
             setUpload(u)
+            if (i === total) {
+              setCompleted(true)
+            }
           }, 200)
         }
       },

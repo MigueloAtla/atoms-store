@@ -6,11 +6,7 @@ import { Link } from 'react-router-dom'
 import * as S from './styles'
 
 // Components
-import { AddIcon } from '@chakra-ui/icons'
 import { Flex } from '@chakra-ui/react'
-import { IconLink } from '@/admin/atoms/menuLink/styles'
-import { Icon } from '@chakra-ui/react'
-import { FaImages } from 'react-icons/fa'
 // Firebase functions
 import { getCollection } from '@/firebase/client'
 
@@ -25,7 +21,7 @@ const CollectionsList = () => {
   )
   const selectedCollectionName = useStore(state => state.selectedCollectionName)
   return (
-    <Flex direction='column' height='100%'>
+    <Flex direction='column' height='100%' width='100%'>
       {collections &&
         collections.map((collection, i) => {
           return (
@@ -43,22 +39,6 @@ const CollectionsList = () => {
             </Link>
           )
         })}
-      <IconLink
-        to={`/admin/collections`}
-        onClick={() => {
-          setSelectedCollectionName('')
-        }}
-      >
-        <AddIcon />
-      </IconLink>
-      <IconLink
-        to='/admin/media-library'
-        onClick={() => {
-          setSelectedCollectionName('')
-        }}
-      >
-        <Icon as={FaImages} color='white' />
-      </IconLink>
     </Flex>
   )
 }

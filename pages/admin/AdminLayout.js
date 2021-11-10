@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { Icon, Flex } from '@chakra-ui/react'
-import { FaHome } from 'react-icons/fa'
+import { FaHome, FaPlug, FaLayerGroup, FaUsers } from 'react-icons/fa'
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom'
 
 // Firebase functions
@@ -23,7 +23,10 @@ import UserPage from './pages/user'
 import User from '@/admin/components/userLink'
 import CollectionList from './pages/collectionList'
 import MediaLibrary from './pages/mediaLibrary'
-
+import { AddIcon } from '@chakra-ui/icons'
+import SidebarLink from '@/admin/atoms/sidebarLink'
+import { FaImages } from 'react-icons/fa'
+import { Box, Tooltip } from '@chakra-ui/react'
 // Assets
 import firebase from '../../public/firebase.svg'
 
@@ -50,11 +53,13 @@ const areas = {
 
 // Layout Component
 export default function AdminLayout () {
+  const setSelectedSidebarMenu = useStore(state => state.setSelectedSidebarMenu)
   const setCollections = useStore(state => state.setCollections)
   const setSelectedCollectionName = useStore(
     state => state.setSelectedCollectionName
   )
 
+  const [toggleCollectionsPanel, setToggleCollectionsPanel] = useState(false)
   const [scale, setScale] = useState(1)
   const [rotate, setRotate] = useState(0)
 
@@ -68,58 +73,148 @@ export default function AdminLayout () {
     <Router>
       <S.Layout
         areas={areas.layout}
-        templateCols='90px 1fr'
+        templateCols={`${toggleCollectionsPanel ? '200px' : '90px'} 1fr`}
         templateColsXsDown='80px 1fr'
         templateRows='1fr'
       >
         {Areas => (
           <>
-            <Areas.Sidebar>
+            <Areas.Sidebar
+              style={{
+                display: 'flex'
+              }}
+            >
               <S.SideBar
                 areas={areas.sidebar}
                 templateCols='1fr'
                 templateRows='200px 1fr 120px'
                 height='100%'
+                style={{
+                  width: '90px'
+                }}
               >
                 {Areas => (
                   <>
-                    <Areas.Header>
-                      <a target='_blank' href='/'>
-                        <Flex h='30px'>
-                          <p style={{ color: 'white' }}>Go to web</p>
-                        </Flex>
-                      </a>
-                      <Link
-                        to='/admin'
+                    <Areas.Header
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: 10,
+                        paddingTop: 10
+                      }}
+                    >
+                      {/* home */}
+                      <SidebarLink
+                        to={`/admin`}
+                        menu='home'
                         onClick={() => {
                           setSelectedCollectionName('')
+                          setSelectedSidebarMenu('home')
                         }}
                       >
-                        <Flex>
-                          <Icon as={FaHome} color='white' />
-                          <p style={{ color: 'white' }}>home</p>
+                        <Icon as={FaHome} width='6' height='6' color='white' />
+                      </SidebarLink>
+
+                      {/* web */}
+                      <SidebarLink target='_blank' href='/'>
+                        <Flex h='30px'>
+                          <p style={{ color: 'white', fontWeight: 'bold' }}>
+                            web
+                          </p>
                         </Flex>
-                      </Link>
-                      <IconLink
+                      </SidebarLink>
+
+                      {/* firebase */}
+                      <SidebarLink
                         target='_blank'
                         rel='noreferrer'
                         href={`${process.env.NEXT_PUBLIC_FIREBASE_URL}`}
                       >
                         <Image src={firebase} width='20' height='20' />
-                      </IconLink>
+                      </SidebarLink>
                     </Areas.Header>
-                    <Areas.Content>
-                      <CollectionsList />
-                    </Areas.Content>
-                    <Areas.Footer>
-                      <Link
-                        to='/admin/user-profile'
+                    <Areas.Content
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: 10
+                      }}
+                    >
+                      {/* <CollectionsList /> */}
+                      <SidebarLink
+                        menu='collections'
                         onClick={() => {
                           setSelectedCollectionName('')
+                          setSelectedSidebarMenu('collections')
+                          setToggleCollectionsPanel(s => !s)
+                        }}
+                      >
+                        <Icon as={FaLayerGroup} color='white' />
+                      </SidebarLink>
+                      <SidebarLink
+                        to={`/admin/collections`}
+                        menu='collectionslist'
+                        onClick={() => {
+                          setSelectedCollectionName('')
+                          setSelectedSidebarMenu('collectionslist')
+                        }}
+                      >
+                        <AddIcon />
+                      </SidebarLink>
+                      <SidebarLink
+                        to='/admin/media-library'
+                        menu='medialibrary'
+                        onClick={() => {
+                          setSelectedCollectionName('')
+                          setSelectedSidebarMenu('medialibrary')
+                        }}
+                      >
+                        <Icon as={FaImages} color='white' />
+                      </SidebarLink>
+                      <SidebarLink
+                        to={`/admin/users`}
+                        menu='users'
+                        onClick={() => {
+                          setSelectedCollectionName('')
+                          setSelectedSidebarMenu('users')
+                        }}
+                      >
+                        <Icon as={FaUsers} color='white' />
+                      </SidebarLink>
+                      <SidebarLink
+                        to={`/admin/plugins`}
+                        menu='plugins'
+                        onClick={() => {
+                          setSelectedCollectionName('')
+                          setSelectedSidebarMenu('plugins')
+                        }}
+                      >
+                        <Icon as={FaPlug} color='white' />
+                      </SidebarLink>
+                    </Areas.Content>
+                    <Areas.Footer
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: 10
+                      }}
+                    >
+                      <SidebarLink
+                        to='/admin/user-profile'
+                        menu='profile'
+                        onClick={() => {
+                          setSelectedCollectionName('')
+                          setSelectedSidebarMenu('profile')
                         }}
                       >
                         <User />
-                      </Link>
+                      </SidebarLink>
                       <Settings>
                         <SettingsIcon
                           w='30'
@@ -142,6 +237,18 @@ export default function AdminLayout () {
                   </>
                 )}
               </S.SideBar>
+              {toggleCollectionsPanel && (
+                <Flex
+                  height='100%'
+                  width='calc(100% - 90px)'
+                  style={{
+                    backgroundColor: 'black',
+                    borderLeft: '1px solid white'
+                  }}
+                >
+                  <CollectionsList />
+                </Flex>
+              )}
             </Areas.Sidebar>
 
             <Areas.Content>
@@ -156,18 +263,18 @@ export default function AdminLayout () {
   )
 }
 
-const IconLink = styled.a`
-  width: 100%;
-  height: 60px;
-  cursor: pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  :hover {
-    background-color: #80808017;
-    border-right: 1px solid black;
-  }
-`
+// const IconLink = styled.a`
+//   width: 100%;
+//   height: 60px;
+//   cursor: pointer;
+//   display: flex;
+//   justify-content: center;
+//   align-items: center;
+//   :hover {
+//     background-color: #80808017;
+//     border-right: 1px solid black;
+//   }
+// `
 
 const Settings = styled.div`
   width: 100%;

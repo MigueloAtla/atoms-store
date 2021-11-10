@@ -23,17 +23,13 @@ const ImageUploader = () => {
   const setImgURL = useStore(state => state.setImgURL)
   const [upload, setUpload] = useState([])
   const [progress, setProgress] = useState([])
+  const [completed, setCompleted] = useState(false)
   const file = useRef([])
 
   useEffect(() => {
     if (upload) setUpload(false)
     return () => setImgURL('')
   }, [])
-
-  const onProgress = snapshot => {
-    let progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-    setProgress(progress)
-  }
 
   const handleDragEnter = e => {
     e.preventDefault()
@@ -43,21 +39,43 @@ const ImageUploader = () => {
     e.preventDefault()
     setDrag(DRAG_IMAGE_STATES.NONE)
   }
-  const handleDrop = e => {
+  const handleDrop = async e => {
     e.preventDefault()
     setDrag(DRAG_IMAGE_STATES.NONE)
     const data_files = e.dataTransfer.files
     const data_arr = [...data_files]
-    file.current = [...data_arr]
-    const reader = []
-    file.current.map(async (f, i) => {
-      reader[i] = new FileReader()
-      await reader[i].readAsDataURL(f)
-      reader[i].addEventListener('load', event => {
-        let uploaded_image = event.target.result
-        setDroppedImage(s => [...s, uploaded_image])
+    const arr = file.current
+    file.current = [...arr, ...data_arr]
+
+    readImage().then(p => {
+      setDroppedImage(s => [...p])
+    })
+  }
+
+  useEffect(() => {
+    if (completed === true) {
+      setDroppedImage([])
+      file.current = []
+    }
+  }, [completed])
+  useEffect(() => {
+    if (droppedImage.length > 0) setCompleted(false)
+  }, [droppedImage])
+
+  const readImage = async () => {
+    let reader = []
+    const promises = file.current.map(async (f, i) => {
+      return new Promise((resolve, reject) => {
+        reader[i] = new FileReader()
+        reader[i].readAsDataURL(f)
+        reader[i].addEventListener('load', event => {
+          let readimg = event.target.result
+          resolve(readimg)
+        })
       })
     })
+    const images = await Promise.all(promises)
+    return images
   }
 
   return (
@@ -66,6 +84,7 @@ const ImageUploader = () => {
         <Button
           onClick={() => {
             setUploader(true)
+            if (completed === true) setCompleted(false)
           }}
         >
           Upload Images
@@ -94,80 +113,89 @@ const ImageUploader = () => {
             onDragOver={e => e.preventDefault()}
             onDrag={e => e.preventDefault()}
             onDragStart={e => e.preventDefault()}
-          />
+          >
+            {droppedImage && (
+              <>
+                <Box
+                  m='40px'
+                  top='80px'
+                  display='flex'
+                  flexWrap='wrap'
+                  minH='250px'
+                >
+                  {droppedImage.length > 0 && !completed ? (
+                    <>
+                      {droppedImage.map((img, i) => {
+                        return (
+                          <Box key={i}>
+                            <Flex>
+                              <UploadedImage
+                                draggable={false}
+                                quality='1'
+                                objectFit='cover'
+                                layout='fill'
+                                drag={drag}
+                                src={img}
+                                alt={`image from media library`}
+                                loading='eager'
+                                priority
+                              />
+                              <RemoveImageButton
+                                onClick={() => {
+                                  setImgURL('')
+                                }}
+                              />
+                            </Flex>
+                            {upload.length > 0 &&
+                              current === i &&
+                              upload[i] === true && (
+                                <Flex>
+                                  <Flex
+                                    key={i}
+                                    justify='center'
+                                    align='center'
+                                    h='100%'
+                                    mr='20px'
+                                  >
+                                    <Spinner size='sm' color='black' />
+                                  </Flex>
 
-          {droppedImage && drag !== DRAG_IMAGE_STATES.DRAG_OVER && (
-            <Box
-              h='300px'
-              mt='40px'
-              ml='40px'
-              position='absolute'
-              top='80px'
-              display='flex'
-            >
-              {droppedImage.length > 0 && (
-                <>
-                  {droppedImage.map((img, i) => {
-                    return (
-                      <div key={i}>
-                        <UploadedImage
-                          draggable={false}
-                          quality='1'
-                          objectFit='cover'
-                          layout='fill'
-                          drag={drag}
-                          src={img}
-                          alt={`image from media library`}
-                          loading='eager'
-                          priority
-                        />
-                        <RemoveImageButton
-                          onClick={() => {
-                            setImgURL('')
-                          }}
-                        />
-
-                        {upload.length > 0 &&
-                          current === i &&
-                          upload[i] === true && (
-                            <>
-                              <Text>
-                                {'Uploading: ' + Math.trunc(progress[i]) + ' %'}
-                              </Text>
-                              <Flex
-                                key={i}
-                                justify='center'
-                                align='center'
-                                w='100%'
-                                h='100%'
-                              >
-                                <Spinner size='xl' color='black' />
-                              </Flex>
-                            </>
-                          )}
-                      </div>
-                    )
-                  })}
-                  <Button
-                    onClick={async () => {
-                      for (var i = 0; i < file.current.length; i++) {
-                        var imageFile = file.current[i]
-                        await uploadImages({
-                          imageFile,
-                          setProgress,
-                          setUpload,
-                          setCurrent,
-                          i
-                        })
-                      }
-                    }}
-                  >
-                    Upload
-                  </Button>
-                </>
-              )}
-            </Box>
-          )}
+                                  <Text>
+                                    {'Uploading: ' +
+                                      Math.trunc(progress[i]) +
+                                      ' %'}
+                                  </Text>
+                                </Flex>
+                              )}
+                          </Box>
+                        )
+                      })}
+                    </>
+                  ) : (
+                    <Text>Drop images here</Text>
+                  )}
+                </Box>
+                <Button
+                  onClick={async () => {
+                    for (var i = 0; i < file.current.length; i++) {
+                      var imageFile = file.current[i]
+                      await uploadImages({
+                        imageFile,
+                        setProgress,
+                        setUpload,
+                        setCurrent,
+                        i,
+                        setCompleted,
+                        total: file.current.length - 1
+                      })
+                    }
+                  }}
+                >
+                  Upload
+                </Button>
+              </>
+            )}
+          </TextAreaImageStyled>
         </Box>
       )}
     </>
@@ -177,7 +205,7 @@ const ImageUploader = () => {
 export default ImageUploader
 
 const UploadedImage = styled.img`
-  height: 290px;
+  height: 200px;
   opacity: ${props => (props.drag === DRAG_IMAGE_STATES.DRAG_OVER ? 0.5 : 1)};
   transition: opacity 0.2s linear;
 `

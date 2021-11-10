@@ -44,6 +44,7 @@ const CollectionsList = () => {
           justify='center'
           align='center'
           direction='column'
+          gridGap='10px'
         >
           {collections &&
             collections.map((collection, i) => {
@@ -55,12 +56,13 @@ const CollectionsList = () => {
                 >
                   <Flex
                     bg='white'
-                    height='150px'
-                    borderBottom='1px solid black'
+                    height='75px'
+                    // borderBottom='1px solid black'
                     width='100%'
                     align='center'
+                    borderRadius='10px'
                   >
-                    <Text as='h3' ml='30'>
+                    <Text as='h4' fontSize='22px' ml='30'>
                       {capitalizeFirstLetter(collection)}
                     </Text>
                   </Flex>

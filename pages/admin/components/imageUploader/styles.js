@@ -3,8 +3,10 @@ import styled from 'styled-components'
 import { DRAG_IMAGE_STATES } from './dragImageState'
 
 export const TextAreaImageStyled = styled.div`
-  width: 100%;
-  height: 380px;
+  margin: 50px;
+  width: calc(100% - 100px);
+  min-height: 374px;
+  height: 100%;
   border: ${props =>
     props.drag === DRAG_IMAGE_STATES.DRAG_OVER
       ? '2px dashed rgba(66, 153, 225, 0.6)'
