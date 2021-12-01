@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import Image from 'next/image'
 
-import { useParams } from 'react-router-dom'
+import { useParams, useHistory } from 'react-router-dom'
 
 import { getCollection } from '@/firebase/client'
 import Img from 'react-cool-img'
@@ -28,12 +27,14 @@ import { capitalizeFirstLetter } from '@/admin/utils/utils'
 
 const CollectionList = () => {
   // const [collectionDataSorted, setCollectionDataSorted] = useState(null)
+  let history = useHistory()
   const collectionData = useStore(state => state.collectionData)
   const selectedCollectionName = useStore(state => state.selectedCollectionName)
   const setSelectedCollectionName = useStore(
     state => state.setSelectedCollectionName
   )
   const loading = useStore(state => state.loading)
+  const setId = useStore(state => state.setId)
   const setCollectionData = useStore(state => state.setCollectionData)
   const rerender = useStore(state => state.rerender)
 
@@ -47,18 +48,6 @@ const CollectionList = () => {
       setSelectedCollectionName(type)
     }
   }, [rerender])
-
-  // useEffect(() => {
-  //   // When reload the page collection is not defined, so it takes from the url
-  //   if (collectionData.length <= 0) {
-  //     getCollection(type).then(c => {
-  //       setCollectionData(c)
-  //     })
-  //   }
-  //   if (selectedCollectionName === '') {
-  //     setSelectedCollectionName(type)
-  //   }
-  // }, [])
 
   // Prepare columns for the table
   let arr = []
@@ -81,8 +70,6 @@ const CollectionList = () => {
     accesor: 'id',
     Cell: DeleteRowButton
   })
-
-  console.log(arr)
 
   const columns = React.useMemo(() => arr, [arr])
 
@@ -123,21 +110,12 @@ const CollectionList = () => {
     dataArr.push(dataObj)
   })
 
-  // useEffect(() => {
-  //   if (collectionData) {
-  //     let collectionDataSortedArr = Object.entries(collectionData).sort(
-  //       function (a, b) {
-  //         // console.log(a)
-  //         // console.log(b)
-  //         return a[1].order - b[1].order
-  //       }
-  //     )
-  //     console.log(collectionDataSortedArr)
-  //     setCollectionDataSorted(collectionDataSortedArr)
-  //   }
-  // }, [collectionData])
-
   const data = React.useMemo(() => dataArr, [collectionData, rerender])
+
+  const onClick = id => {
+    setId(id)
+    history.push(`/admin/${type}/${id}`)
+  }
 
   return (
     <S.ContentStyled>
@@ -150,7 +128,12 @@ const CollectionList = () => {
       ) : (
         <PageTransitionAnimation>
           {data.length > 0 ? (
-            <Table columns={columns} data={data} type={type} />
+            <Table
+              columns={columns}
+              data={data}
+              type={type}
+              onClick={onClick}
+            />
           ) : (
             <Flex w='100%' h='100%' justify='center' align='center'>
               You may want to create a {type}

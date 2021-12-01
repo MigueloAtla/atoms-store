@@ -6,10 +6,16 @@ import { useParams, useHistory } from 'react-router-dom'
 import { Label } from '../styles'
 
 // Ui
-import { Textarea, Input, useToast, Box } from '@chakra-ui/react'
+import { Textarea, Input, useToast, Box, Button } from '@chakra-ui/react'
 
 // Firebase
-import { getSchemaByType, addByCollectionType } from '@/firebase/client'
+import {
+  getSchemaByType,
+  addByCollectionType,
+  getFullSchemaByType,
+  fetchProducts,
+  addByCollectionTypeWithCustomIDBatched
+} from '@/firebase/client'
 
 // Utils
 import { capitalizeFirstLetter } from '../utils/utils'
@@ -19,6 +25,7 @@ import TipTap from '../components/editor'
 import CreateDocButton from '@/admin/atoms/createDocButton'
 import Header from '@/admin/components/header'
 import TextAreaImage from '@/admin/components/atoms/textAreaImage'
+import AddRelatedDocModal from '@/admin/components/addRelatedDocModal'
 
 // Hooks
 import { useForm } from 'react-hook-form'
@@ -30,9 +37,8 @@ import useStore from '@/admin/store/store'
 
 const Create = () => {
   const [schema, setSchema] = useState()
+  const [relations, setRelations] = useState([])
   const imgURL = useStore(state => state.imgURL)
-  const setImgURL = useStore(state => state.setImgURL)
-  // const [editorContent, setEditorContent] = useState()
   const editorContent = useRef(null)
   const [onSubmit, setOnSubmit] = useState()
   const newContent = useRef(null)
@@ -41,6 +47,8 @@ const Create = () => {
   const { type } = useParams()
   const [schemaSorted, setSchemaSorted] = useState(null)
   const history = useHistory()
+  const relatedDocRef = useRef([])
+  const selectedRowIds = useRef([])
 
   const {
     register,
@@ -93,9 +101,48 @@ const Create = () => {
       }
     })
 
+    console.log(selectedRowIds)
+
     if (haveEditor.current === true) setOnSubmit(!onSubmit)
     else {
-      addByCollectionType(type, newContent.current)
+      addByCollectionType(type, newContent.current).then(function (docRef) {
+        let newId = docRef.id
+
+        // map selectedRowIds
+        selectedRowIds.current.map(s => {
+          let idsArr = []
+          let docsContent = []
+          Object.keys(s).map(entry => {
+            const spliceRelations = entry.split('_')
+            s[entry].map(currentId => {
+              let type1
+              let type2
+              let composedId
+
+              // Compose ids
+              if (spliceRelations[1] === type) {
+                composedId = `${newId}_${currentId}`
+                type1 = spliceRelations[1]
+                type2 = spliceRelations[2]
+              } else {
+                composedId = `${currentId}_${newId}`
+                type1 = spliceRelations[2]
+                type2 = spliceRelations[1]
+              }
+              idsArr.push(composedId)
+
+              // Prepare content of Doc
+              docsContent.push({
+                [`${type1}Id`]: newId,
+                [`${type2}Id`]: currentId
+              })
+            })
+
+            // Create doc and junction collection if no exists yet
+            addByCollectionTypeWithCustomIDBatched(entry, idsArr, docsContent)
+          })
+        })
+      })
       toast({
         title: 'Content Created Successfully',
         position: 'bottom-right',
@@ -151,6 +198,62 @@ const Create = () => {
     }
   }
 
+  const getRelations = async () => {
+    let relatedDocs = []
+
+    const types = junction => {
+      const spliceRelations = junction.name.split('_')
+      let type1, type2
+      if (spliceRelations[1] === type) {
+        type1 = spliceRelations[1]
+        type2 = spliceRelations[2]
+      } else {
+        type1 = spliceRelations[2]
+        type2 = spliceRelations[1]
+      }
+      return { type1, type2 }
+    }
+
+    getFullSchemaByType(type).then(async data => {
+      if (data.length > 0 && data[0].relations?.length > 0) {
+        const promises = []
+        const relatedCollections = []
+        data[0].relations.forEach((junction, i) => {
+          console.log(junction)
+          const { type2 } = types(junction)
+          relatedCollections.push({ type: type2, junction: junction.name })
+          // if (junction.display === true) {
+          //   const promise = new Promise(async (resolve, reject) => {
+          //     const { type1, type2 } = types(junction)
+          //     relatedDocs = await fetchProducts(id, junction.name, type1, type2)
+          //     resolve({
+          //       content: [...relatedDocs],
+          //       collection: type2,
+          //       junctionName: junction.name
+          //     })
+          //   })
+          //   promises.push(promise)
+          // } else {
+          //   const promise = new Promise(async (resolve, reject) => {
+          //     resolve({ junctionName: junction.name, collection: type2 })
+          //   })
+          //   promises.push(promise)
+          // }
+        })
+        setRelations(relatedCollections)
+        // if (promises.length > 0) {
+        //   await Promise.all(promises).then(resolved => {
+        //     setRelations([...resolved])
+        //   })
+        // }
+      }
+    })
+  }
+
+  useEffect(() => {
+    console.log(relations)
+  }, [relations])
+
   useEffect(() => {
     if (schema) {
       console.log(schema)
@@ -158,6 +261,7 @@ const Create = () => {
         return a[1].order - b[1].order
       })
       setSchemaSorted(schemaSortedArr)
+      getRelations()
     }
   }, [schema])
 
@@ -185,20 +289,26 @@ const Create = () => {
                     </EditDataTypeInputWrapper>
                   )
                 })}
-              {/* {Object.keys(schema).map((key, i) => {
-                let name = key
-                let type = schema[key].type
-                let isRequired = schema[key].isRequired
+            </form>
+            {relations.length > 0 &&
+              relations.map((relation, i) => {
                 return (
-                  <EditDataTypeInputWrapper key={i}>
-                    <Label w='100%' key={i}>
-                      {capitalizeFirstLetter(key)}
+                  <EditDataTypeInputWrapper key={i} direction='row'>
+                    <Label w='100%'>
+                      {capitalizeFirstLetter(relation.type)}
                     </Label>
-                    {renderSwitch({ name, type, isRequired })}
+                    <AddRelatedDocModal
+                      collection={relation.type}
+                      junctionName={relation.junction}
+                      content={[]}
+                      type={type}
+                      relatedDocRef={relatedDocRef}
+                      selectedRowIds={selectedRowIds}
+                      // id={id}
+                    />
                   </EditDataTypeInputWrapper>
                 )
-              })} */}
-            </form>
+              })}
           </Box>
         )}
       </PageTransitionAnimation>

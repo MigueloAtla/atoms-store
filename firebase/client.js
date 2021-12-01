@@ -64,6 +64,23 @@ export const addByCollectionType = (type, content) => {
     // createdAt: firebase.firestore.Timestamp.fromDate(new Date())
   )
 }
+export const addByCollectionTypeWithCustomID = (type, ids, content) => {
+  return db
+    .collection(type)
+    .doc(ids)
+    .set(content)
+}
+export const addByCollectionTypeWithCustomIDBatched = (type, ids, content) => {
+  console.log(type)
+  console.log(ids)
+  console.log(content)
+  const batch = db.batch()
+  ids.map((id, i) => {
+    let docRef = db.collection(type).doc(id)
+    batch.set(docRef, content[i])
+  })
+  batch.commit()
+}
 export const addPost = ({ content }) => {
   return db.collection('posts').add({
     content,
@@ -212,6 +229,27 @@ export const fetchPosts = () => {
     })
 }
 
+export const fetchProducts = async (id, junction, type, type2) => {
+  const junctions = await db
+    .collection(`${junction}`)
+    .where(`${type}Id`, '==', id)
+    .get()
+
+  const products = await Promise.all(
+    junctions.docs
+      .filter(doc => doc.exists)
+      .map(doc => {
+        return db.doc(`${type2}/${doc.data()[`${type2}Id`]}`).get()
+      })
+  )
+
+  return products
+    .filter(doc => doc.exists)
+    .map(doc => {
+      return { id: doc.id, ...doc.data() }
+    })
+}
+
 export const getSchemaByType = type => {
   return db
     .collection('collectionList')
@@ -223,6 +261,17 @@ export const getSchemaByType = type => {
       })
     })
 }
+// export const getRelationsListByType = type => {
+//   return db
+//     .collection('collectionList')
+//     .get()
+//     .then(snapshot => {
+//       return snapshot.docs.map(doc => {
+//         let data = doc.data()
+//         return data[type].relations
+//       })
+//     })
+// }
 export const getFullSchemaByType = type => {
   return db
     .collection('collectionList')
@@ -401,6 +450,21 @@ export const deleteFields = async (name, type) => {
   await Promise.all(batches)
 }
 
+export const addRelationToCollection = async (collection, relation) => {
+  console.log(collection)
+  console.log(relation)
+  await db
+    .collection('collectionList')
+    .doc('OjUAtyfsIW6ECoryEovP')
+    .update({
+      [`${collection}.relations`]: firebase.firestore.FieldValue.arrayUnion(
+        relation
+      )
+    })
+
+  // db.collection(collection[Object.keys(collection)[0]].name)
+}
+
 export const createCollection = async collection => {
   await db
     .collection('collectionList')
@@ -409,6 +473,12 @@ export const createCollection = async collection => {
 
   db.collection(collection[Object.keys(collection)[0]].name)
 }
+
+// Create Junction: When link two docs
+// export const createJunction = async (fromId, toId, junction) => {
+//   const junctionRef = db.doc(`${junction}/${fromId}_${toId}`)
+//   await junctionRef.set({ studentId, courseId })
+// }
 
 // CLIENT
 

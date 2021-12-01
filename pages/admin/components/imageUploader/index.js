@@ -175,24 +175,26 @@ const ImageUploader = () => {
                     <Text>Drop images here</Text>
                   )}
                 </Box>
-                <Button
-                  onClick={async () => {
-                    for (var i = 0; i < file.current.length; i++) {
-                      var imageFile = file.current[i]
-                      await uploadImages({
-                        imageFile,
-                        setProgress,
-                        setUpload,
-                        setCurrent,
-                        i,
-                        setCompleted,
-                        total: file.current.length - 1
-                      })
-                    }
-                  }}
-                >
-                  Upload
-                </Button>
+                {droppedImage.length > 0 && (
+                  <Button
+                    onClick={async () => {
+                      for (var i = 0; i < file.current.length; i++) {
+                        var imageFile = file.current[i]
+                        await uploadImages({
+                          imageFile,
+                          setProgress,
+                          setUpload,
+                          setCurrent,
+                          i,
+                          setCompleted,
+                          total: file.current.length - 1
+                        })
+                      }
+                    }}
+                  >
+                    Upload
+                  </Button>
+                )}
               </>
             )}
           </TextAreaImageStyled>

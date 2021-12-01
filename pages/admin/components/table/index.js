@@ -8,8 +8,8 @@ import {
   usePagination
 } from 'react-table'
 
-import { useHistory } from 'react-router-dom'
-import { Input, Button, HStack, Select } from '@chakra-ui/react'
+// import { useHistory } from 'react-router-dom'
+import { Input, HStack, Select } from '@chakra-ui/react'
 import { IconButton } from '@chakra-ui/react'
 import {
   ChevronLeftIcon,
@@ -18,9 +18,7 @@ import {
   ArrowRightIcon
 } from '@chakra-ui/icons'
 
-// State
-import useStore from '../../store/store'
-
+// Styles
 import { TableStyled } from './styles'
 
 // Components
@@ -73,9 +71,7 @@ function DefaultColumnFilter ({
   )
 }
 
-function Table ({ columns, data, type }) {
-  let history = useHistory()
-  const setId = useStore(state => state.setId)
+function Table ({ columns, data, type, onClick }) {
   const filterTypes = React.useMemo(
     () => ({
       text: (rows, id, filterValue) => {
@@ -160,14 +156,12 @@ function Table ({ columns, data, type }) {
           </thead>
           <tbody {...getTableBodyProps()}>
             {page.map((row, i) => {
-              console.log(row)
               prepareRow(row)
               return (
                 <TableTr
                   key={i}
                   onClick={() => {
-                    setId(row.values.id)
-                    history.push(`/admin/${type}/${row.values.id}`)
+                    onClick(row.values.id)
                   }}
                   row={row}
                 />

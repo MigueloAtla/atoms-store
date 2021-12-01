@@ -1,7 +1,7 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useHistory } from 'react-router-dom'
 
-import { createCollection } from '@/firebase/client'
+import { addRelationToCollection, createCollection } from '@/firebase/client'
 
 // Chackra UI Components
 import {
@@ -10,10 +10,10 @@ import {
   FormLabel,
   Button,
   Input,
-  Spacer,
   Box,
   Text,
-  useToast
+  useToast,
+  Checkbox
 } from '@chakra-ui/react'
 import Header from '@/admin/components/header'
 
@@ -22,9 +22,11 @@ import PageTransitionAnimation from '@/admin/atoms/pageTransitionAnimation'
 // State
 import useStore from '@/admin/store/store'
 
-import { useForm, useFieldArray } from 'react-hook-form'
+import { useForm, useFieldArray, Controller } from 'react-hook-form'
 
 export default function NewCollection () {
+  const collections = useStore(state => state.collections)
+  const [table, setTable] = useState([false])
   const setRerender = useStore(state => state.setRerender)
 
   const history = useHistory()
@@ -50,6 +52,9 @@ export default function NewCollection () {
     let formData = {}
     let key
     let new_entry = {}
+    let junction = ''
+    let relation_entries = []
+
     Object.entries(data).map((field, i) => {
       if (field[0] === 'collection-name') {
         key = field[1]
@@ -57,18 +62,37 @@ export default function NewCollection () {
       }
       if (field[0] === 'fieldArr') {
         data['fieldArr'].map((f, i) => {
-          const { name, order, ...entries } = f
-          new_entry[name] = {
-            ...entries,
-            order: i
+          const { name, order, relation, display, type, ...entries } = f
+          if (relation !== undefined) {
+            junction = `junction_${data['collection-name']}_${relation}`
+            relation_entries.push({
+              name: junction,
+              display
+            })
+          }
+          if (type !== 'relation') {
+            new_entry[name] = {
+              ...entries,
+              order: i
+            }
           }
         })
         let key = data['collection-name']
-        formData[key] = { ...formData[key], schema: new_entry }
+        formData[key] = {
+          ...formData[key],
+          schema: new_entry,
+          relations: relation_entries
+        }
       }
     })
+
     try {
       createCollection(formData)
+      relation_entries.map(relation => {
+        const spliceRelations = relation.name.split('_')
+        let type2 = spliceRelations[2]
+        addRelationToCollection(type2, relation)
+      })
       toast({
         title: 'Collection created successfully',
         position: 'bottom-right',
@@ -92,6 +116,10 @@ export default function NewCollection () {
       })
     }
   }
+
+  // useEffect(() => {
+  //   console.log(table)
+  // }, [table])
 
   return (
     <Box minH='calc(100% - 50px)'>
@@ -137,7 +165,67 @@ export default function NewCollection () {
                     <FormLabel>Type</FormLabel>
 
                     <Flex minW='150' direction='column'>
-                      <Select
+                      {/* Controller select onchange check if value === relation: 
+                      to display a new select filed with all the tables */}
+                      <Controller
+                        render={({ field }) => (
+                          <Select
+                            name='type'
+                            placeholder='Select type'
+                            {...field}
+                            value={field.value}
+                            onChange={e => {
+                              let prevTable = Array.from(table)
+                              if (e.target.value === 'relation') {
+                                prevTable[index] = true
+                                setTable(s => prevTable)
+                              } else {
+                                prevTable[index] = false
+                                setTable(s => prevTable)
+                              }
+                              field.onChange(e)
+                            }}
+                          >
+                            <option value='text'>text</option>
+                            <option value='longtext'>long text</option>
+                            <option value='richtext'>rich text</option>
+                            <option value='image'>image</option>
+                            <option value='relation'>
+                              relation (many-to-many)
+                            </option>
+                          </Select>
+                        )}
+                        control={control}
+                        name={`fieldArr.${index}.type`}
+                      />
+                      {table[index] && (
+                        <>
+                          <Select
+                            name='relation'
+                            placeholder='Select type'
+                            {...register(`fieldArr.${index}.relation`, {
+                              required: 'select a existent collection type'
+                            })}
+                          >
+                            {collections.length > 0 &&
+                              collections.map((collection, i) => {
+                                return (
+                                  <option key={i} value={collection}>
+                                    {collection}
+                                  </option>
+                                )
+                              })}
+                          </Select>
+                          <Checkbox
+                            name='display'
+                            defaultValue={false}
+                            {...register(`fieldArr.${index}.display`)}
+                          >
+                            Display this relation by default
+                          </Checkbox>
+                        </>
+                      )}
+                      {/* <Select
                         name='type'
                         placeholder='Select type'
                         {...register(`fieldArr.${index}.type`, {
@@ -148,7 +236,8 @@ export default function NewCollection () {
                         <option value='longtext'>long text</option>
                         <option value='richtext'>rich text</option>
                         <option value='image'>image</option>
-                      </Select>
+                        <option value='relation'>relation</option>
+                      </Select> */}
                       {errors.fieldArr?.[index]?.type && (
                         <Text>{errors.fieldArr?.[index]?.type.message}</Text>
                       )}

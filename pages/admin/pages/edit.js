@@ -1,12 +1,16 @@
 // React/Next
 import React, { useEffect, useRef, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, Link, useHistory } from 'react-router-dom'
 
 // Firebase
 import {
   getSchemaByType,
   fetchOneByType,
-  updateOneByType
+  updateOneByType,
+  fetchProducts,
+  getFullSchemaByType,
+  getCollection,
+  addByCollectionTypeWithCustomID
 } from '@/firebase/client'
 
 // Components
@@ -16,12 +20,13 @@ import LoaderScreen from '@/admin/atoms/loadScreen'
 import PreviewDrawer from '@/admin/atoms/previewDrawer'
 import EditDataTypeInputWrapper from '@/admin/layouts/editDataTypeInputWrapper'
 
-import { Input, Box, useToast } from '@chakra-ui/react'
+import { Input, Box, useToast, Button, Flex, Text } from '@chakra-ui/react'
 
 // Components
 import TipTap from '../components/editor'
 import Header from '../components/header'
 import TextAreaImage from '@/admin/components/atoms/textAreaImage'
+import AddRelatedDocModal from '@/admin/components/addRelatedDocModal'
 
 // Styles
 import { Label } from '../styles'
@@ -37,14 +42,21 @@ import useStore from '../store/store'
 import { useForm, FormProvider } from 'react-hook-form'
 
 const Edit = () => {
+  let history = useHistory()
   const [schema, setSchema] = useState()
+  // const [relatedCollectionsState, setRelatedCollectionsState] = useState([])
+  const [relations, setRelations] = useState([])
+  const [relatedCollection, setRelatedCollection] = useState([])
   const [content, setContent] = useState(null)
   const imgURL = useStore(state => state.imgURL)
   const setImgURL = useStore(state => state.setImgURL)
+  const setId = useStore(state => state.setId)
+  const globalId = useStore(state => state.id)
   const editorContent = useRef(null)
   const [onSubmit, setOnSubmit] = useState()
   const { id, type } = useParams()
   const contentCloned = useRef(null)
+  const relatedJunction = useRef(null)
   const haveEditor = useRef(false)
   const updateRef = useRef(false)
   const setLoading = useStore(state => state.setLoading)
@@ -76,6 +88,17 @@ const Edit = () => {
     })
   }
 
+  // get related collection
+  const getRelationCollection = junction => {
+    console.log('adding a relation')
+    // get all products on modal
+    relatedJunction.current = junction
+    const { type1, type2 } = getTypes(junction)
+    getCollection(type2).then(r => {
+      setRelatedCollection(r)
+    })
+  }
+
   useEffect(() => {
     if (selectedCollectionName === '') {
       setSelectedCollectionName(type)
@@ -88,7 +111,93 @@ const Edit = () => {
       setContent(res)
       setLoading(false)
     })
-  }, [])
+  }, [globalId, id])
+
+  const getTypes = junction => {
+    console.log('get types')
+    console.log(junction)
+    const spliceRelations = junction.split('_')
+    let type1, type2
+    if (spliceRelations[1] === type) {
+      type1 = spliceRelations[1]
+      type2 = spliceRelations[2]
+    } else {
+      type1 = spliceRelations[2]
+      type2 = spliceRelations[1]
+    }
+    return { type1, type2 }
+  }
+
+  const getRelatedDoc = async junction => {
+    const { type1, type2 } = getTypes(junction)
+    const relationsFetched = await fetchProducts(id, junction, type1, type2)
+    const prevState = relations
+    const newState = prevState.map(collection => {
+      console.log(collection.collection)
+      if (collection.collection === type2) {
+        return {
+          content: [...relationsFetched],
+          collection: type2,
+          junctionName: junction
+        }
+      } else return collection
+    })
+    setRelations(newState)
+  }
+
+  const getRelations = async () => {
+    let relatedDocs = []
+
+    const types = junction => {
+      const spliceRelations = junction.name.split('_')
+      let type1, type2
+      if (spliceRelations[1] === type) {
+        type1 = spliceRelations[1]
+        type2 = spliceRelations[2]
+      } else {
+        type1 = spliceRelations[2]
+        type2 = spliceRelations[1]
+      }
+      return { type1, type2 }
+    }
+
+    getFullSchemaByType(type).then(async data => {
+      if (data.length > 0 && data[0].relations?.length > 0) {
+        const promises = []
+        // const relatedCollections = []
+        data[0].relations.forEach((junction, i) => {
+          const { type2 } = types(junction)
+          // relatedCollections.push(type2)
+          if (junction.display === true) {
+            const promise = new Promise(async (resolve, reject) => {
+              const { type1, type2 } = types(junction)
+              relatedDocs = await fetchProducts(id, junction.name, type1, type2)
+              resolve({
+                content: [...relatedDocs],
+                collection: type2,
+                junctionName: junction.name
+              })
+            })
+            promises.push(promise)
+          } else {
+            const promise = new Promise(async (resolve, reject) => {
+              resolve({ junctionName: junction.name, collection: type2 })
+            })
+            promises.push(promise)
+          }
+        })
+        if (promises.length > 0) {
+          await Promise.all(promises).then(resolved => {
+            setRelations([...resolved])
+          })
+        }
+      }
+    })
+  }
+
+  useEffect(() => {
+    console.log(relations)
+  }, [relations])
 
   useEffect(() => {
     if (content) {
@@ -97,6 +206,7 @@ const Edit = () => {
           setImgURL(content[key].value)
         }
       })
+      getRelations()
     }
   }, [content])
 
@@ -131,8 +241,6 @@ const Edit = () => {
     }
     setContent(contentCloned.current)
   }
-
-  console.log(errors)
 
   const renderDataInput = (obj, key) => {
     let { type, value, isRequired } = obj
@@ -251,7 +359,6 @@ const Edit = () => {
                         let key = el[1]
                         let expanded =
                           expandedEditor && el[1].type === 'richtext'
-                        console.log(el)
                         return (
                           <EditDataTypeInputWrapper key={i} expanded={expanded}>
                             <Label w='100%' key={i}>
@@ -263,6 +370,66 @@ const Edit = () => {
                       })}
                   </form>
                 </FormProvider>
+
+                {relations.length > 0 &&
+                  relations.map((relation, i) => {
+                    return (
+                      <EditDataTypeInputWrapper key={i} direction='row'>
+                        <Label w='100%'>
+                          {capitalizeFirstLetter(relation.collection)}
+                        </Label>
+                        {'content' in relation ? (
+                          <div>
+                            {console.log(relation)}
+                            <AddRelatedDocModal
+                              // type={relation.collection}
+                              // collection={relation.content}
+                              collection={relation.collection}
+                              junctionName={relation.junctionName}
+                              content={relation.content}
+                              type={type}
+                              id={id}
+                              // onClick={() => {
+                              //   getRelationCollection(relation.junctionName)
+                              // }}
+                            />
+                            {relation.content.map(doc => {
+                              return (
+                                <div
+                                  key={doc.id}
+                                  onClick={() => {
+                                    history.push(
+                                      `/admin/${relation.collection}/${doc.id}`
+                                    )
+                                  }}
+                                >
+                                  {Object.keys(doc).map(docField => {
+                                    if (docField !== 'id') {
+                                      return (
+                                        <p>
+                                          {docField}: {doc[docField].value}
+                                        </p>
+                                      )
+                                    }
+                                  })}
+                                </div>
+                              )
+                            })}
+                          </div>
+                        ) : (
+                          <div>
+                            <Button
+                              onClick={() => {
+                                getRelatedDoc(relation.junctionName)
+                              }}
+                            >
+                              show {relation.collection}
+                            </Button>
+                          </div>
+                        )}
+                      </EditDataTypeInputWrapper>
+                    )
+                  })}
               </Box>
             </>
           )}
