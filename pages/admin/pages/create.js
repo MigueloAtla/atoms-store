@@ -6,7 +6,7 @@ import { useParams, useHistory } from 'react-router-dom'
 import { Label } from '../styles'
 
 // Ui
-import { Textarea, Input, useToast, Box, Button } from '@chakra-ui/react'
+import { Textarea, Input, useToast, Box, Button, Flex } from '@chakra-ui/react'
 
 // Firebase
 import {
@@ -26,7 +26,7 @@ import CreateDocButton from '@/admin/atoms/createDocButton'
 import Header from '@/admin/components/header'
 import TextAreaImage from '@/admin/components/atoms/textAreaImage'
 import AddRelatedDocModal from '@/admin/components/addRelatedDocModal'
-
+import AddedRelatedDoc from '@/admin/components/addedRelatedDoc'
 // Hooks
 import { useForm } from 'react-hook-form'
 import EditDataTypeInputWrapper from '@/admin/layouts/editDataTypeInputWrapper'
@@ -38,6 +38,7 @@ import useStore from '@/admin/store/store'
 const Create = () => {
   const [schema, setSchema] = useState()
   const [relations, setRelations] = useState([])
+  const [update, setUpdate] = useState([])
   const imgURL = useStore(state => state.imgURL)
   const editorContent = useRef(null)
   const [onSubmit, setOnSubmit] = useState()
@@ -48,7 +49,8 @@ const Create = () => {
   const [schemaSorted, setSchemaSorted] = useState(null)
   const history = useHistory()
   const relatedDocRef = useRef([])
-  const selectedRowIds = useRef([])
+  // const selectedRowIds = useRef([])
+  const [selectedRowIds, setSelectedRowIds] = useState([])
 
   const {
     register,
@@ -101,20 +103,18 @@ const Create = () => {
       }
     })
 
-    console.log(selectedRowIds)
-
     if (haveEditor.current === true) setOnSubmit(!onSubmit)
     else {
       addByCollectionType(type, newContent.current).then(function (docRef) {
         let newId = docRef.id
 
         // map selectedRowIds
-        selectedRowIds.current.map(s => {
+        selectedRowIds.map(s => {
           let idsArr = []
           let docsContent = []
           Object.keys(s).map(entry => {
             const spliceRelations = entry.split('_')
-            s[entry].map(currentId => {
+            s[entry].map(({ id: currentId }) => {
               let type1
               let type2
               let composedId
@@ -222,37 +222,11 @@ const Create = () => {
           console.log(junction)
           const { type2 } = types(junction)
           relatedCollections.push({ type: type2, junction: junction.name })
-          // if (junction.display === true) {
-          //   const promise = new Promise(async (resolve, reject) => {
-          //     const { type1, type2 } = types(junction)
-          //     relatedDocs = await fetchProducts(id, junction.name, type1, type2)
-          //     resolve({
-          //       content: [...relatedDocs],
-          //       collection: type2,
-          //       junctionName: junction.name
-          //     })
-          //   })
-          //   promises.push(promise)
-          // } else {
-          //   const promise = new Promise(async (resolve, reject) => {
-          //     resolve({ junctionName: junction.name, collection: type2 })
-          //   })
-          //   promises.push(promise)
-          // }
         })
         setRelations(relatedCollections)
-        // if (promises.length > 0) {
-        //   await Promise.all(promises).then(resolved => {
-        //     setRelations([...resolved])
-        //   })
-        // }
       }
     })
   }
-
-  useEffect(() => {
-    console.log(relations)
-  }, [relations])
 
   useEffect(() => {
     if (schema) {
@@ -300,12 +274,74 @@ const Create = () => {
                     <AddRelatedDocModal
                       collection={relation.type}
                       junctionName={relation.junction}
-                      content={[]}
                       type={type}
-                      relatedDocRef={relatedDocRef}
-                      selectedRowIds={selectedRowIds}
-                      // id={id}
+                      setSelectedRowIds={setSelectedRowIds}
                     />
+
+                    <AddedRelatedDoc
+                      selectedRowIds={selectedRowIds}
+                      relatedDocType={relation.type}
+                      type={type}
+                      setSelectedRowIds={setSelectedRowIds}
+                    />
+
+                    {/* {selectedRowIds.length > 0 &&
+                      selectedRowIds.map((selected, i) => {
+                        return Object.keys(selected).map(key => {
+                          let spliceRelations = key.split('_')
+                          let type1, type2
+                          if (spliceRelations[1] === type) {
+                            type1 = spliceRelations[1]
+                            type2 = spliceRelations[2]
+                          } else {
+                            type1 = spliceRelations[2]
+                            type2 = spliceRelations[1]
+                          }
+                          if (relation.type === type2) {
+                            return selected[key].map((s, i) => {
+                              return (
+                                <Flex
+                                  key={i}
+                                  height='50px'
+                                  mt='20px'
+                                  justifyContent='space-between'
+                                >
+                                  {Object.keys(s).map((subkey, i) => {
+                                    return (
+                                      <div key={i}>
+                                        <div>{s[subkey]}</div>
+                                      </div>
+                                    )
+                                  })}
+                                  <Button
+                                    height='30px'
+                                    onClick={() => {
+                                      // onDelete row
+                                      let arr = selected[key].filter(item => {
+                                        return item.id !== s.id
+                                      })
+                                      let newState = selectedRowIds
+
+                                      selectedRowIds.map((selectedRow, i) => {
+                                        Object.keys(selectedRow).map(
+                                          selectDelKey => {
+                                            if (selectDelKey === key) {
+                                              newState[i][selectDelKey] = arr
+                                            }
+                                          }
+                                        )
+                                      })
+                                      setSelectedRowIds(Array.from(newState))
+                                    }}
+                                  >
+                                    remove
+                                  </Button>
+                                </Flex>
+                              )
+                            })
+                          }
+                        })
+                      })} */}
                   </EditDataTypeInputWrapper>
                 )
               })}

@@ -10,7 +10,9 @@ import {
   fetchProducts,
   getFullSchemaByType,
   getCollection,
-  addByCollectionTypeWithCustomID
+  addByCollectionTypeWithCustomID,
+  addByCollectionTypeWithCustomIDBatched,
+  deleteRelatedDoc
 } from '@/firebase/client'
 
 // Components
@@ -27,6 +29,7 @@ import TipTap from '../components/editor'
 import Header from '../components/header'
 import TextAreaImage from '@/admin/components/atoms/textAreaImage'
 import AddRelatedDocModal from '@/admin/components/addRelatedDocModal'
+import AddedRelatedDoc from '@/admin/components/addedRelatedDoc'
 
 // Styles
 import { Label } from '../styles'
@@ -59,6 +62,8 @@ const Edit = () => {
   const relatedJunction = useRef(null)
   const haveEditor = useRef(false)
   const updateRef = useRef(false)
+  const relatedDocRef = useRef([])
+  const [selectedRowIds, setSelectedRowIds] = useState([])
   const setLoading = useStore(state => state.setLoading)
   const selectedCollectionName = useStore(state => state.selectedCollectionName)
   const setSelectedCollectionName = useStore(
@@ -216,6 +221,43 @@ const Edit = () => {
     }
     if (updateRef.current === true) {
       updateOneByType(id, type, contentCloned.current)
+
+      selectedRowIds.map(s => {
+        let idsArr = []
+        let docsContent = []
+        Object.keys(s).map(entry => {
+          const spliceRelations = entry.split('_')
+          s[entry].map(({ id: currentId }) => {
+            console.log(entry)
+            console.log(currentId)
+            let type1
+            let type2
+            let composedId
+
+            // Compose ids
+            if (spliceRelations[1] === type) {
+              composedId = `${id}_${currentId}`
+              type1 = spliceRelations[1]
+              type2 = spliceRelations[2]
+            } else {
+              composedId = `${currentId}_${id}`
+              type1 = spliceRelations[2]
+              type2 = spliceRelations[1]
+            }
+            idsArr.push(composedId)
+
+            // Prepare content of Doc
+            docsContent.push({
+              [`${type1}Id`]: id,
+              [`${type2}Id`]: currentId
+            })
+          })
+
+          // Create doc and junction collection if no exists yet
+          addByCollectionTypeWithCustomIDBatched(entry, idsArr, docsContent)
+        })
+      })
+
       toast({
         title: 'Content updated successfully',
         position: 'bottom-right',
@@ -331,6 +373,10 @@ const Edit = () => {
     }
   }, [content])
 
+  useEffect(() => {
+    console.log(selectedRowIds)
+  }, [selectedRowIds])
+
   return (
     <Box minH='calc(100% - 50px)'>
       <Header back={true} title={`Editing ${type.slice(0, -1)}: ${title}`}>
@@ -380,24 +426,95 @@ const Edit = () => {
                         </Label>
                         {'content' in relation ? (
                           <div>
-                            {console.log(relation)}
                             <AddRelatedDocModal
-                              // type={relation.collection}
-                              // collection={relation.content}
                               collection={relation.collection}
                               junctionName={relation.junctionName}
                               content={relation.content}
                               type={type}
                               id={id}
-                              // onClick={() => {
-                              //   getRelationCollection(relation.junctionName)
-                              // }}
+                              setSelectedRowIds={setSelectedRowIds}
                             />
+
+                            <AddedRelatedDoc
+                              selectedRowIds={selectedRowIds}
+                              relatedDocType={relation.collection}
+                              type={type}
+                              setSelectedRowIds={setSelectedRowIds}
+                            />
+
+                            {/* {selectedRowIds.length > 0 &&
+                              selectedRowIds.map((selected, i) => {
+                                console.log(selected)
+                                return Object.keys(selected).map(key => {
+                                  let spliceRelations = key.split('_')
+                                  let type1, type2
+                                  if (spliceRelations[1] === type) {
+                                    type1 = spliceRelations[1]
+                                    type2 = spliceRelations[2]
+                                  } else {
+                                    type1 = spliceRelations[2]
+                                    type2 = spliceRelations[1]
+                                  }
+                                  if (relation.collection === type2) {
+                                    return selected[key].map((s, i) => {
+                                      return (
+                                        <Flex
+                                          key={i}
+                                          height='50px'
+                                          mt='20px'
+                                          justifyContent='space-between'
+                                        >
+                                          {Object.keys(s).map((subkey, i) => {
+                                            return (
+                                              <div key={i}>
+                                                <div>{s[subkey]}</div>
+                                              </div>
+                                            )
+                                          })}
+                                          <Button
+                                            height='30px'
+                                            onClick={() => {
+                                              // onDelete row
+                                              let arr = selected[key].filter(
+                                                item => {
+                                                  return item.id !== s.id
+                                                }
+                                              )
+                                              let newState = selectedRowIds
+
+                                              selectedRowIds.map(
+                                                (selectedRow, i) => {
+                                                  Object.keys(selectedRow).map(
+                                                    selectDelKey => {
+                                                      if (
+                                                        selectDelKey === key
+                                                      ) {
+                                                        newState[i][
+                                                          selectDelKey
+                                                        ] = arr
+                                                      }
+                                                    }
+                                                  )
+                                                }
+                                              )
+                                              setSelectedRowIds(
+                                                Array.from(newState)
+                                              )
+                                            }}
+                                          >
+                                            remove
+                                          </Button>
+                                        </Flex>
+                                      )
+                                    })
+                                  }
+                                })
+                              })} */}
                             {relation.content.map(doc => {
                               return (
                                 <div
                                   key={doc.id}
-                                  onClick={() => {
+                                  onClick={e => {
                                     history.push(
                                       `/admin/${relation.collection}/${doc.id}`
                                     )
@@ -412,6 +529,35 @@ const Edit = () => {
                                       )
                                     }
                                   })}
+                                  <Button
+                                    onClick={e => {
+                                      e.stopPropagation()
+                                      console.log(doc.id)
+                                      console.log(id)
+                                      let composedId
+                                      let type1, type2
+                                      const spliceRelations = relation.junctionName.split(
+                                        '_'
+                                      )
+                                      if (spliceRelations[1] === type) {
+                                        composedId = `${id}_${doc.id}`
+                                        type1 = spliceRelations[1]
+                                        type2 = spliceRelations[2]
+                                      } else {
+                                        composedId = `${doc.id}_${id}`
+                                        type1 = spliceRelations[2]
+                                        type2 = spliceRelations[1]
+                                      }
+                                      console.log(composedId)
+
+                                      deleteRelatedDoc(
+                                        relation.junctionName,
+                                        composedId
+                                      )
+                                    }}
+                                  >
+                                    Delete
+                                  </Button>
                                 </div>
                               )
                             })}

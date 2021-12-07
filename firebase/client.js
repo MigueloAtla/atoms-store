@@ -70,6 +70,13 @@ export const addByCollectionTypeWithCustomID = (type, ids, content) => {
     .doc(ids)
     .set(content)
 }
+
+export const deleteRelatedDoc = (collection, id) => {
+  db.collection(collection)
+    .doc(id)
+    .delete()
+}
+
 export const addByCollectionTypeWithCustomIDBatched = (type, ids, content) => {
   console.log(type)
   console.log(ids)
