@@ -1,6 +1,6 @@
 // React/Next
 import React, { useEffect, useRef, useState } from 'react'
-import { useParams, Link, useHistory } from 'react-router-dom'
+import { useParams, useHistory } from 'react-router-dom'
 
 // Firebase
 import {
@@ -9,8 +9,6 @@ import {
   updateOneByType,
   fetchProducts,
   getFullSchemaByType,
-  getCollection,
-  addByCollectionTypeWithCustomID,
   addByCollectionTypeWithCustomIDBatched,
   deleteRelatedDoc
 } from '@/firebase/client'
@@ -22,7 +20,7 @@ import LoaderScreen from '@/admin/atoms/loadScreen'
 import PreviewDrawer from '@/admin/atoms/previewDrawer'
 import EditDataTypeInputWrapper from '@/admin/layouts/editDataTypeInputWrapper'
 
-import { Input, Box, useToast, Button, Flex, Text } from '@chakra-ui/react'
+import { Input, Box, useToast, Button } from '@chakra-ui/react'
 
 // Components
 import TipTap from '../components/editor'
@@ -36,7 +34,7 @@ import { Label } from '../styles'
 import { TextInputStyled, TextAreaStyled } from '@/admin/atoms/textInput/styles'
 
 // Utils
-import { capitalizeFirstLetter } from '../utils/utils'
+import { capitalizeFirstLetter, getTypes } from '../utils/utils'
 
 // State
 import useStore from '../store/store'
@@ -47,22 +45,17 @@ import { useForm, FormProvider } from 'react-hook-form'
 const Edit = () => {
   let history = useHistory()
   const [schema, setSchema] = useState()
-  // const [relatedCollectionsState, setRelatedCollectionsState] = useState([])
   const [relations, setRelations] = useState([])
-  const [relatedCollection, setRelatedCollection] = useState([])
   const [content, setContent] = useState(null)
   const imgURL = useStore(state => state.imgURL)
   const setImgURL = useStore(state => state.setImgURL)
-  const setId = useStore(state => state.setId)
   const globalId = useStore(state => state.id)
   const editorContent = useRef(null)
   const [onSubmit, setOnSubmit] = useState()
   const { id, type } = useParams()
   const contentCloned = useRef(null)
-  const relatedJunction = useRef(null)
   const haveEditor = useRef(false)
   const updateRef = useRef(false)
-  const relatedDocRef = useRef([])
   const [selectedRowIds, setSelectedRowIds] = useState([])
   const setLoading = useStore(state => state.setLoading)
   const selectedCollectionName = useStore(state => state.selectedCollectionName)
@@ -93,17 +86,6 @@ const Edit = () => {
     })
   }
 
-  // get related collection
-  const getRelationCollection = junction => {
-    console.log('adding a relation')
-    // get all products on modal
-    relatedJunction.current = junction
-    const { type1, type2 } = getTypes(junction)
-    getCollection(type2).then(r => {
-      setRelatedCollection(r)
-    })
-  }
-
   useEffect(() => {
     if (selectedCollectionName === '') {
       setSelectedCollectionName(type)
@@ -118,27 +100,11 @@ const Edit = () => {
     })
   }, [globalId, id])
 
-  const getTypes = junction => {
-    console.log('get types')
-    console.log(junction)
-    const spliceRelations = junction.split('_')
-    let type1, type2
-    if (spliceRelations[1] === type) {
-      type1 = spliceRelations[1]
-      type2 = spliceRelations[2]
-    } else {
-      type1 = spliceRelations[2]
-      type2 = spliceRelations[1]
-    }
-    return { type1, type2 }
-  }
-
   const getRelatedDoc = async junction => {
-    const { type1, type2 } = getTypes(junction)
+    const { type1, type2 } = getTypes(junction, type)
     const relationsFetched = await fetchProducts(id, junction, type1, type2)
     const prevState = relations
     const newState = prevState.map(collection => {
-      console.log(collection.collection)
       if (collection.collection === type2) {
         return {
           content: [...relationsFetched],
@@ -201,10 +167,6 @@ const Edit = () => {
   }
 
   useEffect(() => {
-    console.log(relations)
-  }, [relations])
-
-  useEffect(() => {
     if (content) {
       Object.keys(content).map(key => {
         if (content[key].type === 'image' && content[key].value !== '') {
@@ -228,8 +190,6 @@ const Edit = () => {
         Object.keys(s).map(entry => {
           const spliceRelations = entry.split('_')
           s[entry].map(({ id: currentId }) => {
-            console.log(entry)
-            console.log(currentId)
             let type1
             let type2
             let composedId
@@ -392,192 +352,108 @@ const Edit = () => {
       ) : (
         <PageTransitionAnimation>
           {content && (
-            <>
-              <Box m='80px'>
-                <FormProvider {...{ register, errors, setValue }}>
-                  <form
-                    id='edit-form'
-                    onSubmit={handleSubmitHook(handleSubmit)}
-                  >
-                    {schemaSorted &&
-                      schemaSorted.map((el, i) => {
-                        let name = el[0]
-                        let key = el[1]
-                        let expanded =
-                          expandedEditor && el[1].type === 'richtext'
-                        return (
-                          <EditDataTypeInputWrapper key={i} expanded={expanded}>
-                            <Label w='100%' key={i}>
-                              {capitalizeFirstLetter(name)}
-                            </Label>
-                            {renderDataInput(key, name)}
-                          </EditDataTypeInputWrapper>
-                        )
-                      })}
-                  </form>
-                </FormProvider>
+            <Box m='80px'>
+              <FormProvider {...{ register, errors, setValue }}>
+                <form id='edit-form' onSubmit={handleSubmitHook(handleSubmit)}>
+                  {schemaSorted &&
+                    schemaSorted.map((el, i) => {
+                      let name = el[0]
+                      let key = el[1]
+                      let expanded = expandedEditor && el[1].type === 'richtext'
+                      return (
+                        <EditDataTypeInputWrapper key={i} expanded={expanded}>
+                          <Label w='100%' key={i}>
+                            {capitalizeFirstLetter(name)}
+                          </Label>
+                          {renderDataInput(key, name)}
+                        </EditDataTypeInputWrapper>
+                      )
+                    })}
+                </form>
+              </FormProvider>
 
-                {relations.length > 0 &&
-                  relations.map((relation, i) => {
-                    return (
-                      <EditDataTypeInputWrapper key={i} direction='row'>
-                        <Label w='100%'>
-                          {capitalizeFirstLetter(relation.collection)}
-                        </Label>
-                        {'content' in relation ? (
-                          <div>
-                            <AddRelatedDocModal
-                              collection={relation.collection}
-                              junctionName={relation.junctionName}
-                              content={relation.content}
-                              type={type}
-                              id={id}
-                              setSelectedRowIds={setSelectedRowIds}
-                            />
+              {relations.length > 0 &&
+                relations.map((relation, i) => {
+                  return (
+                    <EditDataTypeInputWrapper key={i} direction='row'>
+                      <Label w='100%'>
+                        {capitalizeFirstLetter(relation.collection)}
+                      </Label>
+                      {'content' in relation ? (
+                        <div>
+                          <AddRelatedDocModal
+                            collection={relation.collection}
+                            junctionName={relation.junctionName}
+                            content={relation.content}
+                            type={type}
+                            id={id}
+                            setSelectedRowIds={setSelectedRowIds}
+                          />
 
-                            <AddedRelatedDoc
-                              selectedRowIds={selectedRowIds}
-                              relatedDocType={relation.collection}
-                              type={type}
-                              setSelectedRowIds={setSelectedRowIds}
-                            />
-
-                            {/* {selectedRowIds.length > 0 &&
-                              selectedRowIds.map((selected, i) => {
-                                console.log(selected)
-                                return Object.keys(selected).map(key => {
-                                  let spliceRelations = key.split('_')
-                                  let type1, type2
-                                  if (spliceRelations[1] === type) {
-                                    type1 = spliceRelations[1]
-                                    type2 = spliceRelations[2]
-                                  } else {
-                                    type1 = spliceRelations[2]
-                                    type2 = spliceRelations[1]
+                          <AddedRelatedDoc
+                            selectedRowIds={selectedRowIds}
+                            relatedDocType={relation.collection}
+                            type={type}
+                            setSelectedRowIds={setSelectedRowIds}
+                          />
+                          {relation.content.map(doc => {
+                            return (
+                              <div
+                                key={doc.id}
+                                onClick={e => {
+                                  history.push(
+                                    `/admin/${relation.collection}/${doc.id}`
+                                  )
+                                }}
+                              >
+                                {Object.keys(doc).map(docField => {
+                                  if (docField !== 'id') {
+                                    return (
+                                      <p>
+                                        {docField}: {doc[docField].value}
+                                      </p>
+                                    )
                                   }
-                                  if (relation.collection === type2) {
-                                    return selected[key].map((s, i) => {
-                                      return (
-                                        <Flex
-                                          key={i}
-                                          height='50px'
-                                          mt='20px'
-                                          justifyContent='space-between'
-                                        >
-                                          {Object.keys(s).map((subkey, i) => {
-                                            return (
-                                              <div key={i}>
-                                                <div>{s[subkey]}</div>
-                                              </div>
-                                            )
-                                          })}
-                                          <Button
-                                            height='30px'
-                                            onClick={() => {
-                                              // onDelete row
-                                              let arr = selected[key].filter(
-                                                item => {
-                                                  return item.id !== s.id
-                                                }
-                                              )
-                                              let newState = selectedRowIds
-
-                                              selectedRowIds.map(
-                                                (selectedRow, i) => {
-                                                  Object.keys(selectedRow).map(
-                                                    selectDelKey => {
-                                                      if (
-                                                        selectDelKey === key
-                                                      ) {
-                                                        newState[i][
-                                                          selectDelKey
-                                                        ] = arr
-                                                      }
-                                                    }
-                                                  )
-                                                }
-                                              )
-                                              setSelectedRowIds(
-                                                Array.from(newState)
-                                              )
-                                            }}
-                                          >
-                                            remove
-                                          </Button>
-                                        </Flex>
-                                      )
-                                    })
-                                  }
-                                })
-                              })} */}
-                            {relation.content.map(doc => {
-                              return (
-                                <div
-                                  key={doc.id}
+                                })}
+                                <Button
                                   onClick={e => {
-                                    history.push(
-                                      `/admin/${relation.collection}/${doc.id}`
+                                    e.stopPropagation()
+                                    let composedId
+                                    const spliceRelations = relation.junctionName.split(
+                                      '_'
+                                    )
+                                    if (spliceRelations[1] === type) {
+                                      composedId = `${id}_${doc.id}`
+                                    } else {
+                                      composedId = `${doc.id}_${id}`
+                                    }
+                                    deleteRelatedDoc(
+                                      relation.junctionName,
+                                      composedId
                                     )
                                   }}
                                 >
-                                  {Object.keys(doc).map(docField => {
-                                    if (docField !== 'id') {
-                                      return (
-                                        <p>
-                                          {docField}: {doc[docField].value}
-                                        </p>
-                                      )
-                                    }
-                                  })}
-                                  <Button
-                                    onClick={e => {
-                                      e.stopPropagation()
-                                      console.log(doc.id)
-                                      console.log(id)
-                                      let composedId
-                                      let type1, type2
-                                      const spliceRelations = relation.junctionName.split(
-                                        '_'
-                                      )
-                                      if (spliceRelations[1] === type) {
-                                        composedId = `${id}_${doc.id}`
-                                        type1 = spliceRelations[1]
-                                        type2 = spliceRelations[2]
-                                      } else {
-                                        composedId = `${doc.id}_${id}`
-                                        type1 = spliceRelations[2]
-                                        type2 = spliceRelations[1]
-                                      }
-                                      console.log(composedId)
-
-                                      deleteRelatedDoc(
-                                        relation.junctionName,
-                                        composedId
-                                      )
-                                    }}
-                                  >
-                                    Delete
-                                  </Button>
-                                </div>
-                              )
-                            })}
-                          </div>
-                        ) : (
-                          <div>
-                            <Button
-                              onClick={() => {
-                                getRelatedDoc(relation.junctionName)
-                              }}
-                            >
-                              show {relation.collection}
-                            </Button>
-                          </div>
-                        )}
-                      </EditDataTypeInputWrapper>
-                    )
-                  })}
-              </Box>
-            </>
+                                  Delete
+                                </Button>
+                              </div>
+                            )
+                          })}
+                        </div>
+                      ) : (
+                        <div>
+                          <Button
+                            onClick={() => {
+                              getRelatedDoc(relation.junctionName)
+                            }}
+                          >
+                            show {relation.collection}
+                          </Button>
+                        </div>
+                      )}
+                    </EditDataTypeInputWrapper>
+                  )
+                })}
+            </Box>
           )}
         </PageTransitionAnimation>
       )}

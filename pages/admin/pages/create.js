@@ -6,19 +6,18 @@ import { useParams, useHistory } from 'react-router-dom'
 import { Label } from '../styles'
 
 // Ui
-import { Textarea, Input, useToast, Box, Button, Flex } from '@chakra-ui/react'
+import { Textarea, Input, useToast, Box } from '@chakra-ui/react'
 
 // Firebase
 import {
   getSchemaByType,
   addByCollectionType,
   getFullSchemaByType,
-  fetchProducts,
   addByCollectionTypeWithCustomIDBatched
 } from '@/firebase/client'
 
 // Utils
-import { capitalizeFirstLetter } from '../utils/utils'
+import { capitalizeFirstLetter, getTypes } from '../utils/utils'
 
 // Components
 import TipTap from '../components/editor'
@@ -27,6 +26,7 @@ import Header from '@/admin/components/header'
 import TextAreaImage from '@/admin/components/atoms/textAreaImage'
 import AddRelatedDocModal from '@/admin/components/addRelatedDocModal'
 import AddedRelatedDoc from '@/admin/components/addedRelatedDoc'
+
 // Hooks
 import { useForm } from 'react-hook-form'
 import EditDataTypeInputWrapper from '@/admin/layouts/editDataTypeInputWrapper'
@@ -38,7 +38,6 @@ import useStore from '@/admin/store/store'
 const Create = () => {
   const [schema, setSchema] = useState()
   const [relations, setRelations] = useState([])
-  const [update, setUpdate] = useState([])
   const imgURL = useStore(state => state.imgURL)
   const editorContent = useRef(null)
   const [onSubmit, setOnSubmit] = useState()
@@ -48,8 +47,6 @@ const Create = () => {
   const { type } = useParams()
   const [schemaSorted, setSchemaSorted] = useState(null)
   const history = useHistory()
-  const relatedDocRef = useRef([])
-  // const selectedRowIds = useRef([])
   const [selectedRowIds, setSelectedRowIds] = useState([])
 
   const {
@@ -58,6 +55,7 @@ const Create = () => {
     formState: { errors }
   } = useForm()
 
+  // OnMount: get metadata of the Collection
   useEffect(() => {
     type &&
       getSchemaByType(type).then(res => {
@@ -69,20 +67,12 @@ const Create = () => {
     if (newContent.current) {
       newContent.current['content'].value = editorContent.current
       addByCollectionType(type, newContent.current)
-
-      toast({
-        title: 'Content Created Successfully',
-        position: 'bottom-right',
-        variant: 'subtle',
-        description: 'Alright!',
-        duration: 5000,
-        isClosable: true
-      })
-      history.goBack()
+      showToastAndGoBack()
     }
   }, [editorContent.current])
 
   const handleSubmit = data => {
+    // Prepare data before write in DB
     newContent.current = {}
 
     Object.keys(schema).map(s => {
@@ -105,6 +95,7 @@ const Create = () => {
 
     if (haveEditor.current === true) setOnSubmit(!onSubmit)
     else {
+      // Create the Doc and get the generated ID
       addByCollectionType(type, newContent.current).then(function (docRef) {
         let newId = docRef.id
 
@@ -138,24 +129,29 @@ const Create = () => {
               })
             })
 
-            // Create doc and junction collection if no exists yet
+            // Create Doc and junction collection if no exists yet
             addByCollectionTypeWithCustomIDBatched(entry, idsArr, docsContent)
           })
         })
       })
-      toast({
-        title: 'Content Created Successfully',
-        position: 'bottom-right',
-        variant: 'subtle',
-        description: 'Alright!',
-        // status: 'success',
-        duration: 5000,
-        isClosable: true
-      })
-      history.goBack()
+      showToastAndGoBack()
     }
   }
 
+  // After Doc is created
+  const showToastAndGoBack = () => {
+    toast({
+      title: 'Content Created Successfully',
+      position: 'bottom-right',
+      variant: 'subtle',
+      description: 'Alright!',
+      duration: 5000,
+      isClosable: true
+    })
+    history.goBack()
+  }
+
+  // Generate the fields to render in the form, based on the type of each field
   const renderSwitch = ({ name, type, isRequired }) => {
     switch (type) {
       case 'longtext':
@@ -199,28 +195,12 @@ const Create = () => {
   }
 
   const getRelations = async () => {
-    let relatedDocs = []
-
-    const types = junction => {
-      const spliceRelations = junction.name.split('_')
-      let type1, type2
-      if (spliceRelations[1] === type) {
-        type1 = spliceRelations[1]
-        type2 = spliceRelations[2]
-      } else {
-        type1 = spliceRelations[2]
-        type2 = spliceRelations[1]
-      }
-      return { type1, type2 }
-    }
-
     getFullSchemaByType(type).then(async data => {
       if (data.length > 0 && data[0].relations?.length > 0) {
         const promises = []
         const relatedCollections = []
         data[0].relations.forEach((junction, i) => {
-          console.log(junction)
-          const { type2 } = types(junction)
+          const { type2 } = getTypes(junction.name, type)
           relatedCollections.push({ type: type2, junction: junction.name })
         })
         setRelations(relatedCollections)
@@ -228,9 +208,10 @@ const Create = () => {
     })
   }
 
+  // When Collection metadata is fetched, sort the fields in order
+  // before they are rendered, and get related Docs
   useEffect(() => {
     if (schema) {
-      console.log(schema)
       let schemaSortedArr = Object.entries(schema).sort(function (a, b) {
         return a[1].order - b[1].order
       })
@@ -245,6 +226,7 @@ const Create = () => {
         <CreateDocButton type={type} />
       </Header>
       <PageTransitionAnimation>
+        {/* Showing fields with Doc data */}
         {schema && (
           <Box m='20px'>
             <form id='create-doc' onSubmit={handleSubmitHook(handleSubmit)}>
@@ -264,6 +246,8 @@ const Create = () => {
                   )
                 })}
             </form>
+
+            {/* Showing related Docs */}
             {relations.length > 0 &&
               relations.map((relation, i) => {
                 return (
@@ -284,64 +268,6 @@ const Create = () => {
                       type={type}
                       setSelectedRowIds={setSelectedRowIds}
                     />
-
-                    {/* {selectedRowIds.length > 0 &&
-                      selectedRowIds.map((selected, i) => {
-                        return Object.keys(selected).map(key => {
-                          let spliceRelations = key.split('_')
-                          let type1, type2
-                          if (spliceRelations[1] === type) {
-                            type1 = spliceRelations[1]
-                            type2 = spliceRelations[2]
-                          } else {
-                            type1 = spliceRelations[2]
-                            type2 = spliceRelations[1]
-                          }
-                          if (relation.type === type2) {
-                            return selected[key].map((s, i) => {
-                              return (
-                                <Flex
-                                  key={i}
-                                  height='50px'
-                                  mt='20px'
-                                  justifyContent='space-between'
-                                >
-                                  {Object.keys(s).map((subkey, i) => {
-                                    return (
-                                      <div key={i}>
-                                        <div>{s[subkey]}</div>
-                                      </div>
-                                    )
-                                  })}
-                                  <Button
-                                    height='30px'
-                                    onClick={() => {
-                                      // onDelete row
-                                      let arr = selected[key].filter(item => {
-                                        return item.id !== s.id
-                                      })
-                                      let newState = selectedRowIds
-
-                                      selectedRowIds.map((selectedRow, i) => {
-                                        Object.keys(selectedRow).map(
-                                          selectDelKey => {
-                                            if (selectDelKey === key) {
-                                              newState[i][selectDelKey] = arr
-                                            }
-                                          }
-                                        )
-                                      })
-                                      setSelectedRowIds(Array.from(newState))
-                                    }}
-                                  >
-                                    remove
-                                  </Button>
-                                </Flex>
-                              )
-                            })
-                          }
-                        })
-                      })} */}
                   </EditDataTypeInputWrapper>
                 )
               })}
