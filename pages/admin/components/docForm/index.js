@@ -30,8 +30,6 @@ const DocForm = ({
     setValue
   } = useForm()
 
-  console.log('onSubmit', onSubmit)
-
   return (
     <FormProvider {...{ register, errors, setValue }}>
       <form id={id} onSubmit={handleSubmitHook(handleSubmit)}>
@@ -40,7 +38,7 @@ const DocForm = ({
             let { obj, name } = transformDataForTypeInput(el)
             let expanded = expandedEditor && el[1].type === 'richtext'
             return (
-              <DocFormFieldWrapper key={i} expanded={expanded}>
+              <DocFormFieldWrapper key={i} $expanded={expanded ? 1 : 0}>
                 <Label w='100%' key={i}>
                   {capitalizeFirstLetter(name)}
                 </Label>

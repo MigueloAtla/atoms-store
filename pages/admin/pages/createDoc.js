@@ -72,6 +72,40 @@ const Create = () => {
     }
   }, [editorContent.current])
 
+  // When Collection metadata is fetched, sort the fields in order
+  // before they are rendered, and get related Docs
+  useEffect(() => {
+    if (schema) {
+      let schemaSortedArr = Object.entries(schema).sort(function (a, b) {
+        return a[1].order - b[1].order
+      })
+      setSchemaSorted(schemaSortedArr)
+      getRelations()
+    }
+  }, [schema])
+
+  const getRelations = async () => {
+    getFullSchemaByType(type).then(async data => {
+      if (data.length > 0 && data[0].relations?.length > 0) {
+        const promises = []
+        const relatedCollections = []
+        data[0].relations.forEach((junction, i) => {
+          const { type2 } = getTypes(junction.name, type)
+          relatedCollections.push({ type: type2, junction: junction.name })
+        })
+        setRelations(relatedCollections)
+      }
+    })
+  }
+
+  const transformDataForTypeInput = el => {
+    let name = el[0]
+    let type = el[1].type
+    let isRequired = el[1].isRequired
+    let obj = { type, value: null, isRequired }
+    return { obj, name }
+  }
+
   const handleSubmit = data => {
     // Prepare data before write in DB
     newContent.current = {}
@@ -94,10 +128,7 @@ const Create = () => {
       }
     })
 
-    if (haveEditor.current === true) {
-      setOnSubmit(!onSubmit)
-      console.log('on submit')
-    }
+    if (haveEditor.current === true) setOnSubmit(!onSubmit)
     // else {
     // Create the Doc and get the generated ID
     addByCollectionType(type, newContent.current).then(function (docRef) {
@@ -153,40 +184,6 @@ const Create = () => {
       isClosable: true
     })
     history.goBack()
-  }
-
-  const getRelations = async () => {
-    getFullSchemaByType(type).then(async data => {
-      if (data.length > 0 && data[0].relations?.length > 0) {
-        const promises = []
-        const relatedCollections = []
-        data[0].relations.forEach((junction, i) => {
-          const { type2 } = getTypes(junction.name, type)
-          relatedCollections.push({ type: type2, junction: junction.name })
-        })
-        setRelations(relatedCollections)
-      }
-    })
-  }
-
-  // When Collection metadata is fetched, sort the fields in order
-  // before they are rendered, and get related Docs
-  useEffect(() => {
-    if (schema) {
-      let schemaSortedArr = Object.entries(schema).sort(function (a, b) {
-        return a[1].order - b[1].order
-      })
-      setSchemaSorted(schemaSortedArr)
-      getRelations()
-    }
-  }, [schema])
-
-  const transformDataForTypeInput = el => {
-    let name = el[0]
-    let type = el[1].type
-    let isRequired = el[1].isRequired
-    let obj = { type, value: null, isRequired }
-    return { obj, name }
   }
 
   return (

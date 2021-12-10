@@ -7,7 +7,7 @@ import {
   fireEvent
 } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
-import Edit from '../edit'
+import Edit from '../editDoc'
 import { MemoryRouter } from 'react-router-dom'
 import { ThemeProvider } from 'styled-components'
 import { theme } from '@/theme'

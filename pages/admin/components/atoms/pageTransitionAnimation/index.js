@@ -16,7 +16,7 @@ const PageTransitionAnimation = ({ children }) => {
         duration: 0.2
       }}
       style={{
-        marginTop: '100px'
+        marginTop: '60px'
       }}
     >
       {children}

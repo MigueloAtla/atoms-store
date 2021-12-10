@@ -4,6 +4,7 @@ export const TableStyled = styled.div`
   padding: 1rem;
   box-sizing: border-box;
   width: calc(100% - 50px);
+  margin: 0 auto;
 
   td,
   th,

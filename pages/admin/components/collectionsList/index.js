@@ -20,6 +20,8 @@ const CollectionsList = () => {
     state => state.setSelectedCollectionName
   )
   const selectedCollectionName = useStore(state => state.selectedCollectionName)
+  const setSelectedSidebarMenu = useStore(state => state.setSelectedSidebarMenu)
+
   return (
     <Flex direction='column' height='100%' width='100%'>
       <Text color='white' fontWeight='bold' my='10px' textAlign='center'>
@@ -32,7 +34,10 @@ const CollectionsList = () => {
               <Link
                 to={`/admin/${collection.name}`}
                 key={i}
-                onClick={() => setSelectedCollectionName(collection.name)}
+                onClick={() => {
+                  setSelectedCollectionName(collection.name)
+                  setSelectedSidebarMenu('collections')
+                }}
               >
                 <CollectionsListItem
                   collection={collection.name}

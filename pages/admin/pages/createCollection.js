@@ -24,7 +24,7 @@ import useStore from '@/admin/store/store'
 
 import { useForm, useFieldArray, Controller } from 'react-hook-form'
 
-export default function NewCollection () {
+export default function CreateCollection () {
   const collections = useStore(state => state.collections)
   const [table, setTable] = useState([false])
   const setRerender = useStore(state => state.setRerender)

@@ -23,6 +23,7 @@ import { TableStyled } from './styles'
 
 // Components
 import TableTr from '@/admin/components/tableTr'
+import styled from 'styled-components'
 
 // Define a default UI for filtering
 function GlobalFilter ({
@@ -38,9 +39,8 @@ function GlobalFilter ({
 
   return (
     <span>
-      Search:{' '}
       <Input
-        variant='flushed'
+        variant='filled'
         mt='24px'
         w='100%'
         value={value || ''}
@@ -170,8 +170,9 @@ function Table ({ columns, data, type, onClick }) {
           </tbody>
         </table>
         <div className='pagination'>
-          <HStack w='100%' spacing='24px' justify='center' mt='24px'>
+          <PaginationStyled spacing='24px' justify='center'>
             <IconButton
+              size='xs'
               outlineColor='#11101d'
               onClick={() => gotoPage(0)}
               disabled={!canPreviousPage}
@@ -179,18 +180,21 @@ function Table ({ columns, data, type, onClick }) {
               icon={<ArrowLeftIcon />}
             />
             <IconButton
+              size='xs'
               outlineColor='#11101d'
               onClick={() => previousPage()}
               disabled={!canPreviousPage}
               icon={<ChevronLeftIcon />}
             />
             <IconButton
+              size='xs'
               outlineColor='#11101d'
               onClick={() => nextPage()}
               disabled={!canNextPage}
               icon={<ChevronRightIcon />}
             />
             <IconButton
+              size='xs'
               outlineColor='#11101d'
               onClick={() => gotoPage(pageCount - 1)}
               disabled={!canNextPage}
@@ -228,7 +232,7 @@ function Table ({ columns, data, type, onClick }) {
                 </option>
               ))}
             </Select>
-          </HStack>
+          </PaginationStyled>
         </div>
       </TableStyled>
     </>
@@ -237,3 +241,13 @@ function Table ({ columns, data, type, onClick }) {
 
 // export default ContentTable
 export default Table
+
+const PaginationStyled = styled(HStack)`
+  position: fixed;
+  bottom: 0;
+  left: 90px;
+  background-color: white;
+  margin-top: 24px;
+  width: calc(100% - 90px);
+  border-top: 1px solid #bcbcbc;
+`

@@ -19,8 +19,6 @@ const ContentHeader = () => {
     setPath(arr)
   }, [location])
 
-  console.log(path)
-
   return (
     <Grid
       data-testid='content-header'

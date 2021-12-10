@@ -25,7 +25,7 @@ import useStore from '@/admin/store/store'
 // Utils
 import { capitalizeFirstLetter } from '@/admin/utils/utils'
 
-const CollectionList = () => {
+const DocsInCollection = () => {
   // const [collectionDataSorted, setCollectionDataSorted] = useState(null)
   let history = useHistory()
   const collectionData = useStore(state => state.collectionData)
@@ -145,7 +145,7 @@ const CollectionList = () => {
   )
 }
 
-export default CollectionList
+export default DocsInCollection
 
 const TableImage = styled(Img)`
   /* border-radius: 50%;

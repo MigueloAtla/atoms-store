@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 
-// components
-import EditCollectionForm from '@/admin/components/editSchemaForm'
-import Header from '@/admin/components/header'
-// State
-// import useStore from '@/admin/store/store'
+// Firebase
 import { getFullSchemaByType } from '@/firebase/client'
+
+// Components
+import Header from '@/admin/components/header'
+import EditCollectionForm from '@/admin/components/editSchemaForm'
 import { Button } from '@chakra-ui/react'
 
+// Utils
 import { capitalizeFirstLetter } from '@/admin/utils/utils'
 
-const CollectionSchema = () => {
+const EditCollection = () => {
   const { type } = useParams()
   const [schema, setSchema] = useState(null)
 
@@ -37,4 +38,4 @@ const CollectionSchema = () => {
     </>
   )
 }
-export default CollectionSchema
+export default EditCollection

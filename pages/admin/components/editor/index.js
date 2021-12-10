@@ -40,11 +40,8 @@ const MenuBar = ({ editor }) => {
   }
 
   return (
-    <MenuStyled expanded={expandedEditor} mb='15px'>
+    <MenuStyled $expanded={expandedEditor ? 1 : 0} mb='15px'>
       <Box w='calc(100% - 30px)'>
-        {/* <span>Formating text</span>
-        <br /> */}
-
         <EditorButton
           variant='outline'
           m='5px'

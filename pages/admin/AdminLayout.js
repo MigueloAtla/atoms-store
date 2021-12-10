@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { Icon, Flex } from '@chakra-ui/react'
 import { FaHome, FaPlug, FaLayerGroup, FaUsers } from 'react-icons/fa'
-import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom'
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
 
 // Firebase functions
 import { getCollections } from '@/firebase/client'
@@ -11,20 +11,24 @@ import { getCollections } from '@/firebase/client'
 // Styled
 import * as S from './styles'
 
+// Pages
+import Home from './pages/home'
+import UserPage from './pages/user'
+import CreateDoc from './pages/createDoc'
+import EditDoc from './pages/editDoc'
+import CreateCollection from './pages/createCollection'
+import DocsInCollection from './pages/docsInCollection'
+import Collections from './pages/collections'
+import EditCollection from './pages/editCollection'
+
 // Components
 import CollectionsList from './components/collectionsList'
-import EditDoc from './pages/editDoc'
-import CreateDoc from './pages/createDoc'
-import Home from './pages/home'
-import NewCollection from './pages/newCollection'
-import Collections from './pages/collections'
-import CollectionSchema from './pages/collectionSchema'
-import UserPage from './pages/user'
-import User from '@/admin/components/userLink'
-import CollectionList from './pages/collectionList'
-import MediaLibrary from './pages/mediaLibrary'
-import { AddIcon } from '@chakra-ui/icons'
+import SidebarButton from '@/admin/atoms/sidebarButton'
 import SidebarLink from '@/admin/atoms/sidebarLink'
+import SidebarExternalLink from '@/admin/atoms/sidebarExternalLink'
+import MediaLibrary from './pages/mediaLibrary'
+import User from '@/admin/components/userLink'
+import { AddIcon } from '@chakra-ui/icons'
 import { FaImages } from 'react-icons/fa'
 
 // Assets
@@ -118,22 +122,22 @@ export default function AdminLayout () {
                       </SidebarLink>
 
                       {/* web */}
-                      <SidebarLink target='_blank' href='/'>
+                      <SidebarExternalLink target='_blank' href='/'>
                         <Flex h='30px'>
                           <p style={{ color: 'white', fontWeight: 'bold' }}>
                             web
                           </p>
                         </Flex>
-                      </SidebarLink>
+                      </SidebarExternalLink>
 
                       {/* firebase */}
-                      <SidebarLink
+                      <SidebarExternalLink
                         target='_blank'
                         rel='noreferrer'
                         href={`${process.env.NEXT_PUBLIC_FIREBASE_URL}`}
                       >
                         <Image src={firebase} width='20' height='20' />
-                      </SidebarLink>
+                      </SidebarExternalLink>
                     </Areas.Header>
                     <Areas.Content
                       style={{
@@ -145,16 +149,16 @@ export default function AdminLayout () {
                       }}
                     >
                       {/* <CollectionsList /> */}
-                      <SidebarLink
+                      <SidebarButton
                         menu='collections'
                         onClick={() => {
-                          setSelectedCollectionName('')
-                          setSelectedSidebarMenu('collections')
+                          // setSelectedCollectionName('')
+                          // setSelectedSidebarMenu('collections')
                           setToggleCollectionsPanel(s => !s)
                         }}
                       >
                         <Icon as={FaLayerGroup} color='white' />
-                      </SidebarLink>
+                      </SidebarButton>
                       <SidebarLink
                         to={`/admin/collections`}
                         menu='collectionslist'
@@ -299,13 +303,13 @@ const AdminRoutes = () => (
       <UserPage />
     </Route>
     <Route path='/admin/new-collection'>
-      <NewCollection />
+      <CreateCollection />
     </Route>
     <Route path='/admin/collections'>
       <Collections />
     </Route>
     <Route path='/admin/collection/:type'>
-      <CollectionSchema />
+      <EditCollection />
     </Route>
     <Route path='/admin/:type/create'>
       <CreateDoc />
@@ -314,7 +318,7 @@ const AdminRoutes = () => (
       <EditDoc />
     </Route>
     <Route path='/admin/:type'>
-      <CollectionList />
+      <DocsInCollection />
     </Route>
     <Route path='/admin'>
       <Home />

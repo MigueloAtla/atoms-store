@@ -13,10 +13,10 @@ export const Styles = styled.div`
   }
 `
 export const MenuStyled = styled(Box)`
-  position: ${({ expanded }) => (expanded ? 'fixed' : 'sticky')};
-  top: ${({ expanded }) => (expanded ? 0 : '60px')};
-  height: ${({ expanded }) => expanded && '100px'};
-  width: ${({ expanded }) => expanded && '100vw'};
+  position: ${({ $expanded }) => ($expanded === 1 ? 'fixed' : 'sticky')};
+  top: ${({ $expanded }) => ($expanded === 1 ? 0 : '60px')};
+  height: ${({ $expanded }) => $expanded === 1 && '100px'};
+  width: ${({ $expanded }) => $expanded === 1 && '100vw'};
   bottom: 100px;
   z-index: 1;
   background-color: #ffffffed;

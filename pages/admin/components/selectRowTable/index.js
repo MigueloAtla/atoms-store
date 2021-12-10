@@ -7,7 +7,7 @@ import {
   useGlobalFilter,
   useAsyncDebounce
 } from 'react-table'
-import { Input, InputGroup, InputLeftAddon, Checkbox } from '@chakra-ui/react'
+import { Input, InputGroup } from '@chakra-ui/react'
 import { useHistory } from 'react-router-dom'
 
 // Define a default UI for filtering
@@ -24,9 +24,7 @@ function GlobalFilter ({
 
   return (
     <span>
-      {/* Search:{' '} */}
       <InputGroup>
-        {/* <InputLeftAddon children='Search' /> */}
         <Input
           variant='filled'
           w='100%'
@@ -72,7 +70,6 @@ const IndeterminateCheckbox = React.forwardRef(
     return (
       <>
         <CheckBox type='checkbox' ref={resolvedRef} {...rest} />
-        {/* <Checkbox type='checkbox' size='lg' ref={resolvedRef} {...rest} /> */}
       </>
     )
   }
@@ -207,24 +204,8 @@ const Table = ({ columns, data, onSelectRow, type, setSelectedLength }) => {
               </tr>
             )
           })}
-          {/* </OverflowScroll> */}
         </tbody>
       </table>
-
-      {/* <pre>
-        <code>
-          {JSON.stringify(
-            {
-              selectedRowIds: selectedRowIds,
-              'selectedFlatRows[].original': selectedFlatRows.map(
-                d => d.original
-              )
-            },
-            null,
-            2
-          )}
-        </code>
-      </pre> */}
     </TableStyled>
   )
 }

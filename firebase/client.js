@@ -217,7 +217,6 @@ export const getCollections = () => {
       return snapshot.docs.map(doc => {
         const result = doc.data()
         // const names = Object.keys(result)
-        console.log(result)
         let collections = []
         for (const [key, value] of Object.entries(result)) {
           collections.push({ name: key, page: value.page })
