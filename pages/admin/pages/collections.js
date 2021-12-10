@@ -3,7 +3,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 
 import PageTransitionAnimation from '@/admin/atoms/pageTransitionAnimation'
-import LoaderScreen from '@/admin/atoms/loadScreen'
+// import LoaderScreen from '@/admin/atoms/loadScreen'
 import { Flex, Text, Button } from '@chakra-ui/react'
 import Header from '../components/header'
 
@@ -51,19 +51,18 @@ const CollectionsList = () => {
               return (
                 <Link
                   style={{ width: 'calc(100% - 50px)', height: '100%' }}
-                  to={`/admin/collection/${collection}`}
+                  to={`/admin/collection/${collection.name}`}
                   key={i}
                 >
                   <Flex
                     bg='white'
                     height='75px'
-                    // borderBottom='1px solid black'
                     width='100%'
                     align='center'
                     borderRadius='10px'
                   >
                     <Text as='h4' fontSize='22px' ml='30'>
-                      {capitalizeFirstLetter(collection)}
+                      {capitalizeFirstLetter(collection.name)}
                     </Text>
                   </Flex>
                 </Link>

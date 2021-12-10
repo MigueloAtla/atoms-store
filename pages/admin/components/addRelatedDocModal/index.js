@@ -1,91 +1,52 @@
-import React, { useState, useRef } from 'react'
-// import Table from '@/admin/components/table'
+import React, { useState, useEffect, useRef } from 'react'
 import Table from '@/admin/components/selectRowTable'
-import styled from 'styled-components'
 
 import {
   Button,
-  Modal,
   ModalOverlay,
-  ModalContent,
   ModalHeader,
   ModalBody,
   ModalCloseButton,
   useDisclosure,
   Box
 } from '@chakra-ui/react'
-import Img from 'react-cool-img'
+
+import {
+  ModalStyled,
+  ModalContentStyled,
+  AddButton,
+  TableImage
+} from './styles'
 
 // Firebase
-import {
-  addByCollectionTypeWithCustomID,
-  getCollection
-} from '@/firebase/client'
+import { getCollection } from '@/firebase/client'
+
+// utils
+import { getTypes } from '@/admin/utils/utils'
+
+const prepareTable = () => {}
 
 const AddRelatedDocModal = ({
   collection,
   content = [],
   junctionName,
-  type,
-  id,
   setSelectedRowIds
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
   const [relatedCollection, setRelatedCollection] = useState([...content])
   const [selectedLength, setSelectedLength] = useState(0)
   const selectedRowOnTable = useRef([])
+  const type2Ref = useRef()
 
-  const getTypes = junction => {
-    console.log('get types')
-    console.log(junction)
-    const spliceRelations = junction.split('_')
-    let type1, type2
-    if (spliceRelations[1] === type) {
-      type1 = spliceRelations[1]
-      type2 = spliceRelations[2]
-    } else {
-      type1 = spliceRelations[2]
-      type2 = spliceRelations[1]
-    }
-    return { type1, type2 }
-  }
+  useEffect(() => {
+    const { type2 } = getTypes(junctionName)
+    type2Ref.current = type2
+  }, [junctionName])
 
   const getRelationCollection = () => {
-    console.log('adding a relation')
-    // get all products on modal
-    const { type1, type2 } = getTypes(junctionName)
-    console.log('type1: ', type1)
-    console.log('type2: ', type2)
-    getCollection(type2).then(r => {
-      console.log(r)
+    getCollection(type2Ref.current).then(r => {
       setRelatedCollection(r)
     })
-  }
-
-  /* @Name: addrelatedDoc
-   * @args: relatedDocId
-   */
-  const addRelatedDoc = relatedDocId => {
-    // compose ids sorted for doc id (idx_idy)
-    let ids = ''
-    let type2 = ''
-    const spliceRelations = junctionName.split('_')
-    if (spliceRelations[1] === type) {
-      ids = `${id}_${relatedDocId}`
-      type2 = spliceRelations[2]
-    } else {
-      ids = `${relatedDocId}_${id}`
-      type2 = spliceRelations[1]
-    }
-
-    // prepare content of doc
-    let docContent = {
-      [`${type}Id`]: id,
-      [`${type2}Id`]: relatedDocId
-    }
-
-    // create doc and junction collection if no exists yet
-    addByCollectionTypeWithCustomID(junctionName, ids, docContent)
   }
 
   // Prepare table: Columns
@@ -149,17 +110,12 @@ const AddRelatedDocModal = ({
     })
   const data = React.useMemo(() => dataArr, [relatedCollection])
 
-  // const onClick = id => {
-  //   addRelatedDoc(id)
-  // }
-
   const onSelectRow = selectedRows => {
     selectedRowOnTable.current = selectedRows.map(s => {
       return s.original
     })
   }
 
-  const { type2 } = getTypes(junctionName)
   return (
     <>
       <Button
@@ -182,15 +138,13 @@ const AddRelatedDocModal = ({
         <ModalContentStyled minW='50vw' h='90vh'>
           <ModalHeader>Select a {collection}</ModalHeader>
           <ModalCloseButton />
-          <ModalBody
-          // my='50' mx='10' bg='#efefef5e' p='40px' borderRadius='5px'
-          >
+          <ModalBody>
             {relatedCollection.length > 0 && (
               <Table
                 columns={columns}
                 data={data}
                 onSelectRow={onSelectRow}
-                type={type2}
+                type={type2Ref.current}
                 setSelectedLength={setSelectedLength}
               />
             )}
@@ -198,7 +152,6 @@ const AddRelatedDocModal = ({
           <AddButton
             variant='outline'
             m='10px'
-            // isDisabled={selectedRowOnTable.current.length <= 0}
             onClick={() => {
               setSelectedRowIds(prevState => {
                 // arr with elements
@@ -242,9 +195,7 @@ const AddRelatedDocModal = ({
                     ...prevState
                   ]
                 }
-                return []
               })
-
               onClose()
             }}
           >
@@ -257,27 +208,3 @@ const AddRelatedDocModal = ({
 }
 
 export default AddRelatedDocModal
-
-const ModalStyled = styled(Modal)`
-  overflow: hidden;
-`
-
-const ModalContentStyled = styled(ModalContent)`
-  background-color: #ffffffd1;
-  backdrop-filter: blur(10px);
-  overflow: hidden;
-  margin: 0;
-`
-const AddButton = styled(Button)`
-  /* background-color: black; */
-  border: 1px solid #3d3d3d;
-`
-const TableImage = styled(Img)`
-  /* border-radius: 50%;
-  height: 100%; */
-  overflow: hidden;
-  object-fit: cover;
-  height: 100%;
-  width: 100%;
-  transform: scale(1.1);
-`

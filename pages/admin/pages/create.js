@@ -17,22 +17,20 @@ import {
 } from '@/firebase/client'
 
 // Utils
-import { capitalizeFirstLetter, getTypes } from '../utils/utils'
+import { capitalizeFirstLetter, getTypes } from '@/admin/utils/utils'
 
 // Components
+import PageTransitionAnimation from '@/admin/atoms/pageTransitionAnimation'
 import TipTap from '../components/editor'
 import CreateDocButton from '@/admin/atoms/createDocButton'
 import Header from '@/admin/components/header'
 import TextAreaImage from '@/admin/components/atoms/textAreaImage'
 import AddRelatedDocModal from '@/admin/components/addRelatedDocModal'
-import AddedRelatedDoc from '@/admin/components/addedRelatedDoc'
+import AddedRelatedDocs from '@/admin/components/addedRelatedDocs'
+import DocFormFieldWrapper from '@/admin/components/layouts/docFormFieldWrapper'
 
 // Hooks
 import { useForm } from 'react-hook-form'
-import EditDataTypeInputWrapper from '@/admin/layouts/editDataTypeInputWrapper'
-import PageTransitionAnimation from '@/admin/atoms/pageTransitionAnimation'
-
-// Store
 import useStore from '@/admin/store/store'
 
 const Create = () => {
@@ -152,7 +150,7 @@ const Create = () => {
   }
 
   // Generate the fields to render in the form, based on the type of each field
-  const renderSwitch = ({ name, type, isRequired }) => {
+  const renderDataInput = ({ name, type, isRequired }) => {
     switch (type) {
       case 'longtext':
         return (
@@ -237,12 +235,12 @@ const Create = () => {
                   let isRequired = el[1].isRequired
                   let order = el[1].order
                   return (
-                    <EditDataTypeInputWrapper key={i}>
+                    <DocFormFieldWrapper key={i}>
                       <Label w='100%' key={i}>
                         {capitalizeFirstLetter(name)}
                       </Label>
-                      {renderSwitch({ name, type, isRequired, order })}
-                    </EditDataTypeInputWrapper>
+                      {renderDataInput({ name, type, isRequired, order })}
+                    </DocFormFieldWrapper>
                   )
                 })}
             </form>
@@ -251,7 +249,7 @@ const Create = () => {
             {relations.length > 0 &&
               relations.map((relation, i) => {
                 return (
-                  <EditDataTypeInputWrapper key={i} direction='row'>
+                  <DocFormFieldWrapper key={i}>
                     <Label w='100%'>
                       {capitalizeFirstLetter(relation.type)}
                     </Label>
@@ -262,13 +260,13 @@ const Create = () => {
                       setSelectedRowIds={setSelectedRowIds}
                     />
 
-                    <AddedRelatedDoc
+                    <AddedRelatedDocs
                       selectedRowIds={selectedRowIds}
                       relatedDocType={relation.type}
                       type={type}
                       setSelectedRowIds={setSelectedRowIds}
                     />
-                  </EditDataTypeInputWrapper>
+                  </DocFormFieldWrapper>
                 )
               })}
           </Box>

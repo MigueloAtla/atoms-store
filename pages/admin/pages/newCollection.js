@@ -81,7 +81,8 @@ export default function NewCollection () {
         formData[key] = {
           ...formData[key],
           schema: new_entry,
-          relations: relation_entries
+          relations: relation_entries,
+          page: data.page
         }
       }
     })
@@ -117,10 +118,6 @@ export default function NewCollection () {
     }
   }
 
-  // useEffect(() => {
-  //   console.log(table)
-  // }, [table])
-
   return (
     <Box minH='calc(100% - 50px)'>
       <Header back={true} title='Create a new collection type'>
@@ -132,7 +129,7 @@ export default function NewCollection () {
         >
           Add field
         </Button>
-        <Button form='create-collection' type='submit'>
+        <Button form='create-collection' type='submitb'>
           Create collection
         </Button>
       </Header>
@@ -146,6 +143,14 @@ export default function NewCollection () {
                 required: 'Write in this field, son of a bitch'
               })}
             />
+            <Flex>
+              <FormLabel>Is page?</FormLabel>
+              <Checkbox
+                name='page'
+                placeholder='Is page?'
+                {...register('page')}
+              />
+            </Flex>
             {errors['collection-name'] && errors['collection-name'].message}
             {fieldsControls.map((item, index) => {
               return (

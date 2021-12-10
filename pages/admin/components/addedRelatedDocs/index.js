@@ -1,7 +1,7 @@
 import { Flex, Button } from '@chakra-ui/react'
 import React from 'react'
 
-const AddedRelatedDoc = ({
+const AddedRelatedDocs = ({
   selectedRowIds,
   setSelectedRowIds,
   relatedDocType,
@@ -68,4 +68,4 @@ const AddedRelatedDoc = ({
   )
 }
 
-export default AddedRelatedDoc
+export default AddedRelatedDocs

@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom'
 import * as S from './styles'
 
 // Components
-import { Flex } from '@chakra-ui/react'
+import { Flex, Text, Divider } from '@chakra-ui/react'
 // Firebase functions
 import { getCollection } from '@/firebase/client'
 
@@ -22,23 +22,52 @@ const CollectionsList = () => {
   const selectedCollectionName = useStore(state => state.selectedCollectionName)
   return (
     <Flex direction='column' height='100%' width='100%'>
+      <Text color='white' fontWeight='bold' my='10px' textAlign='center'>
+        Pages
+      </Text>
       {collections &&
         collections.map((collection, i) => {
+          console.log(collection)
+          if (collection.page === true) {
+            return (
+              <Link
+                to={`/admin/${collection.name}`}
+                key={i}
+                onClick={() => setSelectedCollectionName(collection.name)}
+              >
+                <CollectionsListItem
+                  collection={collection.name}
+                  setCollectionData={setCollectionData}
+                  selectedCollectionName={selectedCollectionName}
+                  key={i}
+                />
+              </Link>
+            )
+          }
+        })}
+      <Divider mt='30px' />
+      <Text color='white' fontWeight='bold' my='10px' textAlign='center'>
+        Collections
+      </Text>
+      {collections.map((collection, i) => {
+        console.log(collection)
+        if (collection.page === false) {
           return (
             <Link
-              to={`/admin/${collection}`}
+              to={`/admin/${collection.name}`}
               key={i}
-              onClick={() => setSelectedCollectionName(collection)}
+              onClick={() => setSelectedCollectionName(collection.name)}
             >
               <CollectionsListItem
-                collection={collection}
+                collection={collection.name}
                 setCollectionData={setCollectionData}
                 selectedCollectionName={selectedCollectionName}
                 key={i}
               />
             </Link>
           )
-        })}
+        }
+      })}
     </Flex>
   )
 }

@@ -7,7 +7,7 @@ import {
   getSchemaByType,
   fetchOneByType,
   updateOneByType,
-  fetchProducts,
+  fetchRelatedDocs,
   getFullSchemaByType,
   addByCollectionTypeWithCustomIDBatched,
   deleteRelatedDoc
@@ -18,7 +18,7 @@ import UpdateButton from '@/admin/atoms/UpdateButton'
 import PageTransitionAnimation from '@/admin/atoms/pageTransitionAnimation'
 import LoaderScreen from '@/admin/atoms/loadScreen'
 import PreviewDrawer from '@/admin/atoms/previewDrawer'
-import EditDataTypeInputWrapper from '@/admin/layouts/editDataTypeInputWrapper'
+import DocFormFieldWrapper from '@/admin/components/layouts/docFormFieldWrapper'
 
 import { Input, Box, useToast, Button } from '@chakra-ui/react'
 
@@ -27,20 +27,18 @@ import TipTap from '../components/editor'
 import Header from '../components/header'
 import TextAreaImage from '@/admin/components/atoms/textAreaImage'
 import AddRelatedDocModal from '@/admin/components/addRelatedDocModal'
-import AddedRelatedDoc from '@/admin/components/addedRelatedDoc'
+import AddedRelatedDocs from '@/admin/components/addedRelatedDocs'
 
 // Styles
 import { Label } from '../styles'
 import { TextInputStyled, TextAreaStyled } from '@/admin/atoms/textInput/styles'
 
 // Utils
-import { capitalizeFirstLetter, getTypes } from '../utils/utils'
-
-// State
-import useStore from '../store/store'
+import { capitalizeFirstLetter, getTypes } from '@/admin/utils/utils'
 
 // Hooks
 import { useForm, FormProvider } from 'react-hook-form'
+import useStore from '../store/store'
 
 const Edit = () => {
   let history = useHistory()
@@ -102,7 +100,7 @@ const Edit = () => {
 
   const getRelatedDoc = async junction => {
     const { type1, type2 } = getTypes(junction, type)
-    const relationsFetched = await fetchProducts(id, junction, type1, type2)
+    const relationsFetched = await fetchRelatedDocs(id, junction, type1, type2)
     const prevState = relations
     const newState = prevState.map(collection => {
       if (collection.collection === type2) {
@@ -142,7 +140,12 @@ const Edit = () => {
           if (junction.display === true) {
             const promise = new Promise(async (resolve, reject) => {
               const { type1, type2 } = types(junction)
-              relatedDocs = await fetchProducts(id, junction.name, type1, type2)
+              relatedDocs = await fetchRelatedDocs(
+                id,
+                junction.name,
+                type1,
+                type2
+              )
               resolve({
                 content: [...relatedDocs],
                 collection: type2,
@@ -244,6 +247,7 @@ const Edit = () => {
     setContent(contentCloned.current)
   }
 
+  // Generate the fields to render in the form, based on the type of each field
   const renderDataInput = (obj, key) => {
     let { type, value, isRequired } = obj
     switch (type) {
@@ -333,10 +337,6 @@ const Edit = () => {
     }
   }, [content])
 
-  useEffect(() => {
-    console.log(selectedRowIds)
-  }, [selectedRowIds])
-
   return (
     <Box minH='calc(100% - 50px)'>
       <Header back={true} title={`Editing ${type.slice(0, -1)}: ${title}`}>
@@ -361,21 +361,22 @@ const Edit = () => {
                       let key = el[1]
                       let expanded = expandedEditor && el[1].type === 'richtext'
                       return (
-                        <EditDataTypeInputWrapper key={i} expanded={expanded}>
+                        <DocFormFieldWrapper key={i} expanded={expanded}>
                           <Label w='100%' key={i}>
                             {capitalizeFirstLetter(name)}
                           </Label>
                           {renderDataInput(key, name)}
-                        </EditDataTypeInputWrapper>
+                        </DocFormFieldWrapper>
                       )
                     })}
                 </form>
               </FormProvider>
 
+              {/* Showing related Docs */}
               {relations.length > 0 &&
                 relations.map((relation, i) => {
                   return (
-                    <EditDataTypeInputWrapper key={i} direction='row'>
+                    <DocFormFieldWrapper key={i}>
                       <Label w='100%'>
                         {capitalizeFirstLetter(relation.collection)}
                       </Label>
@@ -390,7 +391,7 @@ const Edit = () => {
                             setSelectedRowIds={setSelectedRowIds}
                           />
 
-                          <AddedRelatedDoc
+                          <AddedRelatedDocs
                             selectedRowIds={selectedRowIds}
                             relatedDocType={relation.collection}
                             type={type}
@@ -450,7 +451,7 @@ const Edit = () => {
                           </Button>
                         </div>
                       )}
-                    </EditDataTypeInputWrapper>
+                    </DocFormFieldWrapper>
                   )
                 })}
             </Box>

@@ -72,6 +72,8 @@ export const addByCollectionTypeWithCustomID = (type, ids, content) => {
 }
 
 export const deleteRelatedDoc = (collection, id) => {
+  console.log('collection', collection)
+  console.log('id', id)
   db.collection(collection)
     .doc(id)
     .delete()
@@ -214,8 +216,13 @@ export const getCollections = () => {
     .then(snapshot => {
       return snapshot.docs.map(doc => {
         const result = doc.data()
-        const data = Object.keys(result)
-        return data
+        // const names = Object.keys(result)
+        console.log(result)
+        let collections = []
+        for (const [key, value] of Object.entries(result)) {
+          collections.push({ name: key, page: value.page })
+        }
+        return collections
       })
     })
 }
@@ -236,7 +243,7 @@ export const fetchPosts = () => {
     })
 }
 
-export const fetchProducts = async (id, junction, type, type2) => {
+export const fetchRelatedDocs = async (id, junction, type, type2) => {
   const junctions = await db
     .collection(`${junction}`)
     .where(`${type}Id`, '==', id)
