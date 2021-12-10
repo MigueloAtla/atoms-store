@@ -35,9 +35,7 @@ const EditCollectionForm = ({ schema, type }) => {
   })
 
   const onSubmit = data => {
-    console.log(data)
     let formData = {}
-    let key
     let new_entry = {}
     Object.entries(data).map((field, i) => {
       if (field[0] === 'collection-name') {
@@ -54,7 +52,6 @@ const EditCollectionForm = ({ schema, type }) => {
       let key = data['collection-name']
       formData[key] = { ...formData[key], schema: new_entry }
     })
-    console.log(schema)
     updateDocs(formData, schema, type)
   }
 

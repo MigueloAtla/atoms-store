@@ -27,7 +27,6 @@ const CollectionsList = () => {
       </Text>
       {collections &&
         collections.map((collection, i) => {
-          console.log(collection)
           if (collection.page === true) {
             return (
               <Link
@@ -50,7 +49,6 @@ const CollectionsList = () => {
         Collections
       </Text>
       {collections.map((collection, i) => {
-        console.log(collection)
         if (collection.page === false) {
           return (
             <Link

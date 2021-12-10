@@ -19,19 +19,15 @@ import PageTransitionAnimation from '@/admin/atoms/pageTransitionAnimation'
 import LoaderScreen from '@/admin/atoms/loadScreen'
 import PreviewDrawer from '@/admin/atoms/previewDrawer'
 import DocFormFieldWrapper from '@/admin/components/layouts/docFormFieldWrapper'
-
-import { Input, Box, useToast, Button } from '@chakra-ui/react'
-
-// Components
-import TipTap from '../components/editor'
+import { Box, useToast, Button } from '@chakra-ui/react'
 import Header from '../components/header'
-import TextAreaImage from '@/admin/components/atoms/textAreaImage'
 import AddRelatedDocModal from '@/admin/components/addRelatedDocModal'
 import AddedRelatedDocs from '@/admin/components/addedRelatedDocs'
+import TypeInput from '@/admin/components/atoms/typeInput'
+import DocForm from '@/admin/components/docForm'
 
 // Styles
 import { Label } from '../styles'
-import { TextInputStyled, TextAreaStyled } from '@/admin/atoms/textInput/styles'
 
 // Utils
 import { capitalizeFirstLetter, getTypes } from '@/admin/utils/utils'
@@ -62,8 +58,6 @@ const Edit = () => {
   )
   const [schemaSorted, setSchemaSorted] = useState(null)
   const loading = useStore(state => state.loading)
-
-  const expandedEditor = useStore(state => state.expandedEditor)
 
   const toast = useToast()
 
@@ -247,71 +241,6 @@ const Edit = () => {
     setContent(contentCloned.current)
   }
 
-  // Generate the fields to render in the form, based on the type of each field
-  const renderDataInput = (obj, key) => {
-    let { type, value, isRequired } = obj
-    switch (type) {
-      case 'longtext':
-        return (
-          <>
-            <TextAreaStyled
-              rows='6'
-              name={key}
-              defaultValue={value}
-              {...register(key, {
-                required: isRequired && 'Write in this field, son of a bitch'
-              })}
-            />
-            {isRequired && errors[key] && errors[key].message}
-          </>
-        )
-      case 'text':
-        return (
-          <>
-            <TextInputStyled
-              defaultValue={value}
-              {...register(key, {
-                required: isRequired && 'Write in this field, son of a bitch'
-              })}
-            />
-            {isRequired && errors[key] && errors[key].message}
-          </>
-        )
-      case 'image':
-        return (
-          <TextAreaImage
-            name={key}
-            isRequired={isRequired}
-            register={register}
-            errors={errors}
-          />
-        )
-      case 'richtext': {
-        haveEditor.current = true
-        return (
-          <TipTap
-            value={value}
-            onSubmit={onSubmit}
-            editorContent={editorContent}
-          />
-        )
-      }
-      default:
-        return (
-          <>
-            <Input
-              name={key}
-              defaultValue={value}
-              {...register(key, {
-                required: isRequired && 'Write in this field, son of a bitch'
-              })}
-            />
-            {isRequired && errors[key] && errors[key].message}
-          </>
-        )
-    }
-  }
-
   const title = content
     ? content.title
       ? content.title.value
@@ -337,6 +266,12 @@ const Edit = () => {
     }
   }, [content])
 
+  const transformDataForTypeInput = el => {
+    let name = el[0]
+    let obj = el[1]
+    return { obj, name }
+  }
+
   return (
     <Box minH='calc(100% - 50px)'>
       <Header back={true} title={`Editing ${type.slice(0, -1)}: ${title}`}>
@@ -353,24 +288,15 @@ const Edit = () => {
         <PageTransitionAnimation>
           {content && (
             <Box m='80px'>
-              <FormProvider {...{ register, errors, setValue }}>
-                <form id='edit-form' onSubmit={handleSubmitHook(handleSubmit)}>
-                  {schemaSorted &&
-                    schemaSorted.map((el, i) => {
-                      let name = el[0]
-                      let key = el[1]
-                      let expanded = expandedEditor && el[1].type === 'richtext'
-                      return (
-                        <DocFormFieldWrapper key={i} expanded={expanded}>
-                          <Label w='100%' key={i}>
-                            {capitalizeFirstLetter(name)}
-                          </Label>
-                          {renderDataInput(key, name)}
-                        </DocFormFieldWrapper>
-                      )
-                    })}
-                </form>
-              </FormProvider>
+              <DocForm
+                schema={schemaSorted}
+                transformDataForTypeInput={transformDataForTypeInput}
+                id='edit-form'
+                handleSubmit={handleSubmit}
+                onSubmit={onSubmit}
+                editorContent={editorContent}
+                haveEditor={haveEditor}
+              />
 
               {/* Showing related Docs */}
               {relations.length > 0 &&

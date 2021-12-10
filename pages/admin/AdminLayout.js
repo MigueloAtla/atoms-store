@@ -13,8 +13,8 @@ import * as S from './styles'
 
 // Components
 import CollectionsList from './components/collectionsList'
-import Edit from './pages/edit'
-import Create from './pages/create'
+import EditDoc from './pages/editDoc'
+import CreateDoc from './pages/createDoc'
 import Home from './pages/home'
 import NewCollection from './pages/newCollection'
 import Collections from './pages/collections'
@@ -26,7 +26,7 @@ import MediaLibrary from './pages/mediaLibrary'
 import { AddIcon } from '@chakra-ui/icons'
 import SidebarLink from '@/admin/atoms/sidebarLink'
 import { FaImages } from 'react-icons/fa'
-import { Box, Tooltip } from '@chakra-ui/react'
+
 // Assets
 import firebase from '../../public/firebase.svg'
 
@@ -308,10 +308,10 @@ const AdminRoutes = () => (
       <CollectionSchema />
     </Route>
     <Route path='/admin/:type/create'>
-      <Create />
+      <CreateDoc />
     </Route>
     <Route path='/admin/:type/:id'>
-      <Edit />
+      <EditDoc />
     </Route>
     <Route path='/admin/:type'>
       <CollectionList />

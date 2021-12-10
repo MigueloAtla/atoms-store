@@ -28,9 +28,11 @@ import TextAreaImage from '@/admin/components/atoms/textAreaImage'
 import AddRelatedDocModal from '@/admin/components/addRelatedDocModal'
 import AddedRelatedDocs from '@/admin/components/addedRelatedDocs'
 import DocFormFieldWrapper from '@/admin/components/layouts/docFormFieldWrapper'
+import TypeInput from '@/admin/components/atoms/typeInput'
+import DocForm from '@/admin/components/docForm'
 
 // Hooks
-import { useForm } from 'react-hook-form'
+import { useForm, FormProvider } from 'react-hook-form'
 import useStore from '@/admin/store/store'
 
 const Create = () => {
@@ -50,7 +52,8 @@ const Create = () => {
   const {
     register,
     handleSubmit: handleSubmitHook,
-    formState: { errors }
+    formState: { errors },
+    setValue
   } = useForm()
 
   // OnMount: get metadata of the Collection
@@ -91,50 +94,53 @@ const Create = () => {
       }
     })
 
-    if (haveEditor.current === true) setOnSubmit(!onSubmit)
-    else {
-      // Create the Doc and get the generated ID
-      addByCollectionType(type, newContent.current).then(function (docRef) {
-        let newId = docRef.id
+    if (haveEditor.current === true) {
+      setOnSubmit(!onSubmit)
+      console.log('on submit')
+    }
+    // else {
+    // Create the Doc and get the generated ID
+    addByCollectionType(type, newContent.current).then(function (docRef) {
+      let newId = docRef.id
 
-        // map selectedRowIds
-        selectedRowIds.map(s => {
-          let idsArr = []
-          let docsContent = []
-          Object.keys(s).map(entry => {
-            const spliceRelations = entry.split('_')
-            s[entry].map(({ id: currentId }) => {
-              let type1
-              let type2
-              let composedId
+      // map selectedRowIds
+      selectedRowIds.map(s => {
+        let idsArr = []
+        let docsContent = []
+        Object.keys(s).map(entry => {
+          const spliceRelations = entry.split('_')
+          s[entry].map(({ id: currentId }) => {
+            let type1
+            let type2
+            let composedId
 
-              // Compose ids
-              if (spliceRelations[1] === type) {
-                composedId = `${newId}_${currentId}`
-                type1 = spliceRelations[1]
-                type2 = spliceRelations[2]
-              } else {
-                composedId = `${currentId}_${newId}`
-                type1 = spliceRelations[2]
-                type2 = spliceRelations[1]
-              }
-              idsArr.push(composedId)
+            // Compose ids
+            if (spliceRelations[1] === type) {
+              composedId = `${newId}_${currentId}`
+              type1 = spliceRelations[1]
+              type2 = spliceRelations[2]
+            } else {
+              composedId = `${currentId}_${newId}`
+              type1 = spliceRelations[2]
+              type2 = spliceRelations[1]
+            }
+            idsArr.push(composedId)
 
-              // Prepare content of Doc
-              docsContent.push({
-                [`${type1}Id`]: newId,
-                [`${type2}Id`]: currentId
-              })
+            // Prepare content of Doc
+            docsContent.push({
+              [`${type1}Id`]: newId,
+              [`${type2}Id`]: currentId
             })
-
-            // Create Doc and junction collection if no exists yet
-            addByCollectionTypeWithCustomIDBatched(entry, idsArr, docsContent)
           })
+
+          // Create Doc and junction collection if no exists yet
+          addByCollectionTypeWithCustomIDBatched(entry, idsArr, docsContent)
         })
       })
-      showToastAndGoBack()
-    }
+    })
+    showToastAndGoBack()
   }
+  // }
 
   // After Doc is created
   const showToastAndGoBack = () => {
@@ -147,49 +153,6 @@ const Create = () => {
       isClosable: true
     })
     history.goBack()
-  }
-
-  // Generate the fields to render in the form, based on the type of each field
-  const renderDataInput = ({ name, type, isRequired }) => {
-    switch (type) {
-      case 'longtext':
-        return (
-          <>
-            <Textarea
-              rows='6'
-              name={name}
-              {...register(name, {
-                required: isRequired && 'Write in this field, son of a bitch'
-              })}
-            />
-            {isRequired && errors[name] && errors[name].message}
-          </>
-        )
-      case 'image':
-        return <TextAreaImage name={name} isRequired={isRequired} />
-      case 'text':
-        return (
-          <>
-            <Input
-              name={name}
-              {...register(name, {
-                required: isRequired && 'Write in this field, son of a bitch'
-              })}
-            />
-            {isRequired && errors[name] && errors[name].message}
-          </>
-        )
-      case 'richtext': {
-        haveEditor.current = true
-        return (
-          <TipTap
-            id='editor'
-            onSubmit={onSubmit}
-            editorContent={editorContent}
-          />
-        )
-      }
-    }
   }
 
   const getRelations = async () => {
@@ -218,6 +181,14 @@ const Create = () => {
     }
   }, [schema])
 
+  const transformDataForTypeInput = el => {
+    let name = el[0]
+    let type = el[1].type
+    let isRequired = el[1].isRequired
+    let obj = { type, value: null, isRequired }
+    return { obj, name }
+  }
+
   return (
     <>
       <Header back={true} title={`Creating ${type.slice(0, -1)}`}>
@@ -227,23 +198,15 @@ const Create = () => {
         {/* Showing fields with Doc data */}
         {schema && (
           <Box m='20px'>
-            <form id='create-doc' onSubmit={handleSubmitHook(handleSubmit)}>
-              {schemaSorted &&
-                schemaSorted.map((el, i) => {
-                  let name = el[0]
-                  let type = el[1].type
-                  let isRequired = el[1].isRequired
-                  let order = el[1].order
-                  return (
-                    <DocFormFieldWrapper key={i}>
-                      <Label w='100%' key={i}>
-                        {capitalizeFirstLetter(name)}
-                      </Label>
-                      {renderDataInput({ name, type, isRequired, order })}
-                    </DocFormFieldWrapper>
-                  )
-                })}
-            </form>
+            <DocForm
+              schema={schemaSorted}
+              transformDataForTypeInput={transformDataForTypeInput}
+              id='create-doc'
+              handleSubmit={handleSubmit}
+              onSubmit={onSubmit}
+              editorContent={editorContent}
+              haveEditor={haveEditor}
+            />
 
             {/* Showing related Docs */}
             {relations.length > 0 &&
