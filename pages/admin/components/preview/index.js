@@ -18,8 +18,6 @@ const Preview = ({ content }) => {
     [propsName]: content
   }
 
-  console.log(content)
-
   return (
     <>
       {content && (

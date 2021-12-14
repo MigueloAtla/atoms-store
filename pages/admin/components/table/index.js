@@ -207,20 +207,20 @@ function Table ({ columns, data, type, onClick }) {
                 {pageIndex + 1} of {pageOptions.length}
               </strong>{' '}
             </span>
-            <span>
-              | Go to page:{' '}
-              <Input
-                type='number'
-                defaultValue={pageIndex + 1}
-                onChange={e => {
-                  const page = e.target.value ? Number(e.target.value) - 1 : 0
-                  gotoPage(page)
-                }}
-                style={{ width: '100px' }}
-              />
-            </span>{' '}
+            <span style={{ margin: '0 40px' }}>|</span>
+            <span style={{ margin: '0' }}>Go to page: </span>
+            <Input
+              type='number'
+              defaultValue={pageIndex + 1}
+              onChange={e => {
+                const page = e.target.value ? Number(e.target.value) - 1 : 0
+                gotoPage(page)
+              }}
+              style={{ width: '60px', height: '30px' }}
+            />{' '}
             <Select
               w='120px'
+              h='30px'
               value={pageSize}
               onChange={e => {
                 setPageSize(Number(e.target.value))
@@ -249,5 +249,6 @@ const PaginationStyled = styled(HStack)`
   background-color: white;
   margin-top: 24px;
   width: 100%;
+  height: 40px;
   border-top: 1px solid #bcbcbc;
 `

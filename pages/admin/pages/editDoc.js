@@ -63,12 +63,8 @@ const Edit = () => {
 
   const displayToast = useDisplayToast()
 
-  const {
-    register,
-    handleSubmit: handleSubmitHook,
-    formState: { errors },
-    setValue
-  } = useForm()
+  const formUtils = useForm()
+  const { handleSubmit: handleSubmitHook } = formUtils
 
   const updateContent = data => {
     if (contentCloned.current === null) contentCloned.current = content
@@ -234,7 +230,6 @@ const Edit = () => {
   }
 
   const onPreview = data => {
-    console.log(data)
     updateContent(data)
     if (haveEditor.current === true) setOnSubmit(!onSubmit)
     setContent(contentCloned.current)
@@ -264,8 +259,6 @@ const Edit = () => {
       setSchemaSorted(schemaSortedArr)
     }
   }, [content])
-
-  console.log(content)
 
   const transformDataForTypeInput = el => {
     let name = el[0]
@@ -299,6 +292,7 @@ const Edit = () => {
                 onSubmit={onSubmit}
                 editorContent={editorContent}
                 haveEditor={haveEditor}
+                formUtils={formUtils}
               />
 
               {/* Showing related Docs */}

@@ -29,6 +29,7 @@ import DocForm from '@/admin/components/docForm'
 // Hooks
 import useStore from '@/admin/store/store'
 import { useDisplayToast } from '@/admin/hooks/toast'
+import { useForm } from 'react-hook-form'
 
 const Create = () => {
   const [schema, setSchema] = useState()
@@ -44,6 +45,8 @@ const Create = () => {
   const [selectedRowIds, setSelectedRowIds] = useState([])
   const displayToast = useDisplayToast()
 
+  const formUtils = useForm()
+
   // OnMount: get metadata of the Collection
   useEffect(() => {
     type &&
@@ -55,6 +58,7 @@ const Create = () => {
   useEffect(() => {
     if (newContent.current) {
       newContent.current['content'].value = editorContent.current
+      console.log('editor content create')
       addByCollectionType(type, newContent.current)
       displayToast({
         title: 'Content Created Successfully',
@@ -120,51 +124,53 @@ const Create = () => {
     })
 
     if (haveEditor.current === true) setOnSubmit(!onSubmit)
-    // else {
-    // Create the Doc and get the generated ID
-    addByCollectionType(type, newContent.current).then(function (docRef) {
-      let newId = docRef.id
+    else {
+      // Create the Doc and get the generated ID
+      console.log('create handleSubmit')
+      addByCollectionType(type, newContent.current).then(function (docRef) {
+        let newId = docRef.id
 
-      // map selectedRowIds
-      selectedRowIds.map(s => {
-        let idsArr = []
-        let docsContent = []
-        Object.keys(s).map(entry => {
-          const spliceRelations = entry.split('_')
-          s[entry].map(({ id: currentId }) => {
-            let type1
-            let type2
-            let composedId
+        // map selectedRowIds
+        selectedRowIds.map(s => {
+          let idsArr = []
+          let docsContent = []
+          Object.keys(s).map(entry => {
+            const spliceRelations = entry.split('_')
+            s[entry].map(({ id: currentId }) => {
+              let type1
+              let type2
+              let composedId
 
-            // Compose ids
-            if (spliceRelations[1] === type) {
-              composedId = `${newId}_${currentId}`
-              type1 = spliceRelations[1]
-              type2 = spliceRelations[2]
-            } else {
-              composedId = `${currentId}_${newId}`
-              type1 = spliceRelations[2]
-              type2 = spliceRelations[1]
-            }
-            idsArr.push(composedId)
+              // Compose ids
+              if (spliceRelations[1] === type) {
+                composedId = `${newId}_${currentId}`
+                type1 = spliceRelations[1]
+                type2 = spliceRelations[2]
+              } else {
+                composedId = `${currentId}_${newId}`
+                type1 = spliceRelations[2]
+                type2 = spliceRelations[1]
+              }
+              idsArr.push(composedId)
 
-            // Prepare content of Doc
-            docsContent.push({
-              [`${type1}Id`]: newId,
-              [`${type2}Id`]: currentId
+              // Prepare content of Doc
+              docsContent.push({
+                [`${type1}Id`]: newId,
+                [`${type2}Id`]: currentId
+              })
             })
-          })
 
-          // Create Doc and junction collection if no exists yet
-          addByCollectionTypeWithCustomIDBatched(entry, idsArr, docsContent)
+            // Create Doc and junction collection if no exists yet
+            addByCollectionTypeWithCustomIDBatched(entry, idsArr, docsContent)
+          })
         })
       })
-    })
-    displayToast({
-      title: 'Content Created Successfully',
-      description: 'Alright!'
-    })
-    history.goBack()
+      displayToast({
+        title: 'Content Created Successfully',
+        description: 'Alright!'
+      })
+      history.goBack()
+    }
   }
 
   return (
@@ -184,6 +190,7 @@ const Create = () => {
               onSubmit={onSubmit}
               editorContent={editorContent}
               haveEditor={haveEditor}
+              formUtils={formUtils}
             />
 
             {/* Showing related Docs */}

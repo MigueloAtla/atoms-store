@@ -19,7 +19,8 @@ const DocForm = ({
   handleSubmit,
   onSubmit,
   editorContent,
-  haveEditor
+  haveEditor,
+  formUtils
 }) => {
   const expandedEditor = useStore(state => state.expandedEditor)
 
@@ -28,7 +29,7 @@ const DocForm = ({
     handleSubmit: handleSubmitHook,
     formState: { errors },
     setValue
-  } = useForm()
+  } = formUtils
 
   return (
     <FormProvider {...{ register, errors, setValue }}>

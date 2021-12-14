@@ -139,7 +139,10 @@ export default function AdminLayout () {
                         rel='noreferrer'
                         href={`${process.env.NEXT_PUBLIC_FIREBASE_URL}`}
                       >
-                        <Image src={firebase} width='20' height='20' />
+                        <p style={{ color: 'white', fontWeight: 'bold' }}>
+                          firebase
+                        </p>
+                        {/* <Image src={firebase} width='20' height='20' /> */}
                       </SidebarExternalLink>
                     </Areas.Header>
                     <Areas.Content
