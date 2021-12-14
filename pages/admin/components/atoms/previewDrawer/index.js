@@ -16,6 +16,8 @@ import styled from 'styled-components'
 const PreviewDrawer = ({ onClick, content }) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
 
+  console.log(content)
+
   return (
     <>
       <ButtonStyled

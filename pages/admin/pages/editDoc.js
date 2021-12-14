@@ -19,11 +19,11 @@ import PageTransitionAnimation from '@/admin/atoms/pageTransitionAnimation'
 import LoaderScreen from '@/admin/atoms/loadScreen'
 import PreviewDrawer from '@/admin/atoms/previewDrawer'
 import DocFormFieldWrapper from '@/admin/components/layouts/docFormFieldWrapper'
-import { Box, useToast, Button } from '@chakra-ui/react'
+import { Box, Button } from '@chakra-ui/react'
 import Header from '../components/header'
 import AddRelatedDocModal from '@/admin/components/addRelatedDocModal'
 import AddedRelatedDocs from '@/admin/components/addedRelatedDocs'
-import TypeInput from '@/admin/components/atoms/typeInput'
+// import TypeInput from '@/admin/components/atoms/typeInput'
 import DocForm from '@/admin/components/docForm'
 
 // Styles
@@ -33,12 +33,14 @@ import { Label } from '../styles'
 import { capitalizeFirstLetter, getTypes } from '@/admin/utils/utils'
 
 // Hooks
-import { useForm, FormProvider } from 'react-hook-form'
-import useStore from '../store/store'
+import { useForm } from 'react-hook-form'
+import useStore from '@/admin/store/store'
+import { useDisplayToast } from '@/admin/hooks/toast'
 
 const Edit = () => {
   let history = useHistory()
   const [schema, setSchema] = useState()
+  const [preview, setPreview] = useState()
   const [relations, setRelations] = useState([])
   const [content, setContent] = useState(null)
   const imgURL = useStore(state => state.imgURL)
@@ -59,7 +61,7 @@ const Edit = () => {
   const [schemaSorted, setSchemaSorted] = useState(null)
   const loading = useStore(state => state.loading)
 
-  const toast = useToast()
+  const displayToast = useDisplayToast()
 
   const {
     register,
@@ -125,6 +127,7 @@ const Edit = () => {
     }
 
     getFullSchemaByType(type).then(async data => {
+      setPreview(data[0].page)
       if (data.length > 0 && data[0].relations?.length > 0) {
         const promises = []
         // const relatedCollections = []
@@ -215,14 +218,11 @@ const Edit = () => {
         })
       })
 
-      toast({
+      displayToast({
         title: 'Content updated successfully',
-        position: 'bottom-right',
-        variant: 'subtle',
-        description: 'Alright!',
-        duration: 5000,
-        isClosable: true
+        description: 'Alright!'
       })
+
       updateRef.current = false
     }
   }, [onSubmit])
@@ -234,10 +234,9 @@ const Edit = () => {
   }
 
   const onPreview = data => {
+    console.log(data)
     updateContent(data)
-    if (haveEditor.current === true) {
-      setOnSubmit(!onSubmit)
-    }
+    if (haveEditor.current === true) setOnSubmit(!onSubmit)
     setContent(contentCloned.current)
   }
 
@@ -266,6 +265,8 @@ const Edit = () => {
     }
   }, [content])
 
+  console.log(content)
+
   const transformDataForTypeInput = el => {
     let name = el[0]
     let obj = el[1]
@@ -275,10 +276,12 @@ const Edit = () => {
   return (
     <Box minH='calc(100% - 50px)'>
       <Header back={true} title={`Editing ${type.slice(0, -1)}: ${title}`}>
-        <PreviewDrawer
-          onClick={handleSubmitHook(onPreview)}
-          content={content}
-        />
+        {content && preview && (
+          <PreviewDrawer
+            onClick={handleSubmitHook(onPreview)}
+            content={content}
+          />
+        )}
         <UpdateButton type={type} />
       </Header>
 
@@ -301,6 +304,7 @@ const Edit = () => {
               {/* Showing related Docs */}
               {relations.length > 0 &&
                 relations.map((relation, i) => {
+                  console.log(relation)
                   return (
                     <DocFormFieldWrapper key={i}>
                       <Label w='100%'>
@@ -310,13 +314,12 @@ const Edit = () => {
                         <div>
                           <AddRelatedDocModal
                             collection={relation.collection}
+                            type={type}
                             junctionName={relation.junctionName}
                             content={relation.content}
-                            type={type}
                             id={id}
                             setSelectedRowIds={setSelectedRowIds}
                           />
-
                           <AddedRelatedDocs
                             selectedRowIds={selectedRowIds}
                             relatedDocType={relation.collection}

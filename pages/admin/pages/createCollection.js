@@ -12,16 +12,15 @@ import {
   Input,
   Box,
   Text,
-  useToast,
   Checkbox
 } from '@chakra-ui/react'
 import Header from '@/admin/components/header'
 
 import PageTransitionAnimation from '@/admin/atoms/pageTransitionAnimation'
 
-// State
+// Hooks
 import useStore from '@/admin/store/store'
-
+import { useDisplayToast } from '@/admin/hooks/toast'
 import { useForm, useFieldArray, Controller } from 'react-hook-form'
 
 export default function CreateCollection () {
@@ -30,12 +29,12 @@ export default function CreateCollection () {
   const setRerender = useStore(state => state.setRerender)
 
   const history = useHistory()
-  const toast = useToast()
+  const displayToast = useDisplayToast()
+
   const {
     register,
     control,
     handleSubmit: handleSubmitHook,
-    reset,
     formState: { errors }
   } = useForm({
     defaultValues: {
@@ -73,6 +72,7 @@ export default function CreateCollection () {
           if (type !== 'relation') {
             new_entry[name] = {
               ...entries,
+              type,
               order: i
             }
           }
@@ -94,26 +94,16 @@ export default function CreateCollection () {
         let type2 = spliceRelations[2]
         addRelationToCollection(type2, relation)
       })
-      toast({
+      displayToast({
         title: 'Collection created successfully',
-        position: 'bottom-right',
-        type: 'success',
-        variant: 'subtle',
-        description: 'Alright!',
-        duration: 5000,
-        isClosable: true
+        description: 'Alright!'
       })
       setRerender(s => !s)
       history.goBack()
     } catch (err) {
-      toast({
+      displayToast({
         title: 'Something went wrong, please retry',
-        position: 'bottom-right',
-        type: 'error',
-        variant: 'subtle',
-        description: 'Alright!',
-        duration: 5000,
-        isClosable: true
+        description: 'Not alright...'
       })
     }
   }
@@ -195,6 +185,7 @@ export default function CreateCollection () {
                             <option value='longtext'>long text</option>
                             <option value='richtext'>rich text</option>
                             <option value='image'>image</option>
+                            <option value='boolean'>boolean</option>
                             <option value='relation'>
                               relation (many-to-many)
                             </option>

@@ -7,108 +7,35 @@ import {
   ModalHeader,
   ModalBody,
   ModalCloseButton,
-  useDisclosure,
-  Box
+  useDisclosure
 } from '@chakra-ui/react'
 
-import {
-  ModalStyled,
-  ModalContentStyled,
-  AddButton,
-  TableImage
-} from './styles'
+import { ModalStyled, ModalContentStyled, AddButton } from './styles'
 
 // Firebase
 import { getCollection } from '@/firebase/client'
 
-// utils
-import { getTypes } from '@/admin/utils/utils'
-
-const prepareTable = () => {}
+// Hooks
+import usePrepareTable from '@/admin/hooks/prepareDocsTable'
 
 const AddRelatedDocModal = ({
   collection,
   content = [],
   junctionName,
+  type,
   setSelectedRowIds
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
   const [relatedCollection, setRelatedCollection] = useState([...content])
   const [selectedLength, setSelectedLength] = useState(0)
   const selectedRowOnTable = useRef([])
-  const type2Ref = useRef()
-
-  useEffect(() => {
-    const { type2 } = getTypes(junctionName)
-    type2Ref.current = type2
-  }, [junctionName])
+  const { data, columns } = usePrepareTable({ collection: relatedCollection })
 
   const getRelationCollection = () => {
-    getCollection(type2Ref.current).then(r => {
+    getCollection(collection).then(r => {
       setRelatedCollection(r)
     })
   }
-
-  // Prepare table: Columns
-  const arr = []
-  const cols =
-    relatedCollection.length > 0
-      ? Object.keys(relatedCollection[0]).map(key => {
-          return key
-        })
-      : []
-  cols.map(col => {
-    arr.push({
-      Header: col,
-      accessor: col
-    })
-  })
-
-  const columns = React.useMemo(() => arr, [arr])
-
-  // Prepare table: Data
-  const dataArr = []
-  relatedCollection &&
-    relatedCollection.map(c => {
-      let id = { id: c.id }
-      let fields = {}
-      Object.keys(c).map(key => {
-        if (key !== 'id') {
-          fields = { ...fields, [key]: c[key].value }
-        }
-        if (c[key].type === 'image') {
-          fields = {
-            ...fields,
-            [key]: (
-              <Box
-                border='1px solid #333'
-                borderRadius='50%'
-                w='80px'
-                h='80px'
-                overflow='hidden'
-              >
-                <TableImage
-                  style={{
-                    backgroundColor: '#efefef',
-                    width: '90',
-                    height: '90'
-                  }}
-                  quality='50'
-                  src={c[key].value}
-                  alt='main image'
-                  width='90px'
-                  height='90px'
-                  layout='fixed'
-                />
-              </Box>
-            )
-          }
-        }
-      })
-      fields = { ...fields, ...id }
-      dataArr.push(fields)
-    })
-  const data = React.useMemo(() => dataArr, [relatedCollection])
 
   const onSelectRow = selectedRows => {
     selectedRowOnTable.current = selectedRows.map(s => {
@@ -123,7 +50,7 @@ const AddRelatedDocModal = ({
         m='5px'
         onClick={() => {
           onOpen()
-          getRelationCollection(junctionName)
+          getRelationCollection()
         }}
       >
         Add {collection}
@@ -144,7 +71,7 @@ const AddRelatedDocModal = ({
                 columns={columns}
                 data={data}
                 onSelectRow={onSelectRow}
-                type={type2Ref.current}
+                type={type}
                 setSelectedLength={setSelectedLength}
               />
             )}

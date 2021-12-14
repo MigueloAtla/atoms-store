@@ -5,7 +5,7 @@ import { useFormContext } from 'react-hook-form'
 import TipTap from '@/admin/components/editor'
 import TextAreaImage from '@/admin/components/atoms/textAreaImage'
 import { TextInputStyled, TextAreaStyled } from '@/admin/atoms/textInput/styles'
-import { Input } from '@chakra-ui/react'
+import { Input, Switch } from '@chakra-ui/react'
 
 const TypeInput = ({ obj, name, onSubmit, editorContent, haveEditor }) => {
   const { register, errors } = useFormContext()
@@ -56,6 +56,8 @@ const TypeInput = ({ obj, name, onSubmit, editorContent, haveEditor }) => {
         />
       )
     }
+    case 'boolean':
+      return <Switch defaultChecked={value} {...register(name)} />
     default:
       return (
         <>

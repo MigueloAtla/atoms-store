@@ -12,6 +12,5 @@ export const SidebarButtonStyled = styled.div`
   background-color: ${({ active }) => (active ? '#c2c2c2' : 'transparent')};
   :hover {
     background-color: #80808017;
-    border-right: 1px solid black;
   }
 `

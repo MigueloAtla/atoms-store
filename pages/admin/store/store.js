@@ -14,6 +14,7 @@ const store = set => ({
   expandedEditor: false,
   mediaLibraryView: 'table',
   selectedSidebarMenu: 'home',
+  toggleCollectionsPanel: false,
   // actions
   setCollections: data => set({ collections: data }),
   setCollectionData: data => set({ collectionData: data }),
@@ -29,7 +30,8 @@ const store = set => ({
     return set({ expandedEditor: data })
   },
   setMediaLibraryView: data => set({ mediaLibraryView: data }),
-  setSelectedSidebarMenu: data => set({ selectedSidebarMenu: data })
+  setSelectedSidebarMenu: data => set({ selectedSidebarMenu: data }),
+  setToggleCollectionsPanel: data => set({ toggleCollectionsPanel: data })
 })
 
 const useStore = create(devtools(store))

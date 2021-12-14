@@ -23,32 +23,44 @@
     collections = Object.keys(result)
   })
 
+  collectionsData = Object.keys(result).map(key => {
+    return {
+      name: key,
+      page: result[key].page
+    }
+  })
+
   if (collections.length > 0) {
     collections.map(async collection => {
-      let schema = Object.keys(result[collection].schema)
+      let page = result[collection].page
 
-      let capitalizedSchema = schema.map(s => capitalizeFirstLetter(s))
+      if (page) {
+        let schema = Object.keys(result[collection].schema)
 
-      let comps = capitalizedSchema.map(comp => {
-        if (comp === 'Content') {
-          return `{${comp}()}`
-        }
-        return `<${comp} />`
-      })
+        let capitalizedSchema = schema.map(s => capitalizeFirstLetter(s))
 
-      if (!fs.existsSync(`./pages/${collection}`)) {
-        fs.mkdir(`./pages/${collection}`, { recursive: true }, function (err) {
-          if (err) {
-            console.log(err)
-          } else {
-            console.log(
-              `New directory: ./pages/${collection} successfully created.`
-            )
+        let comps = capitalizedSchema.map(comp => {
+          if (comp === 'Content') {
+            return `{${comp}()}`
+          }
+          return `<${comp} />`
+        })
 
-            if (!fs.existsSync(`./pages/${collection}/[id].js`)) {
-              fs.writeFile(
-                `./pages/${collection}/[id].js`,
-                `
+        if (!fs.existsSync(`./pages/${collection}`)) {
+          fs.mkdir(`./pages/${collection}`, { recursive: true }, function (
+            err
+          ) {
+            if (err) {
+              console.log(err)
+            } else {
+              console.log(
+                `New directory: ./pages/${collection} successfully created.`
+              )
+
+              if (!fs.existsSync(`./pages/${collection}/[id].js`)) {
+                fs.writeFile(
+                  `./pages/${collection}/[id].js`,
+                  `
                 import React from 'react'
                 import { getCollection, getDocByID } from '@/firebase/client'
 
@@ -56,14 +68,14 @@
 
                 import { LayoutStyled } from '@/layouts/postLayout'
                 import { Column, Row, AutoColumns } from '@/layouts/index'
-                
+
                 export default function ${capitalizeFirstLetter(
                   collection
                 ).slice(0, -1)} ({ ${collection.slice(0, -1)} }) {
                     const {${capitalizedSchema.join(
                       ', '
                     )}} = getComponents(${collection.slice(0, -1)})
-                      
+
                       return (
                         <LayoutStyled width='100%'>
                           <GlobalStyles />
@@ -73,20 +85,20 @@
                         </LayoutStyled>
                         )
                       }
-                      
+
                       export async function getStaticProps ({ params: { id } }) {
                         const ${collection.slice(
                           0,
                           -1
                         )} = await getDocByID('${collection}', id)
-                          
+
                           return {
                             props: {
                               ${collection.slice(0, -1)}
                             }
                           }
                         }
-                        
+
                         export async function getStaticPaths () {
                           const ${collection} = await getCollection('${collection}')
                           return {
@@ -98,34 +110,34 @@
                             fallback: false
                           }
                         }
-                        
-                        
+
                         `,
-                { recursive: true },
-                () => {
-                  console.log(
-                    `Page component: ${collection}/[id].js successfully created.`
-                  )
-                  // add page components to preview
-                  fs.appendFileSync(
-                    './pages/admin/previews.js',
-                    `export { default as ${capitalizeFirstLetter(
-                      collection
-                    ).slice(0, -1)} } from '../../pages/${collection}/[id]'\n`
-                  )
-                }
-              )
-            } else {
-              console.log(
-                `Page component: ${collection}/[id].js already exists. Nothing created`
-              )
+                  { recursive: true },
+                  () => {
+                    console.log(
+                      `Page component: ${collection}/[id].js successfully created.`
+                    )
+                    // add page components to preview
+                    fs.appendFileSync(
+                      './pages/admin/previews.js',
+                      `export { default as ${capitalizeFirstLetter(
+                        collection
+                      ).slice(0, -1)} } from '../../pages/${collection}/[id]'\n`
+                    )
+                  }
+                )
+              } else {
+                console.log(
+                  `Page component: ${collection}/[id].js already exists. Nothing created`
+                )
+              }
             }
-          }
-        })
-      } else {
-        console.log(
-          `Directory: ./pages/${collection} already exists. Nothing created.`
-        )
+          })
+        } else {
+          console.log(
+            `Directory: ./pages/${collection} already exists. Nothing created.`
+          )
+        }
       }
     })
   }

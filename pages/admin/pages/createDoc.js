@@ -5,9 +5,6 @@ import { useParams, useHistory } from 'react-router-dom'
 // Styles
 import { Label } from '../styles'
 
-// Ui
-import { Textarea, Input, useToast, Box } from '@chakra-ui/react'
-
 // Firebase
 import {
   getSchemaByType,
@@ -20,20 +17,18 @@ import {
 import { capitalizeFirstLetter, getTypes } from '@/admin/utils/utils'
 
 // Components
+import { Box } from '@chakra-ui/react'
 import PageTransitionAnimation from '@/admin/atoms/pageTransitionAnimation'
-import TipTap from '../components/editor'
 import CreateDocButton from '@/admin/atoms/createDocButton'
 import Header from '@/admin/components/header'
-import TextAreaImage from '@/admin/components/atoms/textAreaImage'
 import AddRelatedDocModal from '@/admin/components/addRelatedDocModal'
 import AddedRelatedDocs from '@/admin/components/addedRelatedDocs'
 import DocFormFieldWrapper from '@/admin/components/layouts/docFormFieldWrapper'
-import TypeInput from '@/admin/components/atoms/typeInput'
 import DocForm from '@/admin/components/docForm'
 
 // Hooks
-import { useForm, FormProvider } from 'react-hook-form'
 import useStore from '@/admin/store/store'
+import { useDisplayToast } from '@/admin/hooks/toast'
 
 const Create = () => {
   const [schema, setSchema] = useState()
@@ -43,18 +38,11 @@ const Create = () => {
   const [onSubmit, setOnSubmit] = useState()
   const newContent = useRef(null)
   const haveEditor = useRef(false)
-  const toast = useToast()
   const { type } = useParams()
   const [schemaSorted, setSchemaSorted] = useState(null)
   const history = useHistory()
   const [selectedRowIds, setSelectedRowIds] = useState([])
-
-  const {
-    register,
-    handleSubmit: handleSubmitHook,
-    formState: { errors },
-    setValue
-  } = useForm()
+  const displayToast = useDisplayToast()
 
   // OnMount: get metadata of the Collection
   useEffect(() => {
@@ -68,7 +56,11 @@ const Create = () => {
     if (newContent.current) {
       newContent.current['content'].value = editorContent.current
       addByCollectionType(type, newContent.current)
-      showToastAndGoBack()
+      displayToast({
+        title: 'Content Created Successfully',
+        description: 'Alright!'
+      })
+      history.goBack()
     }
   }, [editorContent.current])
 
@@ -87,7 +79,6 @@ const Create = () => {
   const getRelations = async () => {
     getFullSchemaByType(type).then(async data => {
       if (data.length > 0 && data[0].relations?.length > 0) {
-        const promises = []
         const relatedCollections = []
         data[0].relations.forEach((junction, i) => {
           const { type2 } = getTypes(junction.name, type)
@@ -169,19 +160,9 @@ const Create = () => {
         })
       })
     })
-    showToastAndGoBack()
-  }
-  // }
-
-  // After Doc is created
-  const showToastAndGoBack = () => {
-    toast({
+    displayToast({
       title: 'Content Created Successfully',
-      position: 'bottom-right',
-      variant: 'subtle',
-      description: 'Alright!',
-      duration: 5000,
-      isClosable: true
+      description: 'Alright!'
     })
     history.goBack()
   }

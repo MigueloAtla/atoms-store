@@ -12,12 +12,17 @@ import useStore from '@/admin/store/store'
 // Styles
 import { HeaderStyled } from './styles'
 
-const Header = ({ back, title, children }) => {
+const Header = ({ back, title, children, width }) => {
   const expandedEditor = useStore(state => state.expandedEditor)
+  const toggleCollectionsPanel = useStore(state => state.toggleCollectionsPanel)
   let history = useHistory()
 
   return (
-    <HeaderStyled expanded={expandedEditor} data-testid='header'>
+    <HeaderStyled
+      width={toggleCollectionsPanel ? 201 : 91}
+      expanded={expandedEditor}
+      data-testid='header'
+    >
       {back ? (
         <Flex pl='20px'>
           <IconButton

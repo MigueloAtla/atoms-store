@@ -7,6 +7,7 @@ export const HeaderStyled = styled.header`
   gap: 6px;
   height: 60px;
   width: calc(100% - 100px);
+  width: ${({ width }) => `calc(100% - ${width}px)`};
   align-items: center;
   position: fixed;
   top: 0;

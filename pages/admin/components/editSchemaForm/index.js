@@ -110,6 +110,7 @@ const EditCollectionForm = ({ schema, type }) => {
                         <option value='longtext'>long text</option>
                         <option value='richtext'>rich text</option>
                         <option value='image'>image</option>
+                        <option value='boolean'>boolean</option>
                       </Select>
                     )}
                   </Flex>

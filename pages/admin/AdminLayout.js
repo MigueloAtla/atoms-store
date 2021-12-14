@@ -58,12 +58,15 @@ const areas = {
 // Layout Component
 export default function AdminLayout () {
   const setSelectedSidebarMenu = useStore(state => state.setSelectedSidebarMenu)
+  const toggleCollectionsPanel = useStore(state => state.toggleCollectionsPanel)
+  const setToggleCollectionsPanel = useStore(
+    state => state.setToggleCollectionsPanel
+  )
   const setCollections = useStore(state => state.setCollections)
   const setSelectedCollectionName = useStore(
     state => state.setSelectedCollectionName
   )
-
-  const [toggleCollectionsPanel, setToggleCollectionsPanel] = useState(false)
+  // const [toggleCollectionsPanel, setToggleCollectionsPanel] = useState(false)
   const [scale, setScale] = useState(1)
   const [rotate, setRotate] = useState(0)
 
@@ -154,7 +157,7 @@ export default function AdminLayout () {
                         onClick={() => {
                           // setSelectedCollectionName('')
                           // setSelectedSidebarMenu('collections')
-                          setToggleCollectionsPanel(s => !s)
+                          setToggleCollectionsPanel(!toggleCollectionsPanel)
                         }}
                       >
                         <Icon as={FaLayerGroup} color='white' />
@@ -266,19 +269,6 @@ export default function AdminLayout () {
     </Router>
   )
 }
-
-// const IconLink = styled.a`
-//   width: 100%;
-//   height: 60px;
-//   cursor: pointer;
-//   display: flex;
-//   justify-content: center;
-//   align-items: center;
-//   :hover {
-//     background-color: #80808017;
-//     border-right: 1px solid black;
-//   }
-// `
 
 const Settings = styled.div`
   width: 100%;

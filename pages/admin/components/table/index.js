@@ -243,11 +243,11 @@ function Table ({ columns, data, type, onClick }) {
 export default Table
 
 const PaginationStyled = styled(HStack)`
-  position: fixed;
+  position: absolute;
   bottom: 0;
-  left: 90px;
+  left: 0;
   background-color: white;
   margin-top: 24px;
-  width: calc(100% - 90px);
+  width: 100%;
   border-top: 1px solid #bcbcbc;
 `
