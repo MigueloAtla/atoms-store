@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import Image from 'next/image'
-
+// import Image from 'next/image'
+import Img from 'react-cool-img'
 import styled from 'styled-components'
 
 import {
@@ -84,7 +84,7 @@ const ModalImages = ({ setImgURL }) => {
                       h='auto'
                       position='relative'
                     >
-                      <img
+                      <Img
                         style={{
                           objectFit: 'cover',
                           width: '100%',
