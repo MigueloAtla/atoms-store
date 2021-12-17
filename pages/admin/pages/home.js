@@ -1,4 +1,5 @@
 import React from 'react'
+import Link from 'next/link'
 import { Icon, Flex } from '@chakra-ui/react'
 import { FaHome } from 'react-icons/fa'
 import Image from 'next/image'
@@ -9,11 +10,13 @@ const Home = () => {
   return (
     <div>
       <h2>Home</h2>
-      <a target='_blank' href='/'>
-        <Flex h='30px'>
-          <p>Go to web</p>
-        </Flex>
-      </a>
+      <Link href='/'>
+        <a>
+          <Flex h='30px'>
+            <p>Go to web</p>
+          </Flex>
+        </a>
+      </Link>
       <IconLink
         target='_blank'
         rel='noreferrer'

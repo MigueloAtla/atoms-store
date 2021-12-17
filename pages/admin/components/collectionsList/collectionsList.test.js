@@ -10,18 +10,22 @@ const StoreWrapper = ({ children }) => {
   const setCollections = useStore(state => state.setCollections)
 
   useEffect(() => {
-    setCollections(['Posts', 'Projects', 'Recipes', 'Albums'])
+    setCollections([
+      { name: 'posts', page: true },
+      { name: 'products', page: true },
+      { name: 'projects', page: true },
+      { name: 'checkouts', page: false }
+    ])
   }, [])
-
   return <CollectionsList />
 }
 
 describe('Collections list', () => {
   it('Renders a list of the available collections', async () => {
     render(<StoreWrapper />, { wrapper: MemoryRouter })
-    expect(screen.getByText('Posts')).toBeInTheDocument()
-    expect(screen.getByText('Projects')).toBeInTheDocument()
-    expect(screen.getByText('Recipes')).toBeInTheDocument()
-    expect(screen.getByText('Albums')).toBeInTheDocument()
+    expect(screen.getByText('posts')).toBeInTheDocument()
+    expect(screen.getByText('products')).toBeInTheDocument()
+    expect(screen.getByText('projects')).toBeInTheDocument()
+    expect(screen.getByText('checkouts')).toBeInTheDocument()
   })
 })

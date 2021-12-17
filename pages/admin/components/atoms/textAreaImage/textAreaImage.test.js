@@ -38,8 +38,17 @@ jest.mock('@/firebase/client.js', () => ({
 
 jest.mock('next/image', () => ({ src, alt }) => <img src={src} alt={alt} />)
 
+jest.mock('react-hook-form', () => ({
+  ...jest.requireActual('react-hook-form'),
+  useFormContext: () => ({
+    register: () => jest.fn(),
+    errors: () => jest.fn(),
+    setValue: () => jest.fn()
+  })
+}))
+
 const file = new File(['dummy content'], 'example.png', { type: 'image/png' })
-console.log(file.name)
+// console.log(file.name)
 const StoreWrapper = ({ withImage }) => {
   const setImgURL = useStore(state => state.setImgURL)
 
@@ -52,8 +61,7 @@ const StoreWrapper = ({ withImage }) => {
 
 describe('Input Image', () => {
   it('renders a textarea without image', async () => {
-    render(<TextAreaImage name='image' isRequired='false' />)
-    expect(screen.getByRole('textbox')).toBeInTheDocument()
+    render(<StoreWrapper />)
     expect(screen.queryByRole('img')).toBe(null)
     cleanup()
   })

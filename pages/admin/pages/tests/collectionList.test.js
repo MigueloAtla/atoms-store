@@ -2,7 +2,7 @@ import React from 'react'
 import { render, screen, waitFor } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import { MemoryRouter } from 'react-router-dom'
-import CollectionList from '../collectionList'
+import DocsInCollection from '../docsInCollection'
 
 // const collectionData = [
 //   {
@@ -69,7 +69,7 @@ jest.mock('react-router-dom', () => ({
 
 describe('Edit Page', () => {
   it('Renders loader in first render and after renders content interface with data', async () => {
-    render(<CollectionList />, {
+    render(<DocsInCollection />, {
       wrapper: MemoryRouter
     })
     // expect(screen.getByTestId('loader')).toBeInTheDocument()

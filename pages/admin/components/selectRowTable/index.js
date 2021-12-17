@@ -69,7 +69,7 @@ const IndeterminateCheckbox = React.forwardRef(
 
     return (
       <>
-        <CheckBox type='checkbox' ref={resolvedRef} {...rest} />
+        <CheckBox type='checkbox' role='checkbox' ref={resolvedRef} {...rest} />
       </>
     )
   }
