@@ -8,7 +8,7 @@ const store = set => ({
   selectedCollectionName: '',
   id: null,
   loading: false,
-  imgURL: null,
+  imgURL: '',
   rerender: false,
   smallImageEditor: false,
   expandedEditor: false,

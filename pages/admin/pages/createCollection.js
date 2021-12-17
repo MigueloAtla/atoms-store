@@ -184,6 +184,7 @@ export default function CreateCollection () {
                             <option value='text'>text</option>
                             <option value='longtext'>long text</option>
                             <option value='richtext'>rich text</option>
+                            <option value='number'>number</option>
                             <option value='image'>image</option>
                             <option value='boolean'>boolean</option>
                             <option value='relation'>

@@ -2,13 +2,14 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 
+// Firebase
+import { getCollection } from '@/firebase/client'
+
 // Styles
 import * as S from './styles'
 
 // Components
 import { Flex, Text, Divider } from '@chakra-ui/react'
-// Firebase functions
-import { getCollection } from '@/firebase/client'
 
 // State
 import useStore from '@/admin/store/store'

@@ -5,7 +5,15 @@ import { useFormContext } from 'react-hook-form'
 import TipTap from '@/admin/components/editor'
 import TextAreaImage from '@/admin/components/atoms/textAreaImage'
 import { TextInputStyled, TextAreaStyled } from '@/admin/atoms/textInput/styles'
-import { Input, Switch } from '@chakra-ui/react'
+import {
+  Input,
+  Switch,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  NumberIncrementStepper,
+  NumberDecrementStepper
+} from '@chakra-ui/react'
 
 const TypeInput = ({ obj, name, onSubmit, editorContent, haveEditor }) => {
   const { register, errors } = useFormContext()
@@ -34,6 +42,30 @@ const TypeInput = ({ obj, name, onSubmit, editorContent, haveEditor }) => {
               required: isRequired && 'Write in this field, son of a bitch'
             })}
           />
+          {isRequired && errors[name] && errors[name].message}
+        </>
+      )
+    case 'number':
+      return (
+        <>
+          <NumberInput
+            // name={name}
+            defaultValue={value}
+            // {...register(name, {
+            //   required: isRequired && 'Write in this field, son of a bitch'
+            // })}
+          >
+            <NumberInputField
+              name={name}
+              {...register(name, {
+                required: isRequired && 'Write in this field, son of a bitch'
+              })}
+            />
+            <NumberInputStepper>
+              <NumberIncrementStepper />
+              <NumberDecrementStepper />
+            </NumberInputStepper>
+          </NumberInput>
           {isRequired && errors[name] && errors[name].message}
         </>
       )

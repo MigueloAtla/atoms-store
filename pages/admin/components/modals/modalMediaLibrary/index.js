@@ -64,6 +64,7 @@ const ModalImages = ({ setImgURL }) => {
           <ModalBody my='50' mx='10' bg='#efefef5e' p='40px' borderRadius='5px'>
             {/* <Flex wrap='wrap'> */}
             <Masonry
+              className='masonry'
               style={{
                 display: 'flex'
               }}

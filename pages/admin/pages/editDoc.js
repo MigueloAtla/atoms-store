@@ -162,6 +162,10 @@ const Edit = () => {
     })
   }
 
+  // useEffect(() => {
+  //   console.log(relations)
+  // }, [relations])
+
   useEffect(() => {
     if (content) {
       Object.keys(content).map(key => {
@@ -298,7 +302,6 @@ const Edit = () => {
               {/* Showing related Docs */}
               {relations.length > 0 &&
                 relations.map((relation, i) => {
-                  console.log(relation)
                   return (
                     <DocFormFieldWrapper key={i}>
                       <Label w='100%'>
@@ -330,10 +333,10 @@ const Edit = () => {
                                   )
                                 }}
                               >
-                                {Object.keys(doc).map(docField => {
+                                {Object.keys(doc).map((docField, i) => {
                                   if (docField !== 'id') {
                                     return (
-                                      <p>
+                                      <p key={i}>
                                         {docField}: {doc[docField].value}
                                       </p>
                                     )
