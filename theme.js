@@ -1,10 +1,12 @@
 import styled, { createGlobalStyle, css } from 'styled-components'
 import { LayoutStyled } from '@/layouts/index'
 import Image from 'next/image'
+import Img from 'react-cool-img'
+
 import { capitalize } from '@/utils'
 import { parse } from 'node-html-parser'
 
-import { Heading, Paragraph } from '@/atoms'
+import { Heading, Paragraph, ImageWrapper, ImageStyled } from '@/atoms'
 import { Text } from 'rebass/styled-components'
 
 // Theme
@@ -60,15 +62,6 @@ export const TitleStyled = ({ as, style = {}, ...props }) => (
 
 export const LongTextStyled = ({ ...props }) => <Text as='p' {...props} />
 
-export const ImageWrapper = styled.div`
-  width: 100%;
-  height: 400px;
-  position: relative;
-  margin: 20px;
-`
-export const ImageStyled = styled(Image)`
-  object-fit: contain;
-`
 export const ContentStyled = styled.div`
   width: 100%;
   display: flex;
@@ -160,10 +153,12 @@ export const getComponents = doc => {
                 break
               case 'img':
                 contentMarkup.push(() => (
-                  <img
+                  <Img
                     src={node.attributes.src}
                     alt='content image'
                     width='100%'
+                    // height='100%'
+                    // layout='fill'
                   />
                 ))
                 break
@@ -183,20 +178,18 @@ export const getComponents = doc => {
         } else response[capitalize(key)] = () => ''
       } else if (value.type === 'image') {
         if (value.value !== '') {
-          response[capitalize(key)] = () => (
-            <ImageWrapper>
-              <ImageStyled
-                src={value.value}
-                alt={doc.title.value}
-                layout='fill'
-              />
-            </ImageWrapper>
-          )
+          response[capitalize(key)] = function MappedImage () {
+            return (
+              <ImageWrapper>
+                <ImageStyled src={value.value} alt={doc.title.value} />
+              </ImageWrapper>
+            )
+          }
         } else response[capitalize(key)] = () => ''
       } else {
-        response[capitalize(key)] = props => (
-          <Comp {...props}>{value.value}</Comp>
-        )
+        response[capitalize(key)] = function MappedComp (props) {
+          return <Comp {...props}>{value.value}</Comp>
+        }
       }
     }
   }

@@ -127,10 +127,12 @@ function Table ({ columns, data }) {
       />
       <table {...getTableProps()}>
         <thead>
-          {headerGroups.map(headerGroup => (
-            <tr {...headerGroup.getHeaderGroupProps()}>
-              {headerGroup.headers.map(column => (
-                <th {...column.getHeaderProps()}>{column.render('Header')}</th>
+          {headerGroups.map((headerGroup, i) => (
+            <tr key={i} {...headerGroup.getHeaderGroupProps()}>
+              {headerGroup.headers.map((column, i) => (
+                <th key={i} {...column.getHeaderProps()}>
+                  {column.render('Header')}
+                </th>
               ))}
             </tr>
           ))}
@@ -139,9 +141,13 @@ function Table ({ columns, data }) {
           {page.map((row, i) => {
             prepareRow(row)
             return (
-              <tr {...row.getRowProps()}>
-                {row.cells.map(cell => {
-                  return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
+              <tr key={i} {...row.getRowProps()}>
+                {row.cells.map((cell, i) => {
+                  return (
+                    <td key={i} {...cell.getCellProps()}>
+                      {cell.render('Cell')}
+                    </td>
+                  )
                 })}
               </tr>
             )

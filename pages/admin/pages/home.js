@@ -1,10 +1,10 @@
 import React from 'react'
 import Link from 'next/link'
 import { Icon, Flex } from '@chakra-ui/react'
-import { FaHome } from 'react-icons/fa'
-import Image from 'next/image'
+// import { FaHome } from 'react-icons/fa'
+// import Image from 'next/image'
 import styled from 'styled-components'
-import firebase from '../../../public/firebase.svg'
+// import firebase from '../../../public/firebase.svg'
 
 const Home = () => {
   return (
@@ -22,7 +22,8 @@ const Home = () => {
         rel='noreferrer'
         href={`${process.env.NEXT_PUBLIC_FIREBASE_URL}`}
       >
-        <Image src={firebase} width='20' height='20' />
+        firebase
+        {/* <Image src={firebase} width='20' height='20' /> */}
       </IconLink>
     </div>
   )
