@@ -3,8 +3,7 @@ import { getCollection, getDocByID } from '@/firebase/client'
 
 import { GlobalStyles, getComponents } from '@/theme'
 
-import { LayoutStyled } from '@/layouts/postLayout'
-import { Column, Row, AutoColumns } from '@/layouts/index'
+import { Column, Row, AutoColumns, LayoutStyled } from '@/layouts/index'
 
 export default function Post ({ post }) {
   const { Title, Description, Featuredimage, Content } = getComponents(post)
