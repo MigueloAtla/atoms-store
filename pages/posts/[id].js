@@ -16,10 +16,7 @@ export default function Post ({ post }) {
         <Title as='h1' fontSize={[4, 5, 7]} color='antiquewhite' />
         <Description />
         <Featuredimage />
-        <Column mt='20px'>
-          {Content()}
-          {/* <div dangerouslySetInnerHTML={{ __html: Content() }}></div> */}
-        </Column>
+        <Column mt='20px'>{Content()}</Column>
       </Column>
     </LayoutStyled>
   )
