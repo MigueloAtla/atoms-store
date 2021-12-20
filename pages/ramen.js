@@ -1,4 +1,4 @@
-import Post from './posts/[id]'
+import Post from './posts/[id].page'
 
 const post = {
   title: {
