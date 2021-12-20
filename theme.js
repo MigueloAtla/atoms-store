@@ -207,7 +207,7 @@ export const getComponents = doc => {
           } else {
             markupContent.push(function ImageContent () {
               return (
-                <img
+                <Img
                   src={element.attrs.src}
                   alt='content'
                   style={{ width: '100%' }}
