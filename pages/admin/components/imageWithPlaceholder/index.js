@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import Img from 'react-cool-img'
 
 export default function ImageWithPlaceholder ({ src, width, height }) {
   const [isLoading, setIsLoading] = useState(true)
@@ -17,7 +18,7 @@ export default function ImageWithPlaceholder ({ src, width, height }) {
         style={{ display: isLoading ? 'block' : 'none' }}
       /> */}
       {/* <div style={{ width, height, display: isLoading ? 'block' : 'none' }} /> */}
-      <img
+      <Img
         alt='ad-img'
         height={height}
         width={width}

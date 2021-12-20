@@ -183,7 +183,7 @@ const MediaLibrary = () => {
             {isOpen && (
               <>
                 <ImageExpanded>
-                  <img
+                  <Img
                     src={image.url}
                     alt='opened image'
                     width='500px'
