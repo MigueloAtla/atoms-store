@@ -16,9 +16,10 @@ export default function Post ({ post }) {
         <Title as='h1' fontSize={[4, 5, 7]} color='antiquewhite' />
         <Description />
         <Featuredimage />
-        <AutoColumns mt='20px' gap={3}>
+        <Column mt='20px'>
           {Content()}
-        </AutoColumns>
+          {/* <div dangerouslySetInnerHTML={{ __html: Content() }}></div> */}
+        </Column>
       </Column>
     </LayoutStyled>
   )

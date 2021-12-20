@@ -404,7 +404,7 @@ const TipTap = ({ value, editorContent, onSubmit }) => {
 
   useEffect(() => {
     if (editor) {
-      editorContent.current = editor.getHTML()
+      editorContent.current = editor.getJSON()
     }
   }, [onSubmit])
 

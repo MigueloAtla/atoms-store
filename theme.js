@@ -2,9 +2,9 @@ import styled, { createGlobalStyle, css } from 'styled-components'
 import { LayoutStyled } from '@/layouts/index'
 import Image from 'next/image'
 import { capitalize } from '@/utils'
-import { parse } from 'node-html-parser'
+// import { parse } from 'node-html-parser'
 
-import { Heading, Paragraph } from '@/atoms'
+import { Heading } from '@/atoms'
 import { Text } from 'rebass/styled-components'
 
 // Theme
@@ -90,6 +90,17 @@ export const ContentStyled = styled.div`
 //     color: 'light'
 //   }
 // }
+
+export const Paragraph = styled(Text)``
+
+export const Bold = styled.b`
+  font-weight: bold;
+`
+
+export const Italic = styled.i`
+  font-style: italic;
+`
+
 export const WithTheme = styled.div`
   ${LayoutStyled} {
     background-color: tomato;
@@ -135,7 +146,9 @@ const components = {
   text: Text,
   longtext: LongTextStyled,
   image: ImageStyled,
-  content: ContentStyled
+  content: ContentStyled,
+  bold: Bold,
+  italic: Italic
 }
 
 export const getComponents = doc => {
@@ -145,43 +158,114 @@ export const getComponents = doc => {
       let Comp = components[value.type]
 
       // Richt text mapping
-      if (value.type === 'richtext') {
-        if (value.value !== '') {
-          let contentMarkup = []
-          const root = parse(value.value)
-          root.childNodes.map(node => {
-            switch (node.rawTagName) {
-              case 'p':
-                if (node.innerText !== '') {
-                  contentMarkup.push(() => (
-                    <LongTextStyled>{node.innerText}</LongTextStyled>
-                  ))
-                }
-                break
-              case 'img':
-                contentMarkup.push(() => (
-                  <img
-                    src={node.attributes.src}
-                    alt='content image'
-                    width='100%'
-                  />
-                ))
-                break
-              case 'h1':
-                contentMarkup.push(() => (
-                  <TitleStyled>{node.innerText}</TitleStyled>
-                ))
-                break
-            }
-          })
 
-          response[capitalize(key)] = () => {
-            return contentMarkup.map((Comp, i) => {
-              return <Comp key={i} />
+      if (value.type === 'richtext') {
+        const markupContent = []
+        value.value.content.map(element => {
+          if (element.type !== 'image') {
+            if (element.type === 'paragraph') {
+              let content = []
+              let type = ''
+              element.content.map(el => {
+                el.marks &&
+                  el.marks.map(m => {
+                    if (m.type !== undefined) type = m.type
+                  })
+                if (type.length > 0) {
+                  let Comp = components[type]
+                  content.push(function ParagraphInner () {
+                    return <Comp>{el.text}</Comp>
+                  })
+                  type = ''
+                } else {
+                  content.push(function ParagraphInner () {
+                    return `${el.text}`
+                  })
+                }
+              })
+
+              markupContent.push(function ParagraphOuter () {
+                return (
+                  <Paragraph>
+                    {content.length > 0 &&
+                      content.map((Text, i) => {
+                        if (typeof Text === 'string' || Text instanceof String)
+                          return Text
+                        else return <Text key={i} />
+                      })}
+                  </Paragraph>
+                )
+              })
+            }
+
+            if (element.type === 'heading') {
+              let content
+              element.content.map(el => {
+                content = el.text
+              })
+
+              markupContent.push(function Heading () {
+                return <Text as={`h${element.attrs.level}`}>{content}</Text>
+              })
+            }
+          } else {
+            markupContent.push(function ImageContent () {
+              return (
+                <img
+                  src={element.attrs.src}
+                  alt='content'
+                  style={{ width: '100%' }}
+                />
+              )
             })
           }
-        } else response[capitalize(key)] = () => ''
-      } else if (value.type === 'image') {
+        })
+        response[capitalize(key)] = () => {
+          return markupContent.map((Comp, i) => {
+            return <Comp key={i} />
+          })
+        }
+      }
+
+      // if (value.type === 'richtext') {
+      //   if (value.value !== '') {
+      //     console.log(value)
+      //     let contentMarkup = []
+      //     const root = parse(value.value)
+      //     root.childNodes.map(node => {
+      //       switch (node.rawTagName) {
+      //         case 'p':
+      //           if (node.innerText !== '') {
+      //             contentMarkup.push(() => (
+      //               <LongTextStyled>{node.innerText}</LongTextStyled>
+      //             ))
+      //           }
+      //           break
+      //         case 'img':
+      //           contentMarkup.push(() => (
+      //             <img
+      //               src={node.attributes.src}
+      //               alt='content image'
+      //               width='100%'
+      //             />
+      //           ))
+      //           break
+      //         case 'h1':
+      //           contentMarkup.push(() => (
+      //             <TitleStyled>{node.innerText}</TitleStyled>
+      //           ))
+      //           break
+      //       }
+      //     })
+
+      //     response[capitalize(key)] = () => {
+      //       return contentMarkup.map((Comp, i) => {
+      //         return <Comp key={i} />
+      //       })
+      //     }
+      //   } else response[capitalize(key)] = () => ''
+      // }
+      else if (value.type === 'image') {
         if (value.value !== '') {
           response[capitalize(key)] = () => (
             <ImageWrapper>
