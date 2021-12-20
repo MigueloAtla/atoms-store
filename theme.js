@@ -10,7 +10,7 @@ import { Text } from 'rebass/styled-components'
 // Theme
 export const theme = {
   breakpoints: ['40em', '52em', '64em'],
-  fontSizes: [12, 14, 16, 20, 24, 32, 48, 64],
+  fontSizes: ['12px', '14px', '16px', '20px', '24px', '32px', '48px', '64px'],
   colors: {
     blue: '#07c',
     lightgray: '#f6f6ff',
@@ -91,7 +91,10 @@ export const ContentStyled = styled.div`
 //   }
 // }
 
-export const Paragraph = styled(Text)``
+export const Paragraph = styled(Text)`
+  margin: 10px 0;
+  line-height: 25px;
+`
 
 export const Bold = styled.b`
   font-weight: bold;
@@ -186,7 +189,7 @@ export const getComponents = doc => {
 
               markupContent.push(function ParagraphOuter () {
                 return (
-                  <Paragraph>
+                  <Paragraph as='p'>
                     {content.length > 0 &&
                       content.map((Text, i) => {
                         if (typeof Text === 'string' || Text instanceof String)
