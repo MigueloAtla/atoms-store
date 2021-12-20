@@ -20,7 +20,6 @@ export default function Post ({ post }) {
     </LayoutStyled>
   )
 }
-
 export async function getStaticProps ({ params: { id } }) {
   const post = await getDocByID('posts', id)
 
