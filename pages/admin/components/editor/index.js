@@ -376,7 +376,7 @@ const MenuBar = ({ editor }) => {
         >
           {'->'}
         </EditorButton> */}
-        <Button
+        {/* <Button
           onClick={() => {
             setSmallImageEditor(!smallImageEditor)
           }}
@@ -389,8 +389,8 @@ const MenuBar = ({ editor }) => {
           }}
         >
           expand
-        </Button>
-        <ModalShortcuts />
+        </Button> */}
+        {/* <ModalShortcuts /> */}
       </Box>
     </MenuStyled>
   )

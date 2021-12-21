@@ -44,11 +44,11 @@ const ModalShortcuts = () => {
 export default ModalShortcuts
 
 const ShortcutsButton = styled(Button)`
-  position: absolute;
-  bottom: 10px;
-  right: 0;
-  width: 30px;
-  height: 30px;
+  /* position: absolute;
+  top: 18px;
+  right: 22px; */
+  /* width: 20px;
+  height: 25px; */
 `
 const ModalContentStyled = styled(ModalContent)`
   background-color: #ffffffd1;

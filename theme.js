@@ -133,9 +133,14 @@ export const GlobalStyles = createGlobalStyle`
   p {
     color: ${props => props.theme.colors.light};
   }
-  h1 {
+  
+  // this does not work
+  /* h1 {
     font-size: ${props => props.theme.fontSizes[(5, 6, 7)]};
   }
+  h2 {
+    font-size: ${props => props.theme.fontSizes[(4, 5, 6)]};
+  } */
 `
 
 const components = {
