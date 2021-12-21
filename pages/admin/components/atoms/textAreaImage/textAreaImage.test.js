@@ -67,12 +67,12 @@ describe('Input Image', () => {
   })
 
   // deactivated for deploy
-  // it('renders with a image', async () => {
-  //   render(<StoreWrapper withImage />)
-  //   const image = screen.getByRole('img')
-  //   expect(image).toHaveAttribute('src', images[0])
-  //   cleanup()
-  // })
+  it('renders with a image', async () => {
+    render(<StoreWrapper withImage />)
+    const image = screen.getByRole('img')
+    expect(image).toHaveAttribute('src', images[0])
+    cleanup()
+  })
   it('Uploads an image', async () => {
     render(<StoreWrapper />)
     const fileDropzone = screen.getByTestId('dropimage')

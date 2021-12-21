@@ -157,65 +157,70 @@ export const getComponents = doc => {
 
       if (value.type === 'richtext') {
         const markupContent = []
-        value.value.content.map(element => {
-          if (element.type !== 'image') {
-            if (element.type === 'paragraph') {
-              let content = []
-              let type = ''
-              element.content.map(el => {
-                el.marks &&
-                  el.marks.map(m => {
-                    if (m.type !== undefined) type = m.type
+        value.value.content?.length > 0 &&
+          value.value.content.map(element => {
+            if (element.type !== 'image') {
+              if (element.type === 'paragraph') {
+                let content = []
+                let type = ''
+                element.content?.length > 0 &&
+                  element.content.map(el => {
+                    el.marks &&
+                      el.marks.map(m => {
+                        if (m.type !== undefined) type = m.type
+                      })
+                    if (type.length > 0) {
+                      let Comp = components[type]
+                      content.push(function ParagraphInner () {
+                        return <Comp>{el.text}</Comp>
+                      })
+                      type = ''
+                    } else {
+                      content.push(function ParagraphInner () {
+                        return `${el.text}`
+                      })
+                    }
                   })
-                if (type.length > 0) {
-                  let Comp = components[type]
-                  content.push(function ParagraphInner () {
-                    return <Comp>{el.text}</Comp>
-                  })
-                  type = ''
-                } else {
-                  content.push(function ParagraphInner () {
-                    return `${el.text}`
-                  })
-                }
-              })
 
-              markupContent.push(function ParagraphOuter () {
+                markupContent.push(function ParagraphOuter () {
+                  return (
+                    <Paragraph as='p'>
+                      {content.length > 0 &&
+                        content.map((Text, i) => {
+                          if (
+                            typeof Text === 'string' ||
+                            Text instanceof String
+                          )
+                            return Text
+                          else return <Text key={i} />
+                        })}
+                    </Paragraph>
+                  )
+                })
+              }
+
+              if (element.type === 'heading') {
+                let content
+                element.content.map(el => {
+                  content = el.text
+                })
+
+                markupContent.push(function Heading () {
+                  return <Text as={`h${element.attrs.level}`}>{content}</Text>
+                })
+              }
+            } else {
+              markupContent.push(function ImageContent () {
                 return (
-                  <Paragraph as='p'>
-                    {content.length > 0 &&
-                      content.map((Text, i) => {
-                        if (typeof Text === 'string' || Text instanceof String)
-                          return Text
-                        else return <Text key={i} />
-                      })}
-                  </Paragraph>
+                  <Img
+                    src={element.attrs.src}
+                    alt='content'
+                    style={{ width: '100%' }}
+                  />
                 )
               })
             }
-
-            if (element.type === 'heading') {
-              let content
-              element.content.map(el => {
-                content = el.text
-              })
-
-              markupContent.push(function Heading () {
-                return <Text as={`h${element.attrs.level}`}>{content}</Text>
-              })
-            }
-          } else {
-            markupContent.push(function ImageContent () {
-              return (
-                <Img
-                  src={element.attrs.src}
-                  alt='content'
-                  style={{ width: '100%' }}
-                />
-              )
-            })
-          }
-        })
+          })
         response[capitalize(key)] = () => {
           return markupContent.map((Comp, i) => {
             return <Comp key={i} />

@@ -13,17 +13,17 @@ jest.mock('@/firebase/client.js', () => ({
 }))
 
 // deactivated deploy
-// jest.mock('next/image', () => ({ src, alt }) => <img src={src} alt={alt} />)
+jest.mock('next/image', () => ({ src, alt }) => <img src={src} alt={alt} />)
 
 describe('Modal Image Url', () => {
   it('Click on button opens modal', async () => {
-    expect(true).toBe(true)
+    // expect(true).toBe(true)
     // deactivated deploy
-    // render(<ModalImageUrl />)
-    // userEvent.click(screen.getByRole('button'))
-    // await waitFor(() => {
-    //   expect(screen.getByText('Image from external Url')).toBeInTheDocument()
-    //   expect(screen.getByTestId('imageUrl')).toBeInTheDocument()
-    // })
+    render(<ModalImageUrl />)
+    userEvent.click(screen.getByRole('button'))
+    await waitFor(() => {
+      expect(screen.getByText('Image from external Url')).toBeInTheDocument()
+      expect(screen.getByTestId('imageUrl')).toBeInTheDocument()
+    })
   })
 })
