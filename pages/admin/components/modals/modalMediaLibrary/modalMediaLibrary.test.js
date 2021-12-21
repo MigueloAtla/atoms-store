@@ -14,7 +14,9 @@ jest.mock('@/firebase/client.js', () => ({
 
 // deactivated for deploy
 // jest.mock('next/image', () => ({ src, alt }) => <img src={src} alt={alt} />)
-jest.mock('react-cool-img', () => ({ src, alt }) => <img src={src} alt={alt} />)
+jest.mock('react-cool-img', function Image ({ src, alt }) {
+  return <img src={src} alt={alt} />
+})
 
 describe('Modal', () => {
   it('Click on button opens modal and load Images', async () => {
