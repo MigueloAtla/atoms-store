@@ -1,9 +1,10 @@
 import React from 'react'
 import { getCollection, getDocByID } from '@/firebase/client'
 
-import { GlobalStyles, getComponents } from '@/theme'
+import { GlobalStyles, getComponents, components } from '@/theme'
 
-import { Column, Row, AutoColumns, LayoutStyled } from '@/layouts/index'
+import { LayoutStyled } from '@/layouts/index'
+import { Column, Row, AutoColumns } from 'styled-bento'
 
 export default function Post ({ post }) {
   const { Title, Description, Featuredimage, Content } = getComponents(post)
@@ -11,8 +12,9 @@ export default function Post ({ post }) {
   return (
     <LayoutStyled width='100%'>
       <GlobalStyles />
-      <Column center>
-        <Title as='h1' fontSize={[4, 5, 7]} color='antiquewhite' />
+      <Column center mark='yellow'>
+        <Title as='h1' fontSize={[4, 5, '100px']} color='antiquewhite' />
+        <Title as={components['h2']} color='antiquewhite' />
         <Description />
         <Featuredimage />
         <Column mt='20px'>{Content()}</Column>

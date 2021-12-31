@@ -34,6 +34,7 @@ export default function Admin () {
 }
 
 const Styles = styled.div`
+  // styles for tiptap editor, move to editor comps
   h1 {
     font-size: 64px;
   }

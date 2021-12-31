@@ -11,4 +11,5 @@ export const ImageWrapper = styled.div`
 export const ImageStyled = styled(Img)`
   object-fit: contain;
   max-height: 300px;
+  width: 100%;
 `

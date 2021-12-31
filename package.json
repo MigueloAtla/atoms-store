@@ -39,6 +39,7 @@
     "react-router-dom": "^5.2.0",
     "react-table": "^7.7.0",
     "rebass": "^4.0.7",
+    "styled-bento": "^0.0.13",
     "styled-components": "^5.3.0",
     "styled-system": "^5.1.5",
     "zustand": "^3.5.7"

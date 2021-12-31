@@ -1,13 +1,10 @@
 import styled, { createGlobalStyle, css } from 'styled-components'
 import { LayoutStyled } from '@/layouts/index'
-import Image from 'next/image'
 import Img from 'react-cool-img'
-
 import { capitalize } from '@/utils'
-// import { parse } from 'node-html-parser'
-
 import { Heading, ImageWrapper, ImageStyled } from '@/atoms'
-import { Text } from 'rebass/styled-components'
+import { Text } from 'styled-bento'
+import React from 'react'
 
 // Theme
 export const theme = {
@@ -66,9 +63,13 @@ export const ContentStyled = styled.div`
   width: 100%;
   display: flex;
   flex-direction: column;
-
-  h1 {
-    font-size: 48px;
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-weight: regular;
   }
 
   img {
@@ -83,19 +84,6 @@ export const ContentStyled = styled.div`
 //     color: 'light'
 //   }
 // }
-
-export const Paragraph = styled(Text)`
-  margin: 10px 0;
-  line-height: 25px;
-`
-
-export const Bold = styled.b`
-  font-weight: bold;
-`
-
-export const Italic = styled.i`
-  font-style: italic;
-`
 
 export const WithTheme = styled.div`
   ${LayoutStyled} {
@@ -123,6 +111,7 @@ export const withTheme = css`
 export const GlobalStyles = createGlobalStyle`
   body {
     background-color: ${props => props.theme.colors.dark};
+    font-family: ${props => props.theme.fonts.body}
   }
   h1,
   h2,
@@ -132,24 +121,365 @@ export const GlobalStyles = createGlobalStyle`
   h6,
   p {
     color: ${props => props.theme.colors.light};
+    font-weight: 400;
   }
   
-  // this does not work
-  /* h1 {
-    font-size: ${props => props.theme.fontSizes[(5, 6, 7)]};
+  h1 {
+    font-size: ${props => props.theme.fontSizes[7]};
+    color: tomato;
   }
   h2 {
-    font-size: ${props => props.theme.fontSizes[(4, 5, 6)]};
-  } */
+    font-size: ${props => props.theme.fontSizes[6]};
+  }
 `
 
-const components = {
+export const Paragraph = styled(Text)`
+  margin: 10px 0;
+  line-height: 25px;
+`
+
+export const Bold = styled.b`
+  font-weight: bold;
+`
+
+export const Italic = styled.i`
+  font-style: italic;
+`
+
+export const HorizontalRule = styled.hr`
+  border-top: 1px solid white;
+  width: 100%;
+`
+export const Ul = styled.ul`
+  color: white;
+  margin-left: 20px;
+`
+export const Ol = styled.ol`
+  color: white;
+  margin-left: 20px;
+`
+export const Blockquote = styled.blockquote`
+  color: white;
+  border-left: 1px solid white;
+`
+
+export const Strike = styled.s``
+
+const H1 = ({ children, props }) => {
+  return (
+    <Text {...props} as='h1' fontSize={[4, 5, 7]} fontWeight='inherit'>
+      {children}
+    </Text>
+  )
+}
+const H2 = ({ children, props }) => {
+  return (
+    <Text {...props} as='h2' fontSize={[4, 5, 6]} fontWeight='inherit'>
+      {children}
+    </Text>
+  )
+}
+const H3 = ({ children, props }) => {
+  return (
+    <Text
+      {...props}
+      as='h3'
+      fontSize={['8px', '12px', '20px']}
+      fontWeight='inherit'
+    >
+      {children}
+    </Text>
+  )
+}
+const P = ({ children, props }) => {
+  return (
+    <Text {...props} as='p' fontWeight='inherit'>
+      {children}
+    </Text>
+  )
+}
+
+export const components = {
   text: Text,
   longtext: LongTextStyled,
   image: ImageStyled,
   content: ContentStyled,
   bold: Bold,
-  italic: Italic
+  italic: Italic,
+  strike: Strike,
+  h1: H1,
+  h2: H2,
+  h3: H3,
+  contentParagraph: P
+}
+
+// const selectComponentType = (element, markupContent) => {
+//   switch (element.type) {
+//     case 'image':
+//       markupContent.push(function ImageContent () {
+//         return (
+//           <Img
+//             src={element.attrs.src}
+//             alt='content'
+//             style={{ width: '100%' }}
+//           />
+//         )
+//       })
+//       break
+//     case 'paragraph':
+//       console.log('type paragraph')
+//       let content = []
+//       let type = ''
+//       element.content?.length > 0 &&
+//         element.content.map(el => {
+//           el.marks &&
+//             el.marks.map(m => {
+//               if (m.type !== undefined) type = m.type
+//             })
+//           if (type.length > 0) {
+//             let Comp = components[type]
+//             content.push(function ParagraphInner () {
+//               return <Comp>{el.text}</Comp>
+//             })
+//             type = ''
+//           } else {
+//             content.push(function ParagraphInner () {
+//               return `${el.text}`
+//             })
+//           }
+//         })
+
+//       markupContent.push(function ParagraphOuter () {
+//         return (
+//           <Paragraph as='p'>
+//             {content.length > 0 &&
+//               content.map((Text, i) => {
+//                 if (typeof Text === 'string' || Text instanceof String)
+//                   return Text
+//                 else return <Text key={i} />
+//               })}
+//           </Paragraph>
+//         )
+//       })
+//       break
+//     case 'heading':
+//       let headingContent
+//       element.content?.map(el => {
+//         content = el.text
+//       })
+
+//       markupContent.push(function Heading () {
+//         let Heading = components[`h${element.attrs.level}`]
+//         return <Heading>{headingContent}</Heading>
+//       })
+//       break
+//     case 'horizontalRule':
+//       markupContent.push(function HorizontalRuleContent () {
+//         return <HorizontalRule />
+//       })
+//       break
+//     case 'bulletList':
+//       element.content.length > 0 &&
+//         markupContent.push(function UlWrapper () {
+//           return (
+//             <Ul>
+//               {element.content.map(listItem => {
+//                 return listItem.content?.map(listItemContent => {
+//                   return listItemContent.content?.map((content, i) => {
+//                     return <li key={i}>{content.text}</li>
+//                   })
+//                 })
+//               })}
+//             </Ul>
+//           )
+//         })
+//       break
+//     case 'orderedList':
+//       element.content.length > 0 &&
+//         markupContent.push(function UlWrapper () {
+//           return (
+//             <Ol>
+//               {element.content.map(listItem => {
+//                 return listItem.content?.map(listItemContent => {
+//                   return listItemContent.content?.map((content, i) => {
+//                     return <li key={i}>{content.text}</li>
+//                   })
+//                 })
+//               })}
+//             </Ol>
+//           )
+//         })
+//       break
+//     case 'blockquote':
+//       element.content.length > 0 &&
+//         element.content.map(listItem => {
+//           console.log(listItem)
+//         })
+//       break
+//   }
+// }
+
+// const MarkComp = ({Mark, children}) => {
+
+//   return <Mark>{children}</Mark>
+// }
+const wrapMarks = markComps => {
+  return markComps.reverse().reduce(
+    (ComponentSoFar, { component, props }) => {
+      const Outer = component
+      return function Comp ({ children }) {
+        return (
+          <Outer>
+            <ComponentSoFar>{children}</ComponentSoFar>
+            {'content' in props && children}
+          </Outer>
+        )
+      }
+    },
+    props => null
+  )
+}
+const getMarks = (marks, markComps) => {
+  marks.map(mark => {
+    const Comp = components[mark.type]
+    markComps.push({
+      component: ({ children }) => <Comp>{children}</Comp>,
+      props: {}
+    })
+  })
+}
+
+const selectComponentType = (element, markupContent) => {
+  switch (element.type) {
+    case 'image':
+      markupContent.push(function ImageContent () {
+        return (
+          <Img
+            src={element.attrs.src}
+            alt='content'
+            style={{ width: '100%' }}
+          />
+        )
+      })
+      break
+    case 'paragraph':
+      if (element.content !== undefined) {
+        return element.content.map(el => {
+          const markComps = []
+          if (el.marks !== undefined) {
+            getMarks(el.marks, markComps)
+          }
+          let type = el.type
+          if (el.type === 'text') type = 'contentParagraph'
+          const Comp = components[type]
+          if (el.text !== undefined)
+            markComps.push({
+              component: ({ children }) => <Comp>{children}</Comp>,
+              props: { content: el.text }
+            })
+          const Component = wrapMarks(markComps)
+          markupContent.push(function TextComp () {
+            return <Component>{el.text}</Component>
+          })
+
+          selectComponentType(el, markupContent)
+        })
+      }
+      break
+    case 'heading':
+      let headingContent
+      let markComps = []
+      element.content?.map(el => {
+        if (el.marks !== undefined) {
+          getMarks(el.marks, markComps)
+        }
+        headingContent = el.text
+
+        const Heading = components[`h${element.attrs.level}`]
+        if (el.text !== undefined)
+          markComps.push({
+            component: ({ children }) => <Heading>{children}</Heading>,
+            props: { content: el.text }
+          })
+
+        const Component = wrapMarks(markComps)
+        markupContent.push(function Heading () {
+          return <Component>{headingContent}</Component>
+        })
+      })
+
+      break
+    case 'bulletList':
+      let bulletListArr = []
+      element.content.length > 0 &&
+        element.content?.map(listItem => {
+          let markComps = []
+          return listItem.content?.map(listItemContent => {
+            return listItemContent.content?.map((content, i) => {
+              if (content.marks !== undefined) {
+                getMarks(content.marks, markComps)
+              }
+              if (content.text !== undefined)
+                markComps.push({
+                  component: ({ children }) => <li>{children}</li>,
+                  props: { content: content.text }
+                })
+              const Component = wrapMarks(markComps)
+              bulletListArr.push(function Li () {
+                return <Component>{content.text}</Component>
+              })
+            })
+          })
+        })
+      markupContent.push(function UlWrapper () {
+        return (
+          <Ul>
+            {bulletListArr.map((Li, i) => (
+              <Li key={i} />
+            ))}
+          </Ul>
+        )
+      })
+      break
+    case 'orderedList':
+      let orderedList = []
+      element.content.length > 0 &&
+        element.content?.map(listItem => {
+          let markComps = []
+          return listItem.content?.map(listItemContent => {
+            return listItemContent.content?.map((content, i) => {
+              if (content.marks !== undefined) {
+                getMarks(content.marks, markComps)
+              }
+              if (content.text !== undefined)
+                markComps.push({
+                  component: ({ children }) => <li>{children}</li>,
+                  props: { content: content.text }
+                })
+              const Component = wrapMarks(markComps)
+              orderedList.push(function Li () {
+                return <Component>{content.text}</Component>
+              })
+            })
+          })
+        })
+      markupContent.push(function UlWrapper () {
+        return (
+          <Ol>
+            {orderedList.map((Li, i) => (
+              <Li key={i} />
+            ))}
+          </Ol>
+        )
+      })
+      break
+    case 'blockquote':
+      element.content.length > 0 &&
+        element.content.map(listItem => {
+          console.log(listItem)
+        })
+      break
+  }
 }
 
 export const getComponents = doc => {
@@ -162,116 +492,17 @@ export const getComponents = doc => {
 
       if (value.type === 'richtext') {
         const markupContent = []
+        console.log(value.value.content)
         value.value.content?.length > 0 &&
           value.value.content.map(element => {
-            if (element.type !== 'image') {
-              if (element.type === 'paragraph') {
-                let content = []
-                let type = ''
-                element.content?.length > 0 &&
-                  element.content.map(el => {
-                    el.marks &&
-                      el.marks.map(m => {
-                        if (m.type !== undefined) type = m.type
-                      })
-                    if (type.length > 0) {
-                      let Comp = components[type]
-                      content.push(function ParagraphInner () {
-                        return <Comp>{el.text}</Comp>
-                      })
-                      type = ''
-                    } else {
-                      content.push(function ParagraphInner () {
-                        return `${el.text}`
-                      })
-                    }
-                  })
-
-                markupContent.push(function ParagraphOuter () {
-                  return (
-                    <Paragraph as='p'>
-                      {content.length > 0 &&
-                        content.map((Text, i) => {
-                          if (
-                            typeof Text === 'string' ||
-                            Text instanceof String
-                          )
-                            return Text
-                          else return <Text key={i} />
-                        })}
-                    </Paragraph>
-                  )
-                })
-              }
-
-              if (element.type === 'heading') {
-                let content
-                element.content.map(el => {
-                  content = el.text
-                })
-
-                markupContent.push(function Heading () {
-                  return <Text as={`h${element.attrs.level}`}>{content}</Text>
-                })
-              }
-            } else {
-              markupContent.push(function ImageContent () {
-                return (
-                  <Img
-                    src={element.attrs.src}
-                    alt='content'
-                    style={{ width: '100%' }}
-                  />
-                )
-              })
-            }
+            selectComponentType(element, markupContent)
           })
         response[capitalize(key)] = () => {
           return markupContent.map((Comp, i) => {
             return <Comp key={i} />
           })
         }
-      }
-
-      // if (value.type === 'richtext') {
-      //   if (value.value !== '') {
-      //     console.log(value)
-      //     let contentMarkup = []
-      //     const root = parse(value.value)
-      //     root.childNodes.map(node => {
-      //       switch (node.rawTagName) {
-      //         case 'p':
-      //           if (node.innerText !== '') {
-      //             contentMarkup.push(() => (
-      //               <LongTextStyled>{node.innerText}</LongTextStyled>
-      //             ))
-      //           }
-      //           break
-      //         case 'img':
-      //           contentMarkup.push(() => (
-      //             <img
-      //               src={node.attributes.src}
-      //               alt='content image'
-      //               width='100%'
-      //             />
-      //           ))
-      //           break
-      //         case 'h1':
-      //           contentMarkup.push(() => (
-      //             <TitleStyled>{node.innerText}</TitleStyled>
-      //           ))
-      //           break
-      //       }
-      //     })
-
-      //     response[capitalize(key)] = () => {
-      //       return contentMarkup.map((Comp, i) => {
-      //         return <Comp key={i} />
-      //       })
-      //     }
-      //   } else response[capitalize(key)] = () => ''
-      // }
-      else if (value.type === 'image') {
+      } else if (value.type === 'image') {
         if (value.value !== '') {
           response[capitalize(key)] = function MappedImage () {
             return (
