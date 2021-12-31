@@ -56,4 +56,10 @@ const Styles = styled.div`
   .ProseMirror img {
     height: ${({ smallImageEditor }) => smallImageEditor && '180px'};
   }
+  blockquote {
+    padding-left: 20px;
+    margin-left: 5px;
+    border-left: 2px solid black;
+    background-color: grey;
+  }
 `

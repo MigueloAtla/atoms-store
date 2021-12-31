@@ -161,6 +161,7 @@ export const Ol = styled.ol`
 export const Blockquote = styled.blockquote`
   color: white;
   border-left: 1px solid white;
+  background-color: #ffffff22;
 `
 
 export const Strike = styled.s``
@@ -210,119 +211,10 @@ export const components = {
   h1: H1,
   h2: H2,
   h3: H3,
-  contentParagraph: P
+  contentParagraph: P,
+  horizontalRule: HorizontalRule
 }
 
-// const selectComponentType = (element, markupContent) => {
-//   switch (element.type) {
-//     case 'image':
-//       markupContent.push(function ImageContent () {
-//         return (
-//           <Img
-//             src={element.attrs.src}
-//             alt='content'
-//             style={{ width: '100%' }}
-//           />
-//         )
-//       })
-//       break
-//     case 'paragraph':
-//       console.log('type paragraph')
-//       let content = []
-//       let type = ''
-//       element.content?.length > 0 &&
-//         element.content.map(el => {
-//           el.marks &&
-//             el.marks.map(m => {
-//               if (m.type !== undefined) type = m.type
-//             })
-//           if (type.length > 0) {
-//             let Comp = components[type]
-//             content.push(function ParagraphInner () {
-//               return <Comp>{el.text}</Comp>
-//             })
-//             type = ''
-//           } else {
-//             content.push(function ParagraphInner () {
-//               return `${el.text}`
-//             })
-//           }
-//         })
-
-//       markupContent.push(function ParagraphOuter () {
-//         return (
-//           <Paragraph as='p'>
-//             {content.length > 0 &&
-//               content.map((Text, i) => {
-//                 if (typeof Text === 'string' || Text instanceof String)
-//                   return Text
-//                 else return <Text key={i} />
-//               })}
-//           </Paragraph>
-//         )
-//       })
-//       break
-//     case 'heading':
-//       let headingContent
-//       element.content?.map(el => {
-//         content = el.text
-//       })
-
-//       markupContent.push(function Heading () {
-//         let Heading = components[`h${element.attrs.level}`]
-//         return <Heading>{headingContent}</Heading>
-//       })
-//       break
-//     case 'horizontalRule':
-//       markupContent.push(function HorizontalRuleContent () {
-//         return <HorizontalRule />
-//       })
-//       break
-//     case 'bulletList':
-//       element.content.length > 0 &&
-//         markupContent.push(function UlWrapper () {
-//           return (
-//             <Ul>
-//               {element.content.map(listItem => {
-//                 return listItem.content?.map(listItemContent => {
-//                   return listItemContent.content?.map((content, i) => {
-//                     return <li key={i}>{content.text}</li>
-//                   })
-//                 })
-//               })}
-//             </Ul>
-//           )
-//         })
-//       break
-//     case 'orderedList':
-//       element.content.length > 0 &&
-//         markupContent.push(function UlWrapper () {
-//           return (
-//             <Ol>
-//               {element.content.map(listItem => {
-//                 return listItem.content?.map(listItemContent => {
-//                   return listItemContent.content?.map((content, i) => {
-//                     return <li key={i}>{content.text}</li>
-//                   })
-//                 })
-//               })}
-//             </Ol>
-//           )
-//         })
-//       break
-//     case 'blockquote':
-//       element.content.length > 0 &&
-//         element.content.map(listItem => {
-//           console.log(listItem)
-//         })
-//       break
-//   }
-// }
-
-// const MarkComp = ({Mark, children}) => {
-
-//   return <Mark>{children}</Mark>
-// }
 const wrapMarks = markComps => {
   return markComps.reverse().reduce(
     (ComponentSoFar, { component, props }) => {
@@ -349,7 +241,7 @@ const getMarks = (marks, markComps) => {
   })
 }
 
-const selectComponentType = (element, markupContent) => {
+const selectComponentType = (element, markupContent, Wrapper = null) => {
   switch (element.type) {
     case 'image':
       markupContent.push(function ImageContent () {
@@ -374,7 +266,15 @@ const selectComponentType = (element, markupContent) => {
           const Comp = components[type]
           if (el.text !== undefined)
             markComps.push({
-              component: ({ children }) => <Comp>{children}</Comp>,
+              component: ({ children }) => {
+                return Wrapper ? (
+                  <Wrapper>
+                    <Comp>{children}</Comp>
+                  </Wrapper>
+                ) : (
+                  <Comp>{children}</Comp>
+                )
+              },
               props: { content: el.text }
             })
           const Component = wrapMarks(markComps)
@@ -384,29 +284,55 @@ const selectComponentType = (element, markupContent) => {
 
           selectComponentType(el, markupContent)
         })
+      } else {
+        markupContent.push(function TextComp () {
+          return (
+            <p>
+              <br />
+            </p>
+          )
+        })
       }
       break
     case 'heading':
       let headingContent
       let markComps = []
-      element.content?.map(el => {
-        if (el.marks !== undefined) {
-          getMarks(el.marks, markComps)
-        }
-        headingContent = el.text
+      if (element.content !== undefined) {
+        element.content?.map(el => {
+          if (el.marks !== undefined) {
+            getMarks(el.marks, markComps)
+          }
+          headingContent = el.text
 
-        const Heading = components[`h${element.attrs.level}`]
-        if (el.text !== undefined)
-          markComps.push({
-            component: ({ children }) => <Heading>{children}</Heading>,
-            props: { content: el.text }
+          const Heading = components[`h${element.attrs.level}`]
+          if (el.text !== undefined)
+            markComps.push({
+              component: ({ children }) => {
+                return Wrapper ? (
+                  <Wrapper>
+                    <Heading>{children}</Heading>
+                  </Wrapper>
+                ) : (
+                  <Heading>{children}</Heading>
+                )
+              },
+              props: { content: el.text }
+            })
+
+          const Component = wrapMarks(markComps)
+          markupContent.push(function Heading () {
+            return <Component>{headingContent}</Component>
           })
-
-        const Component = wrapMarks(markComps)
-        markupContent.push(function Heading () {
-          return <Component>{headingContent}</Component>
         })
-      })
+      } else {
+        markupContent.push(function TextComp () {
+          return (
+            <p>
+              <br />
+            </p>
+          )
+        })
+      }
 
       break
     case 'bulletList':
@@ -477,7 +403,21 @@ const selectComponentType = (element, markupContent) => {
       element.content.length > 0 &&
         element.content.map(listItem => {
           console.log(listItem)
+          selectComponentType(
+            listItem,
+            markupContent,
+            (Wrapper = ({ children }) => <Blockquote>{children}</Blockquote>)
+          )
         })
+      break
+    default:
+      console.log(element.type)
+      if (element.type !== 'text') {
+        const Comp = components[element.type]
+        markupContent.push(function Default () {
+          return <Comp />
+        })
+      }
       break
   }
 }
