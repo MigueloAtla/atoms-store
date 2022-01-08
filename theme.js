@@ -429,7 +429,6 @@ export const getComponents = doc => {
       let Comp = components[value.type]
 
       // Richt text mapping
-
       if (value.type === 'richtext') {
         const markupContent = []
         console.log(value.value.content)
