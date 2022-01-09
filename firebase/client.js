@@ -381,8 +381,11 @@ export const updateDocs = async (new_data, old_data, type) => {
   console.log(new_data)
   await db
     .collection('collectionList')
-    .doc('OjUAtyfsIW6ECoryEovP')
-    .update({ [type]: new_data[type] })
+    .limit(1)
+    .get()
+    .then(snapshot => {
+      snapshot.docs[0].ref.update({ [type]: new_data[type] })
+    })
 
   // batched update of the Docs
   const users = await db.collection(type).get()
@@ -422,8 +425,13 @@ export const deleteFields = async (name, type) => {
 
   const deleted = await db
     .collection('collectionList')
-    .doc('OjUAtyfsIW6ECoryEovP')
+    // .doc('OjUAtyfsIW6ECoryEovP')
+    // .get()
+    .limit(1)
     .get()
+    .then(snapshot => {
+      return snapshot.docs[0]
+    })
 
   const deleted_data = deleted.data()[type].schema
 
@@ -439,9 +447,16 @@ export const deleteFields = async (name, type) => {
   // update test ** need to update test.schema
   await db
     .collection('collectionList')
-    .doc('OjUAtyfsIW6ECoryEovP')
-    .update({
-      [type]: new_data
+    // .doc('OjUAtyfsIW6ECoryEovP')
+    // .update({
+    //   [type]: new_data
+    // })
+    .limit(1)
+    .get()
+    .then(snapshot => {
+      snapshot.docs[0].ref.update({
+        [type]: new_data
+      })
     })
 
   const users = await db.collection(type).get()
@@ -468,11 +483,20 @@ export const addRelationToCollection = async (collection, relation) => {
   console.log(relation)
   await db
     .collection('collectionList')
-    .doc('OjUAtyfsIW6ECoryEovP')
-    .update({
-      [`${collection}.relations`]: firebase.firestore.FieldValue.arrayUnion(
-        relation
-      )
+    // .doc('OjUAtyfsIW6ECoryEovP')
+    // .update({
+    //   [`${collection}.relations`]: firebase.firestore.FieldValue.arrayUnion(
+    //     relation
+    //   )
+    // })
+    .limit(1)
+    .get()
+    .then(snapshot => {
+      snapshot.docs[0].ref.update({
+        [`${collection}.relations`]: firebase.firestore.FieldValue.arrayUnion(
+          relation
+        )
+      })
     })
 
   // db.collection(collection[Object.keys(collection)[0]].name)
@@ -481,8 +505,13 @@ export const addRelationToCollection = async (collection, relation) => {
 export const createCollection = async collection => {
   await db
     .collection('collectionList')
-    .doc('OjUAtyfsIW6ECoryEovP')
-    .update(collection)
+    // .doc('OjUAtyfsIW6ECoryEovP')
+    // .update(collection)
+    .limit(1)
+    .get()
+    .then(snapshot => {
+      snapshot.docs[0].ref.update(collection)
+    })
 
   db.collection(collection[Object.keys(collection)[0]].name)
 }

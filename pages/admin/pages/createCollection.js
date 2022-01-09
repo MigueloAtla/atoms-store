@@ -47,6 +47,11 @@ export default function CreateCollection () {
     name: 'fieldArr'
   })
 
+  useEffect(() => {
+    console.log('collections changed')
+    console.log(collections)
+  }, [collections])
+
   const onSubmit = data => {
     let formData = {}
     let key
@@ -174,11 +179,13 @@ export default function CreateCollection () {
                               if (e.target.value === 'relation') {
                                 prevTable[index] = true
                                 setTable(s => prevTable)
+                                console.log('after settable line')
                               } else {
                                 prevTable[index] = false
                                 setTable(s => prevTable)
                               }
                               field.onChange(e)
+                              console.log('after on change')
                             }}
                           >
                             <option value='text'>text</option>
@@ -207,8 +214,8 @@ export default function CreateCollection () {
                             {collections.length > 0 &&
                               collections.map((collection, i) => {
                                 return (
-                                  <option key={i} value={collection}>
-                                    {collection}
+                                  <option key={i} value={collection.name}>
+                                    {collection.name}
                                   </option>
                                 )
                               })}
