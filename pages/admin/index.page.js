@@ -12,11 +12,12 @@ export default function Admin () {
   const router = useRouter()
   const smallImageEditor = useStore(state => state.smallImageEditor)
 
-  useEffect(() => {
-    if (!loading && !admin) {
-      router.push('/')
-    }
-  }, [admin, loading, router])
+  // no-admin
+  // useEffect(() => {
+  //   if (!loading && !admin) {
+  //     router.push('/')
+  //   }
+  // }, [admin, loading, router])
 
   return (
     <ChakraProvider>
@@ -26,7 +27,9 @@ export default function Admin () {
             <Spinner size='xl' />
           </Flex>
         ) : (
-          admin && <AdminLayout />
+          //no-admin
+          // admin && <AdminLayout />
+          <AdminLayout />
         )}
       </Styles>
     </ChakraProvider>
