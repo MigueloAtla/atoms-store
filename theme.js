@@ -4,7 +4,7 @@ import Img from 'react-cool-img'
 import { capitalize } from '@/utils'
 import { Heading, ImageWrapper, ImageStyled } from '@/atoms'
 import { Text } from 'styled-bento'
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 
 // Theme
 export const theme = {
@@ -199,6 +199,13 @@ const P = ({ children, props }) => {
     </Text>
   )
 }
+const NumberStyled = ({ children, props }) => {
+  return (
+    <Text {...props} as='p' fontWeight='inherit'>
+      {children}
+    </Text>
+  )
+}
 
 export const components = {
   text: Text,
@@ -212,7 +219,8 @@ export const components = {
   h2: H2,
   h3: H3,
   contentParagraph: P,
-  horizontalRule: HorizontalRule
+  horizontalRule: HorizontalRule,
+  number: NumberStyled
 }
 
 const wrapMarks = markComps => {
@@ -459,4 +467,16 @@ export const getComponents = doc => {
     }
   }
   return response
+}
+
+export const getValues = doc => {
+  let values = {}
+  console.log(doc)
+  if (doc) {
+    for (let [key, value] of Object.entries(doc)) {
+      if (key === 'id') values = { ...values, id: doc.id }
+      else values = { ...values, [key]: value.value }
+    }
+  }
+  return values
 }

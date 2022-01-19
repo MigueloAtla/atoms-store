@@ -4,10 +4,10 @@ import { ProfilePictureStyled } from '../../styles'
 import { ProfilePictureWrapperStyled } from './styles'
 
 export default function User () {
-  const [user] = useUser()
+  const { user } = useUser()
   return (
     <>
-      {user && (
+      {user && user.avatar && (
         <ProfilePictureWrapperStyled>
           <ProfilePictureStyled
             src={user.avatar}

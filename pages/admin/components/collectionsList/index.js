@@ -1,5 +1,5 @@
 // React / Next
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 
 // Firebase
@@ -28,7 +28,8 @@ const CollectionsList = () => {
       <Text color='white' fontWeight='bold' my='10px' textAlign='center'>
         Pages
       </Text>
-      {collections &&
+      {collections !== undefined &&
+        collections.length > 0 &&
         collections.map((collection, i) => {
           if (collection.page === true) {
             return (
@@ -54,24 +55,26 @@ const CollectionsList = () => {
       <Text color='white' fontWeight='bold' my='10px' textAlign='center'>
         Collections
       </Text>
-      {collections.map((collection, i) => {
-        if (collection.page === false) {
-          return (
-            <Link
-              to={`/admin/${collection.name}`}
-              key={i}
-              onClick={() => setSelectedCollectionName(collection.name)}
-            >
-              <CollectionsListItem
-                collection={collection.name}
-                setCollectionData={setCollectionData}
-                selectedCollectionName={selectedCollectionName}
+      {collections !== undefined &&
+        collections.length > 0 &&
+        collections.map((collection, i) => {
+          if (collection.page === false) {
+            return (
+              <Link
+                to={`/admin/${collection.name}`}
                 key={i}
-              />
-            </Link>
-          )
-        }
-      })}
+                onClick={() => setSelectedCollectionName(collection.name)}
+              >
+                <CollectionsListItem
+                  collection={collection.name}
+                  setCollectionData={setCollectionData}
+                  selectedCollectionName={selectedCollectionName}
+                  key={i}
+                />
+              </Link>
+            )
+          }
+        })}
     </Flex>
   )
 }

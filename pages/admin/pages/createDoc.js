@@ -131,6 +131,7 @@ const Create = () => {
         let newId = docRef.id
 
         // map selectedRowIds
+        console.log('selectedRowIds: ', selectedRowIds)
         selectedRowIds.map(s => {
           let idsArr = []
           let docsContent = []

@@ -211,7 +211,8 @@ export default function CreateCollection () {
                               required: 'select a existent collection type'
                             })}
                           >
-                            {collections.length > 0 &&
+                            {collections !== undefined &&
+                              collections.length > 0 &&
                               collections.map((collection, i) => {
                                 return (
                                   <option key={i} value={collection.name}>

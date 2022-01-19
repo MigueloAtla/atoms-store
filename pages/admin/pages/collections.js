@@ -22,7 +22,7 @@ const CollectionsList = () => {
   const rerender = useStore(state => state.rerender)
 
   useEffect(() => {
-    if (collections.length > 0) {
+    if (collections !== undefined && collections.length > 0) {
       getCollections().then(c => {
         setCollections(c[0])
       })
@@ -46,7 +46,8 @@ const CollectionsList = () => {
           direction='column'
           gridGap='10px'
         >
-          {collections &&
+          {collections !== undefined &&
+            collections.length > 0 &&
             collections.map((collection, i) => {
               return (
                 <Link

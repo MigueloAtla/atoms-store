@@ -4,6 +4,7 @@
     "paths": {
       "@/atoms": ["components/atoms"],
       "@/layouts/*": ["components/layouts/*"],
+      "@/store/*": ["store/*"],
       "@/*": ["/*"],
       "@/firebase/*": ["firebase/*"],
       "@/hooks/*": ["hooks/*"],

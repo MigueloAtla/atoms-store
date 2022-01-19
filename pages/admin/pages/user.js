@@ -5,7 +5,7 @@ import { ProfilePictureStyled } from '../styles'
 import PageTransitionAnimation from '@/admin/atoms/pageTransitionAnimation'
 
 export default function UserPage () {
-  const [user, admin] = useUser()
+  const { user, admin } = useUser()
   useEffect(() => {
     if (user) console.log(user.username)
   }, [user])

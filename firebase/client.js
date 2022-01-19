@@ -51,11 +51,23 @@ export const onAuthStateChange = ({ setUser, setAdmin, setLoading }) => {
           console.log('error onAuthStateChange', error)
         })
       const normalizeUser = mapUserFromFirebaseAuthToUser({ ...user })
+      console.log(normalizeUser)
       setUser(normalizeUser)
     } else {
       setLoading(false)
     }
   })
+}
+
+export const signInWithEmailAndPassword = (email, password) => {
+  return firebase.auth().createUserWithEmailAndPassword(email, password)
+}
+
+export const signUpWithEmailAndPassword = (email, password) => {
+  return firebase.auth().signInWithEmailAndPassword(email, password)
+}
+export const signOut = () => {
+  return firebase.auth().signOut()
 }
 
 export const addByCollectionType = (type, content) => {
@@ -355,6 +367,20 @@ export const updateOneByType = (id, type, formData) => {
     .update(formData)
 }
 
+// substract amount of product
+export const updateDocFieldByType = async (id, type, formData, qty) => {
+  let amount = await db
+    .collection(type)
+    .doc(id)
+    .get()
+    .then(doc => {
+      return doc.data().amount.value
+    })
+  db.collection(type)
+    .doc(id)
+    .update({ ['amount.value']: amount - qty })
+}
+
 // export const signIn = () => {
 //   const auth = getAuth()
 //   createUserWithEmailAndPassword(auth, email, password)
@@ -503,15 +529,28 @@ export const addRelationToCollection = async (collection, relation) => {
 }
 
 export const createCollection = async collection => {
-  await db
+  const collection_exists = await db
     .collection('collectionList')
-    // .doc('OjUAtyfsIW6ECoryEovP')
-    // .update(collection)
     .limit(1)
     .get()
-    .then(snapshot => {
-      snapshot.docs[0].ref.update(collection)
-    })
+
+  console.log(collection_exists.empty)
+
+  // if true create the collection -> CollectionList
+  if (collection_exists.empty) {
+    await db.collection('collectionList').add(collection)
+  } else {
+    // else update:
+    await db
+      .collection('collectionList')
+      // .doc('OjUAtyfsIW6ECoryEovP')
+      // .update(collection)
+      .limit(1)
+      .get()
+      .then(snapshot => {
+        snapshot.docs[0].ref.update(collection)
+      })
+  }
 
   db.collection(collection[Object.keys(collection)[0]].name)
 }

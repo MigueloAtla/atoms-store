@@ -1,5 +1,6 @@
 import { onAuthStateChange, isAdmin } from '@/firebase/client'
 import { useEffect, useState } from 'react'
+import useStore from '@/store/store'
 
 const userStates = {
   NOT_LOGGED: null,
@@ -7,14 +8,16 @@ const userStates = {
 }
 
 export const useUser = () => {
-  const [user, setUser] = useState(userStates.NOT_KNOWN)
+  const { user, setUser } = useStore()
   const [admin, setAdmin] = useState(false)
   const [loading, setLoading] = useState(true)
   useEffect(() => {
     setLoading(true)
     onAuthStateChange({ setUser, setAdmin, setLoading })
   }, [])
-  useEffect(() => {}, [user, admin])
+  useEffect(() => {
+    console.log(user)
+  }, [user, admin])
 
-  return [user, admin, loading]
+  return { user, admin, loading, setUser }
 }

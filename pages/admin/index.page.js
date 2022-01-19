@@ -8,7 +8,7 @@ import styled from 'styled-components'
 import useStore from '@/admin/store/store'
 
 export default function Admin () {
-  const [user, admin, loading] = useUser()
+  const { user, admin, loading } = useUser()
   const router = useRouter()
   const smallImageEditor = useStore(state => state.smallImageEditor)
 
