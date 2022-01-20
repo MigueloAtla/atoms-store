@@ -20,6 +20,7 @@ import CreateCollection from './pages/createCollection'
 import DocsInCollection from './pages/docsInCollection'
 import Collections from './pages/collections'
 import EditCollection from './pages/editCollection'
+import UsersPage from './pages/users'
 
 // Components
 import CollectionsList from './components/collectionsList'
@@ -289,6 +290,9 @@ const Settings = styled.div`
 
 const AdminRoutes = () => (
   <Switch>
+    <Route path='/admin/users'>
+      <UsersPage />
+    </Route>
     <Route path='/admin/media-library'>
       <MediaLibrary />
     </Route>

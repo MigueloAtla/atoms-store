@@ -1,7 +1,7 @@
 import Head from 'next/head'
 import Img from 'react-cool-img'
 
-import { makeAdmin, getAllUsers } from 'firebase/client'
+import { makeAdmin } from 'firebase/client'
 import { useEffect, useState } from 'react'
 import { useUser } from '@/hooks/useUser'
 
@@ -19,13 +19,6 @@ export default function Home () {
   //       console.log(err)
   //     })
   // }
-
-  useEffect(() => {
-    getAllUsers().then(({data}) => {
-      console.log(data)
-      setUsers(data)
-    })
-  }, [])
 
   const handeAdminSubmit = e => {
     e.preventDefault()
@@ -67,14 +60,6 @@ export default function Home () {
         />
         <button type='submit'>Make admin</button>
       </form>
-
-      {users?.length > 0 && users.map((user, i) => {
-        return (
-          <div key={i}>
-            <p>{user.email}</p>
-          </div>
-        )
-      })}
 
       {/* <button
         onClick={() => {
