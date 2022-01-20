@@ -23,6 +23,15 @@ const firebaseConfig = {
 
 const db = firebase.firestore()
 const functions = firebase.functions()
+const auth = firebase.auth()
+const storage = firebase.storage()
+
+if(process.env.NODE_ENV === 'development') {
+  auth.useEmulator('http://localhost:9099')
+  db.useEmulator('localhost', '8080')
+  functions.useEmulator('localhost', '5001')
+  storage.useEmulator('localhost', '9199')
+}
 
 const mapUserFromFirebaseAuthToUser = user => {
   const { displayName, email, photoURL } = user
@@ -351,6 +360,11 @@ export const fetchPost = id => {
       // console.log(snapshot)
       return snapshot.data()
     })
+}
+
+export const getAllUsers = () => {
+  const getUsers = functions.httpsCallable('getAllUsers')
+  return getUsers()
 }
 
 export const makeAdmin = adminEmail => {

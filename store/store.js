@@ -4,6 +4,7 @@ import { devtools } from 'zustand/middleware'
 const store = set => ({
   // state
   user: null,
+  admin: false,
   cartContent: null,
   message: null,
   total: 0,
@@ -11,6 +12,7 @@ const store = set => ({
 
   // actions
   setUser: data => set({ user: data }),
+  setAdmin: data => set({ admin: data }),
   setCartContent: data => set({ cartContent: data }),
   setMessage: data => set({ message: data }),
   setTotal: data => set({ total: data }),

@@ -1,13 +1,14 @@
 import Head from 'next/head'
 import Img from 'react-cool-img'
 
-import { makeAdmin } from 'firebase/client'
-import { useState } from 'react'
+import { makeAdmin, getAllUsers } from 'firebase/client'
+import { useEffect, useState } from 'react'
 import { useUser } from '@/hooks/useUser'
 
 export default function Home () {
-  const { user } = useUser()
-  const [email, setEmail] = useState('')
+  const { user, admin } = useUser()
+  const [ users, setUsers ] = useState(null)
+  const [ email, setEmail ] = useState('')
 
   // const login = () => {
   //   loginWithGithub()
@@ -18,6 +19,13 @@ export default function Home () {
   //       console.log(err)
   //     })
   // }
+
+  useEffect(() => {
+    getAllUsers().then(({data}) => {
+      console.log(data)
+      setUsers(data)
+    })
+  }, [])
 
   const handeAdminSubmit = e => {
     e.preventDefault()
@@ -40,6 +48,7 @@ export default function Home () {
           <p>no user</p>
         ) : (
           <div>
+            {admin ? <h1>Admin!!!!</h1> : <h1>No admin</h1>}
             {user.username}
             {user.email}
             <Img src={user.avatar} alt='avatar' width='125' height='125' />
@@ -47,7 +56,7 @@ export default function Home () {
         )}
       </main>
 
-      {/* <form onSubmit={handeAdminSubmit}>
+      <form onSubmit={handeAdminSubmit}>
         <label>Create admin</label>
         <input
           type='text'
@@ -57,7 +66,15 @@ export default function Home () {
           }}
         />
         <button type='submit'>Make admin</button>
-      </form> */}
+      </form>
+
+      {users?.length > 0 && users.map((user, i) => {
+        return (
+          <div key={i}>
+            <p>{user.email}</p>
+          </div>
+        )
+      })}
 
       {/* <button
         onClick={() => {

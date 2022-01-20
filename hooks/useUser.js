@@ -8,8 +8,8 @@ const userStates = {
 }
 
 export const useUser = () => {
-  const { user, setUser } = useStore()
-  const [admin, setAdmin] = useState(false)
+  const { user, setUser, admin, setAdmin } = useStore()
+  // const [admin, setAdmin] = useState(false)
   const [loading, setLoading] = useState(true)
   useEffect(() => {
     setLoading(true)
@@ -17,6 +17,7 @@ export const useUser = () => {
   }, [])
   useEffect(() => {
     console.log(user)
+    console.log(admin)
   }, [user, admin])
 
   return { user, admin, loading, setUser }
