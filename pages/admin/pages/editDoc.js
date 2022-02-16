@@ -10,7 +10,8 @@ import {
   fetchRelatedDocs,
   getFullSchemaByType,
   addByCollectionTypeWithCustomIDBatched,
-  deleteRelatedDoc
+  deleteRelatedDoc,
+  updateSeenFieldByType
 } from '@/firebase/client'
 
 // Components
@@ -249,6 +250,10 @@ const Edit = () => {
 
   useEffect(() => {
     if (content) {
+      if(!content.seen) {
+        updateSeenFieldByType(id, type)
+        console.log('not seen yet')
+      }
       let contentWithUnusedFields = content
 
       for (var [key, value] of Object.entries(schema)) {

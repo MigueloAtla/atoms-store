@@ -1,0 +1,19 @@
+{
+  "name": "images/gb-advance.jpg",
+  "bucket": "atoms-test-306de.appspot.com",
+  "contentType": "image/jpeg",
+  "metageneration": 1,
+  "generation": 1643485003581,
+  "storageClass": "STANDARD",
+  "etag": "someETag",
+  "contentDisposition": "inline",
+  "contentEncoding": "identity",
+  "downloadTokens": [
+    "abc9c5e0-cd26-4ff8-b1a4-9532936b3ab7"
+  ],
+  "timeCreated": "2022-01-29T19:36:43.580Z",
+  "updated": "2022-01-29T19:36:43.595Z",
+  "size": 4178754,
+  "md5Hash": "cEgX0wByabwTs3Y/KZii5w==",
+  "crc32c": "3361425924"
+}

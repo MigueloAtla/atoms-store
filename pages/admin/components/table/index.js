@@ -71,7 +71,17 @@ function DefaultColumnFilter ({
   )
 }
 
-function Table ({ columns, data, type, onClick }) {
+function Table ({ 
+  columns, 
+  data, 
+  type, 
+  onClick,
+  compact = true,
+  clickRowData = 'id',
+  rowHeight = '100px',
+  footer = true,
+  fixedFooter = true
+  }) {
   const filterTypes = React.useMemo(
     () => ({
       text: (rows, id, filterValue) => {
@@ -134,7 +144,7 @@ function Table ({ columns, data, type, onClick }) {
 
   return (
     <>
-      <TableStyled>
+      <TableStyled rowHeight={rowHeight} compact={compact}>
         <GlobalFilter
           preGlobalFilteredRows={preGlobalFilteredRows}
           globalFilter={state.globalFilter}
@@ -146,7 +156,7 @@ function Table ({ columns, data, type, onClick }) {
               <tr key={i} {...headerGroup.getHeaderGroupProps()}>
                 {headerGroup.headers.map((column, i) => {
                   return (
-                    <th key={i} {...column.getHeaderProps()}>
+                    <th scope='col' key={i} {...column.getHeaderProps()}>
                       {column.render('Header')}
                     </th>
                   )
@@ -161,7 +171,12 @@ function Table ({ columns, data, type, onClick }) {
                 <TableTr
                   key={i}
                   onClick={() => {
-                    onClick(row.values.id)
+                    if(clickRowData === 'id') {
+                      onClick(row.values.id)
+                    }
+                    else {
+                      onClick(row.values)
+                    }
                   }}
                   row={row}
                 />
@@ -169,71 +184,71 @@ function Table ({ columns, data, type, onClick }) {
             })}
           </tbody>
         </table>
-        <div className='pagination'>
-          <PaginationStyled spacing='24px' justify='center'>
-            <IconButton
-              size='xs'
-              outlineColor='#11101d'
-              onClick={() => gotoPage(0)}
-              disabled={!canPreviousPage}
-              fontSize='10px'
-              icon={<ArrowLeftIcon />}
-            />
-            <IconButton
-              size='xs'
-              outlineColor='#11101d'
-              onClick={() => previousPage()}
-              disabled={!canPreviousPage}
-              icon={<ChevronLeftIcon />}
-            />
-            <IconButton
-              size='xs'
-              outlineColor='#11101d'
-              onClick={() => nextPage()}
-              disabled={!canNextPage}
-              icon={<ChevronRightIcon />}
-            />
-            <IconButton
-              size='xs'
-              outlineColor='#11101d'
-              onClick={() => gotoPage(pageCount - 1)}
-              disabled={!canNextPage}
-              fontSize='10px'
-              icon={<ArrowRightIcon />}
-            />
-            <span>
-              Page{' '}
-              <strong>
-                {pageIndex + 1} of {pageOptions.length}
-              </strong>{' '}
-            </span>
-            <span style={{ margin: '0 40px' }}>|</span>
-            <span style={{ margin: '0' }}>Go to page: </span>
-            <Input
-              type='number'
-              defaultValue={pageIndex + 1}
-              onChange={e => {
-                const page = e.target.value ? Number(e.target.value) - 1 : 0
-                gotoPage(page)
-              }}
-              style={{ width: '60px', height: '30px' }}
-            />{' '}
-            <Select
-              w='120px'
-              h='30px'
-              value={pageSize}
-              onChange={e => {
-                setPageSize(Number(e.target.value))
-              }}
-            >
-              {[1, 2, 10, 20, 30, 40, 50].map(pageSize => (
-                <option key={pageSize} value={pageSize}>
-                  Show {pageSize}
-                </option>
-              ))}
-            </Select>
-          </PaginationStyled>
-        </div>
+        {
+          footer &&
+          <PaginationStyled spacing='24px' justify='center' fixedFooter={fixedFooter}>
+          <IconButton
+            size='xs'
+            outlineColor='#11101d'
+            onClick={() => gotoPage(0)}
+            disabled={!canPreviousPage}
+            fontSize='10px'
+            icon={<ArrowLeftIcon />}
+          />
+          <IconButton
+            size='xs'
+            outlineColor='#11101d'
+            onClick={() => previousPage()}
+            disabled={!canPreviousPage}
+            icon={<ChevronLeftIcon />}
+          />
+          <IconButton
+            size='xs'
+            outlineColor='#11101d'
+            onClick={() => nextPage()}
+            disabled={!canNextPage}
+            icon={<ChevronRightIcon />}
+          />
+          <IconButton
+            size='xs'
+            outlineColor='#11101d'
+            onClick={() => gotoPage(pageCount - 1)}
+            disabled={!canNextPage}
+            fontSize='10px'
+            icon={<ArrowRightIcon />}
+          />
+          <span>
+            Page{' '}
+            <strong>
+              {pageIndex + 1} of {pageOptions.length}
+            </strong>{' '}
+          </span>
+          <span style={{ margin: '0 40px' }}>|</span>
+          <span style={{ margin: '0' }}>Go to page: </span>
+          <Input
+            type='number'
+            defaultValue={pageIndex + 1}
+            onChange={e => {
+              const page = e.target.value ? Number(e.target.value) - 1 : 0
+              gotoPage(page)
+            }}
+            style={{ width: '60px', height: '30px' }}
+          />{' '}
+          <Select
+            w='120px'
+            h='30px'
+            value={pageSize}
+            onChange={e => {
+              setPageSize(Number(e.target.value))
+            }}
+          >
+            {[1, 2, 10, 20, 30, 40, 50].map(pageSize => (
+              <option key={pageSize} value={pageSize}>
+                Show {pageSize}
+              </option>
+            ))}
+          </Select>
+        </PaginationStyled>}
       </TableStyled>
     </>
   )
@@ -243,12 +258,15 @@ function Table ({ columns, data, type, onClick }) {
 export default Table
 
 const PaginationStyled = styled(HStack)`
-  position: absolute;
-  bottom: 0;
-  left: 0;
+  position: ${({fixedFooter}) => fixedFooter ? 'fixed': 'sticky'};
+  bottom: ${({fixedFooter}) => fixedFooter ? '0': '0px'};
+  left: ${({fixedFooter}) => fixedFooter ? '66px': '0'};
+  right: ${({fixedFooter}) => fixedFooter ? '0': 'unset'};
+
   background-color: white;
-  margin-top: 24px;
-  width: 100%;
+  margin: 0 10px;
+  /* margin-top: 24px; */
+  /* width: 100%; */
   height: 40px;
   border-top: 1px solid #bcbcbc;
 `

@@ -1,0 +1,19 @@
+{
+  "name": "images/Gochujang_Miso_Ramen_Noodles-4.jpg",
+  "bucket": "atoms-test-306de.appspot.com",
+  "contentType": "image/jpeg",
+  "metageneration": 1,
+  "generation": 1643647000245,
+  "storageClass": "STANDARD",
+  "etag": "someETag",
+  "contentDisposition": "inline",
+  "contentEncoding": "identity",
+  "downloadTokens": [
+    "02951de0-5c5a-43b6-983d-d348ece6354a"
+  ],
+  "timeCreated": "2022-01-31T16:36:40.244Z",
+  "updated": "2022-01-31T16:36:40.247Z",
+  "size": 499647,
+  "md5Hash": "5GfidCAe6Gq6qBWN8skPxw==",
+  "crc32c": "4270933633"
+}

@@ -1,7 +1,7 @@
 import React from 'react'
 import { motion } from 'framer-motion'
 
-const PageTransitionAnimation = ({ children }) => {
+const PageTransitionAnimation = ({ children, style }) => {
   return (
     <motion.div
       initial={{
@@ -17,7 +17,8 @@ const PageTransitionAnimation = ({ children }) => {
       }}
       style={{
         marginTop: '60px',
-        position: 'relative'
+        position: 'relative',
+        ...style
       }}
     >
       {children}

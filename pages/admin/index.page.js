@@ -7,17 +7,19 @@ import { ChakraProvider, Flex, Spinner } from '@chakra-ui/react'
 import styled from 'styled-components'
 import useStore from '@/admin/store/store'
 
+import useRole from '@/admin/hooks/useRole'
+
 export default function Admin () {
-  const { user, admin, loading } = useUser()
+  const { role, loading } = useUser()
+  const { allowed } = useRole(['admin', 'editor'])
   const router = useRouter()
   const smallImageEditor = useStore(state => state.smallImageEditor)
 
-  // no-admin
-  // useEffect(() => {
-  //   if (!loading && !admin) {
-  //     router.push('/')
-  //   }
-  // }, [admin, loading, router])
+  useEffect(() => {
+    if (!loading && !allowed) {
+      router.push('/')
+    }
+  }, [role, loading, router])
 
   return (
     <ChakraProvider>
@@ -27,9 +29,7 @@ export default function Admin () {
             <Spinner size='xl' />
           </Flex>
         ) : (
-          //no-admin
-          // admin && <AdminLayout />
-          <AdminLayout />
+          allowed && <AdminLayout />
         )}
       </Styles>
     </ChakraProvider>

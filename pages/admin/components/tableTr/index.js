@@ -20,7 +20,7 @@ export default function TableTr ({ onClick, row }) {
     >
       {row.cells.map((cell, i) => {
         return (
-          <TdStyled key={i} {...cell.getCellProps()}>
+          <TdStyled seen={row.original.seen} key={i} {...cell.getCellProps()}>
             {cell.render('Cell')}
           </TdStyled>
         )
@@ -30,9 +30,9 @@ export default function TableTr ({ onClick, row }) {
 }
 
 const TdStyled = styled.td`
+  background-color: ${({seen}) => seen === false && '#18282b'};
   max-width: 100px;
   max-height: 100px;
-  height: 100px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

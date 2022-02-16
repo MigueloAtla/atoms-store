@@ -47,20 +47,21 @@ export const loginWithGithub = () => {
   return firebase.auth().signInWithPopup(githubProvider)
 }
 
-export const onAuthStateChange = ({ setUser, setAdmin, setLoading }) => {
+export const onAuthStateChange = ({ setUser, setRole, setLoading }) => {
   return firebase.auth().onAuthStateChanged(user => {
+    console.log('auth state changed')
     if (user) {
       user
-        .getIdTokenResult()
-        .then(idTokenResult => {
-          setAdmin(idTokenResult.claims.admin)
+      .getIdTokenResult()
+      .then(idTokenResult => {
+          console.log(idTokenResult.claims.role)
+          setRole(idTokenResult.claims.role)
           setLoading(false)
         })
         .catch(error => {
           console.log('error onAuthStateChange', error)
         })
       const normalizeUser = mapUserFromFirebaseAuthToUser({ ...user })
-      console.log(normalizeUser)
       setUser(normalizeUser)
     } else {
       setLoading(false)
@@ -80,6 +81,12 @@ export const signOut = () => {
 }
 
 export const addByCollectionType = (type, content) => {
+  content = {
+    ...content, 
+    seen: false,
+    created: firebase.firestore.Timestamp.now()
+  }
+  console.log(content)
   return db.collection(type).add(
     content
     // createdAt: firebase.firestore.Timestamp.fromDate(new Date())
@@ -92,18 +99,20 @@ export const addByCollectionTypeWithCustomID = (type, ids, content) => {
     .set(content)
 }
 
+export const getPayments = () => {
+  const retrievePaymentIntent = functions.httpsCallable('retrievePaymentIntent')
+  return retrievePaymentIntent().then(res => {
+    return res.data.data
+  })
+}
+
 export const deleteRelatedDoc = (collection, id) => {
-  console.log('collection', collection)
-  console.log('id', id)
   db.collection(collection)
     .doc(id)
     .delete()
 }
 
 export const addByCollectionTypeWithCustomIDBatched = (type, ids, content) => {
-  console.log(type)
-  console.log(ids)
-  console.log(content)
   const batch = db.batch()
   ids.map((id, i) => {
     let docRef = db.collection(type).doc(id)
@@ -226,6 +235,19 @@ export const getCollection = collection => {
           id,
           ...data
         }
+      })
+    })
+}
+
+export const getByPeriod = (collection, date1, date2) => {
+  return db
+    .collection(collection)
+    .where('created', '>=', date1)
+    .where('created', '<=', date2)
+    .get()
+    .then(snapshot => {
+      return snapshot.docs.map(doc => {
+        return doc.data()
       })
     })
 }
@@ -375,10 +397,59 @@ export const makeAdmin = adminEmail => {
   })
 }
 
+export const updateUserProfile = (email, newdata, setUser, setRole) => {
+
+  const user = firebase.auth().currentUser
+
+  user.updateProfile({
+    displayName: newdata.displayName,
+    photoURL: newdata.photoURL
+  }).then(() => {
+    console.log(user)
+    const normalizeUser = mapUserFromFirebaseAuthToUser({ ...user })
+    setUser(normalizeUser)
+  }).catch((error) => {
+    console.log(error.message)
+  })
+  
+  // const updateProfile = functions.httpsCallable('updateUser')
+  // updateProfile({ email: email, newdata })
+  //   .then((result) => {
+  //     console.log('user updated')
+  //     console.log(result)
+  //     const normalizeUser = mapUserFromFirebaseAuthToUser({ ...result.data })
+  //     console.log(normalizeUser)
+  //     setUser(normalizeUser)
+  //     setRole(result.data.customClaims.role)
+  // })
+}
+
+export const updateUserCustomClaimsRole = async (data, setRole) => {
+  const updateCustomClaimsRole = functions.httpsCallable('updateUserCustomClaimsRole')
+  await updateCustomClaimsRole(data)
+  const user = firebase.auth().currentUser
+  await user.getIdToken(true)
+  user
+    .getIdTokenResult()
+      .then(idTokenResult => {
+        console.log(idTokenResult.claims.role)
+        setRole(idTokenResult.claims.role)
+      })
+      .catch(error => {
+        console.log('error onAuthStateChange', error)
+      })
+}
+
 export const updateOneByType = (id, type, formData) => {
   db.collection(type)
     .doc(id)
     .update(formData)
+}
+
+export const updateSeenFieldByType = (id, type) => {
+  db.collection(type)
+    .doc(id)
+    .update({'seen': true})
 }
 
 // substract amount of product

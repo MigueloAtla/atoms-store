@@ -5,6 +5,13 @@ export const TableStyled = styled.div`
   box-sizing: border-box;
   width: calc(100% - 50px);
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+
+  & > span {
+    width: calc(100% - 20px);
+    margin: 0 auto;
+  }
 
   td,
   th,
@@ -13,7 +20,7 @@ export const TableStyled = styled.div`
   }
 
   table {
-    border-spacing: 0 15px;
+    border-spacing: ${({compact}) => compact ? 'none' : '0 15px' };
     width: 100%;
     border-collapse: separate;
     overflow: hidden;
@@ -36,6 +43,8 @@ export const TableStyled = styled.div`
       tr {
         background-color: white;
         th {
+          position: sticky;
+          top: 0;
           color: black;
           text-transform: capitalize;
           text-align: left;
@@ -49,7 +58,7 @@ export const TableStyled = styled.div`
     tbody {
       tr {
         background-color: white;
-        height: 60px;
+        height: ${({rowHeight}) => rowHeight};
         :last-child {
           td {
             border-bottom: 0;

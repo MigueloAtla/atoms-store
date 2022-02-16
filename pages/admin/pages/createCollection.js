@@ -124,7 +124,7 @@ export default function CreateCollection () {
         >
           Add field
         </Button>
-        <Button form='create-collection' type='submitb'>
+        <Button form='create-collection' type='submit'>
           Create collection
         </Button>
       </Header>

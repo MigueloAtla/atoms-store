@@ -46,6 +46,7 @@ const DocForm = ({
             let isEditor = el[1].type === 'richtext'
             let expanded = expandedEditor && isEditor
             return (
+              name !== 'seen' &&
               <DocFormFieldWrapper key={i} $expanded={expanded ? 1 : 0}>
                 <Label w='100%' key={i}>
                   {capitalizeFirstLetter(name)}

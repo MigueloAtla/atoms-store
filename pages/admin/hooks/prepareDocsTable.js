@@ -37,7 +37,10 @@ const usePrepareTable = ({ collection, deleteCol = false }) => {
       let fields = {}
       Object.keys(c).map(key => {
         if (key !== 'id') {
-          fields = { ...fields, [key]: c[key].value }
+          if(key === 'seen') {
+            fields = { ...fields, [key]: c[key]}
+          }
+          else fields = { ...fields, [key]: c[key].value }
         }
         if (c[key].type === 'image') {
           fields = {

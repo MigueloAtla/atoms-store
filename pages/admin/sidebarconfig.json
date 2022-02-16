@@ -1,0 +1,84 @@
+{
+  "admin": {
+    "display": {
+      "icons": true,
+      "text": false
+    },
+    "home": true,
+    "firebase": true,
+    "menu": [
+      {
+        "type": "link",
+        "route": "/admin/page/store",
+        "menu": "dashboard",
+        "icon": "FaChartBar"
+      },
+      {
+        "type": "link",
+        "route": "/admin/products",
+        "menu": "products",
+        "icon": "FaShoppingBag"
+      },
+      {
+        "type": "drawer",
+        "menu": "collectionslist",
+        "icon": "FaLayerGroup"
+      },
+      {
+        "type": "link",
+        "route": "/admin/collections",
+        "menu": "collectionslist",
+        "icon": "AddIcon"
+      },
+      {
+        "type": "link",
+        "route": "/admin/media-library",
+        "menu": "medialibrary",
+        "icon": "FaImages"
+      },
+      {
+        "type": "link",
+        "route": "/admin/users",
+        "menu": "users",
+        "icon": "FaUsers"
+      }
+    ],
+    "userprofile": true,
+    "settings": true
+  },
+  "editor": {
+    "display": {
+      "icons": true,
+      "text": false
+    },
+    "home": true,
+    "firebase": false,
+    "menu": [
+      {
+        "type": "drawer",
+        "menu": "collectionslist",
+        "icon": "FaLayerGroup"
+      },
+      {
+        "type": "link",
+        "route": "/admin/page/store",
+        "menu": "dashboard",
+        "icon": "FaChartBar"
+      },
+      {
+        "type": "link",
+        "route": "/admin/products",
+        "menu": "products",
+        "icon": "FaShoppingBag"
+      },
+      {
+        "type": "link",
+        "route": "/admin/media-library",
+        "menu": "medialibrary",
+        "icon": "FaImages"
+      }
+    ],
+    "userprofile": true,
+    "settings": true
+  }
+}

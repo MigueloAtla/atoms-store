@@ -1,0 +1,19 @@
+{
+  "name": "images/gb.jpg",
+  "bucket": "atoms-test-306de.appspot.com",
+  "contentType": "image/jpeg",
+  "metageneration": 1,
+  "generation": 1642900829002,
+  "storageClass": "STANDARD",
+  "etag": "someETag",
+  "contentDisposition": "inline",
+  "contentEncoding": "identity",
+  "downloadTokens": [
+    "7aa0695f-8947-4780-982a-8fe44e791230"
+  ],
+  "timeCreated": "2022-01-23T01:20:29.001Z",
+  "updated": "2022-01-23T01:20:29.003Z",
+  "size": 26636,
+  "md5Hash": "iWvmKEztO2tfNKgI7oSw8Q==",
+  "crc32c": "896445836"
+}

@@ -1,0 +1,19 @@
+{
+  "name": "images/43ee5112-c8ed-415a-a7e6-1c29bc8cf91d.__CR0,0,300,300_PT0_SX300_V1___.jpg",
+  "bucket": "atoms-test-306de.appspot.com",
+  "contentType": "image/jpeg",
+  "metageneration": 1,
+  "generation": 1643052332555,
+  "storageClass": "STANDARD",
+  "etag": "someETag",
+  "contentDisposition": "inline",
+  "contentEncoding": "identity",
+  "downloadTokens": [
+    "2f6f5ded-b80f-4720-bc78-cbf8a8d51b88"
+  ],
+  "timeCreated": "2022-01-24T19:25:32.554Z",
+  "updated": "2022-01-24T19:25:32.555Z",
+  "size": 18386,
+  "md5Hash": "rMAyDIVafubFCwLIUc0ZXg==",
+  "crc32c": "4274574359"
+}

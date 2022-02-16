@@ -1,0 +1,19 @@
+{
+  "name": "images/avatar.jpg",
+  "bucket": "atoms-test-306de.appspot.com",
+  "contentType": "image/jpeg",
+  "metageneration": 1,
+  "generation": 1643055407889,
+  "storageClass": "STANDARD",
+  "etag": "someETag",
+  "contentDisposition": "inline",
+  "contentEncoding": "identity",
+  "downloadTokens": [
+    "c0249bcd-8c2c-4331-b17e-fea908a599eb"
+  ],
+  "timeCreated": "2022-01-24T20:16:47.888Z",
+  "updated": "2022-01-24T20:16:47.890Z",
+  "size": 40271,
+  "md5Hash": "noh6xs1l8LOMm9jyEzcc8Q==",
+  "crc32c": "1161672637"
+}

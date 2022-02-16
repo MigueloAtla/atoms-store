@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 import { Composition } from 'atomic-layout'
-import Image from 'next/image'
+// import Img from 'react-cool-img'
 
 // Base layout styles
 export const Layout = styled(Composition)`
@@ -8,6 +8,7 @@ export const Layout = styled(Composition)`
   max-height: 100%;
   overflow-y: hidden;
   background-color: #f6f7f9;
+  transition: all .1s ease-in;
 `
 export const SideBar = styled(Composition)`
   background-color: #11101d;
@@ -44,12 +45,31 @@ export const Label = styled.label`
   display: inline-block;
   margin-bottom: 20px;
 `
-export const ProfilePictureStyled = styled(Image)`
+// export const ProfilePictureStyled = styled(Img)`
+//   border-radius: 50%;
+//   width: 40px;
+//   height: 40px;
+//   overflow: hidden;
+//   border: 2px solid black;
+// `
+export const ProfilePictureStyled = styled.figure`
+  width: 36px;
+  height: 36px;
+  margin: 0;
   border-radius: 50%;
-  width: 40px;
-  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   overflow: hidden;
-  border: 2px solid black;
+  transition: border-radius .2s ease-in-out;
+  cursor: pointer;
+  
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border: 0;
+  }
 `
 // export const TextareaImage = styled.textarea`
 //   border:

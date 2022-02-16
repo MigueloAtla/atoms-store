@@ -9,7 +9,8 @@
     "lint": "next lint",
     "test": "jest --watch",
     "generate:pages": "node ./generators/pages.js",
-    "generate:atom": "node ./generators/atom.js"
+    "generate:atom": "node ./generators/atom.js",
+    "emulators": "firebase emulators:start --export-on-exit=./emulator-data --import=./emulator-data"
   },
   "dependencies": {
     "@chakra-ui/icons": "^1.0.15",
@@ -25,6 +26,8 @@
     "atomic-layout": "^0.16.2",
     "axios": "^0.24.0",
     "babel-plugin-styled-components": "^1.13.2",
+    "chart.js": "^3.7.0",
+    "dayjs": "^1.10.7",
     "dotenv": "^10.0.0",
     "firebase": "^8.6.8",
     "framer-motion": "^4",
@@ -34,6 +37,8 @@
     "nodemailer": "^6.7.2",
     "prop-types": "^15.7.2",
     "react": "17.0.2",
+    "react-avatar": "^4.0.0",
+    "react-chartjs-2": "^4.0.1",
     "react-cool-img": "^1.2.12",
     "react-dom": "17.0.2",
     "react-firebase-hooks": "^3.0.4",

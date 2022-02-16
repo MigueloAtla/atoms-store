@@ -1,0 +1,17 @@
+{
+  "name": "images/",
+  "bucket": "default-bucket",
+  "contentType": "text/plain",
+  "metageneration": 1,
+  "generation": 1643052323975,
+  "storageClass": "STANDARD",
+  "etag": "someETag",
+  "contentDisposition": "inline",
+  "contentEncoding": "identity",
+  "downloadTokens": [],
+  "timeCreated": "2022-01-24T19:25:23.974Z",
+  "updated": "2022-01-24T19:25:23.975Z",
+  "size": 0,
+  "md5Hash": "1B2M2Y8AsgTpgAmY7PhCfg==",
+  "crc32c": "0"
+}
