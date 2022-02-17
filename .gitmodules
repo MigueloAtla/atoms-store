@@ -1,0 +1,3 @@
+[submodule ".\\pages\\admin\\customAdminPages\\ecommerce"]
+	path = .\\pages\\admin\\customAdminPages\\ecommerce
+	url = https://github.com/MigueloAtla/atomscms-customAdminPage-ecommerce

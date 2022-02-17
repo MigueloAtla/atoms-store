@@ -20,7 +20,8 @@ import EditCollection from './pages/editCollection'
 import UsersPage from './pages/users'
 
 // custom admin pages
-import StoreAdminPage from '../customAdminPages/store'
+// import StoreAdminPage from '../customAdminPages/store'
+import StoreAdminPage from '@/admin/customAdminPages/ecommerce'
 
 // Components
 import MediaLibrary from './pages/mediaLibrary'
