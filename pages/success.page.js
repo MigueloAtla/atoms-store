@@ -52,68 +52,68 @@ const Data = ({ session_id }) => {
       // set firestore checkout paid -> true
       // get cartContent substract product amount (stock)
 
-      // const checkout_data = {
-      //   session_id: {
-      //     isRequired: 'true',
-      //     order: 0,
-      //     type: 'text',
-      //     value: data.id
-      //   },
-      //   total: {
-      //     isRequired: 'true',
-      //     order: 2,
-      //     type: 'number',
-      //     value: data.amount_total / 100
-      //   },
-      //   email: {
-      //     isRequired: 'true',
-      //     order: 1,
-      //     type: 'text',
-      //     value: data.customer_details.email
-      //   }
-      // }
+      const checkout_data = {
+        session_id: {
+          isRequired: 'true',
+          order: 0,
+          type: 'text',
+          value: data.id
+        },
+        total: {
+          isRequired: 'true',
+          order: 2,
+          type: 'number',
+          value: data.amount_total / 100
+        },
+        email: {
+          isRequired: 'true',
+          order: 1,
+          type: 'text',
+          value: data.customer_details.email
+        }
+      }
 
       // // not working
-      // const related_products = cartContent.map(el => el.product.id)
+      const related_products = cartContent.map(el => el.product.id)
 
       // console.log(related_products)
 
-      // addByCollectionType('checkouts', checkout_data).then(function (docRef) {
-      //   let newId = docRef.id
-      //   let docsContent = []
-      //   let idsArr = []
-      //   related_products.map(id => {
-      //     idsArr.push(`${newId}_${id}`)
-      //     docsContent.push({
-      //       checkoutsId: newId,
-      //       productsId: id
-      //     })
-      //   })
-      //   addByCollectionTypeWithCustomIDBatched(
-      //     'junction_checkouts_products',
-      //     idsArr,
-      //     docsContent
-      //   )
-      // })
+      addByCollectionType('checkouts', checkout_data).then(function (docRef) {
+        let newId = docRef.id
+        let docsContent = []
+        let idsArr = []
+        related_products.map(id => {
+          idsArr.push(`${newId}_${id}`)
+          docsContent.push({
+            checkoutsId: newId,
+            productsId: id
+          })
+        })
+        addByCollectionTypeWithCustomIDBatched(
+          'junction_checkouts_products',
+          idsArr,
+          docsContent
+        )
+      })
 
-      // fetch('/api/mail', {
-      //   method: 'post',
-      //   body: JSON.stringify({ email: data.customer_details.email }),
-      //   headers: {
-      //     'Content-Type': 'application/json'
-      //   }
-      // })
-      //   .then(res => {
-      //     if (res.status === 200) {
-      //       // setSended(true)
-      //       // reset()
-      //     }
-      //   })
-      //   .catch(err => {
-      //     console.log(err)
-      //     // setError(true)
-      //     // reset()
-      //   })
+      fetch('/api/mail', {
+        method: 'post',
+        body: JSON.stringify({ email: data.customer_details.email }),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+        .then(res => {
+          if (res.status === 200) {
+            // setSended(true)
+            // reset()
+          }
+        })
+        .catch(err => {
+          console.log(err)
+          // setError(true)
+          // reset()
+        })
     }
   }, [data])
   return (

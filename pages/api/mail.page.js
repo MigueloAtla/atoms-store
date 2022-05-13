@@ -2,6 +2,7 @@ import { useUser } from '@/hooks/useUser'
 
 export default async function handler (req, res) {
   let nodemailer = require('nodemailer')
+  console.log('sending a email ---------------------------')
   const transporter = nodemailer.createTransport({
     port: 587,
     host: 'smtp.gmail.com',

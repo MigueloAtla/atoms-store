@@ -23,11 +23,14 @@ import { SelectChartButton, SelectTypeChart, ChartWrapper, StatsWrapper, PageWra
 
 // components
 import { Flex, Icon } from '@chakra-ui/react'
-import { BiUpArrow } from 'react-icons/bi'
+import { BiUpArrow, BiDownArrow } from 'react-icons/bi'
 
 import dayjs from 'dayjs'
 import { useRef } from 'react'
 import { Column, Row } from 'styled-bento';
+
+// state
+import useStore from '@/admin/store/store' 
 
 ChartJS.register(
   CategoryScale,
@@ -59,20 +62,31 @@ export const options = {
 
 const Charts = ({ collection }) => {
   const [data, setData] = useState([])
+  const [prevData, setPrevData] = useState([])
   const [labels, setLabels] = useState([])
   const [totalArr, setTotalArr] = useState([])
+  const [prevTotalArr, setPrevTotalArr] = useState([])
   const [total, setTotal] = useState(0)
+  const [prevTotal, setPrevTotal] = useState(0)
   const [dataChart, setDataChart] = useState({})
+  const [percent, setPercent] = useState(null)
   const [title, setTitle] = useState()
+  // const [loading, setLoading] = useState(true)
   const [type, setType] = useState('bar')
   const period = useRef()
+
+  const { loading, setLoading } = useStore(state => state)
 
   useEffect(() => {
     handlePeriod('month')
   }, [])
+
+  useEffect(() => {
+    const percent = ( total / prevTotal - 1) * 100
+    setPercent(() => Math.floor(percent * 100) / 100)
+  }, [total, prevTotal])
   
   useEffect(() => {
-    
     setDataChart({
       labels,
       datasets: [
@@ -86,7 +100,7 @@ const Charts = ({ collection }) => {
         },
         {
           label: 'Money made (in €)',
-          data: ['50', '100', '100', '110', '200', '100', '100', '80', '100', '0', '100', '100', '100', '180', '180', '200', '200', '130', '150', '100', '100', '50', '50', '50', '80', '50', '0', '0'],
+          data: prevTotalArr.map((d) => d),
           borderColor: 'rgba(52, 14, 41, 1)',
           backgroundColor: 'rgba(52, 14, 41, 0.5)',
           tension: 0.3,
@@ -94,7 +108,7 @@ const Charts = ({ collection }) => {
         },
       ],
     })
-  }, [labels, totalArr])
+  }, [labels, prevTotalArr])
 
   useEffect(() => {
 
@@ -111,7 +125,7 @@ const Charts = ({ collection }) => {
         total += el.total.value
       })
       let arr = days_arr.map(n => n.toString())
-      setTotal(total)
+      setTotal(parseInt(total, 10))
       setTotalArr(arr)
     }
     
@@ -128,8 +142,24 @@ const Charts = ({ collection }) => {
         total += el.total.value
       })
       let arr = days_arr.map(n => n.toString())
-      setTotal(total)
+      setTotal(parseInt(total, 10))
       setTotalArr(arr)
+
+      total = 0
+      arr = []
+      days_arr = []
+      for (let i = 0; i < dayjs().daysInMonth(); i++) {
+        days_arr.push(0)
+      }
+      prevData.map((el) => {
+        curr_day = dayjs(el.created.toDate()).date()
+        days_arr[curr_day - 1] += el.total.value
+        total += el.total.value
+      })
+      arr = days_arr.map(n => n.toString())
+      
+      setPrevTotal(parseInt(total, 10))
+      setPrevTotalArr(arr)
     }
 
     if(period.current === 'year') {
@@ -145,15 +175,15 @@ const Charts = ({ collection }) => {
         total += el.total.value
       })
       let arr = months_arr.map(n => n.toString())
-      setTotal(total)
+      setTotal(parseInt(total, 10))
       setTotalArr(arr)
     }
     
-  }, [data])
+  }, [prevData])
 
   const handlePeriod = (selected_period) => {
     let date 
-    let start, end
+    let start, end, prev_start, prev_end
     
     if (selected_period === 'today' || selected_period === 'yesterday') {
       date = 'day'
@@ -168,6 +198,9 @@ const Charts = ({ collection }) => {
     else {
       start = dayjs().startOf(selected_period).toDate()
       end = dayjs().endOf(selected_period).toDate()
+
+      prev_start = dayjs().subtract(1, 'year').startOf(selected_period).toDate()
+      prev_end = dayjs().subtract(1, 'year').endOf(selected_period).toDate()
     }
 
     if(date === 'day') {
@@ -189,6 +222,16 @@ const Charts = ({ collection }) => {
       setData(res)
     })
 
+    getByPeriod(collection, prev_start, prev_end)
+    .then((res) => {
+      setPrevData(res)
+    })
+
+    // getByPeriod(collection, prev_start, prev_end)
+    // .then((res) => {
+    //   setData(res)
+    // })
+
     period.current = date
     setTitle(selected_period)
 
@@ -197,92 +240,95 @@ const Charts = ({ collection }) => {
   return (
     <PageWrapper>
       <Column width='30%' gap='10px'>
-        <StatsWrapper>
-          <h2>{title}</h2>
-          <p>total profits:</p><p style={{
-            fontWeight: 'bold',
-            fontSize: '20px'
-          }}>{total} €</p>
+          <StatsWrapper>
+            <h2>{title}</h2>
+            <p>total profits:</p><p style={{
+              fontWeight: 'bold',
+              fontSize: '20px'
+            }}>{total} €</p>
 
-          <Percent>
-            <h1 style={{
-              color: '#10ff87'
-            }}>20%</h1>
-            <Icon as={BiUpArrow} color={'#10ff87'} width='2em' height='2em' />
-          </Percent>
-          Respect last {title}
-        </StatsWrapper>
-        <ChartActions>
-          Select chart type
-          <Row>
-            <SelectTypeChart onClick={() => {
-              setType('line')
-            }}>
-              Line chart
-            </SelectTypeChart>
-            <SelectTypeChart onClick={() => {
-              setType('bar')
-            }}>
-              Bar chart
-            </SelectTypeChart>
-          </Row>
-          <Flex mt='30px'>
-          Select period
-          </Flex>
-          <Flex flexWrap='wrap'>
-            <SelectChartButton onClick={() => {
-              handlePeriod('yesterday')
-            }}>
-              <p>
-                Yesterday 
-                <span style={{
-                  color: '#10ff87'
-                }}>
-                  +2%
-                </span>
-              </p>
-            </SelectChartButton>
-            <SelectChartButton onClick={() => {
-              handlePeriod('day')
-            }}>
-              <p>
-                Today 
-                <span style={{
-                  color: '#c70039'
-                }}>
-                  -5%
-                </span>
-              </p>
-            </SelectChartButton>
-            <SelectChartButton onClick={() => {
-              handlePeriod('month')
-            }}>
-              <p>
-                Last month 
-                <span style={{
-                  color: '#c70039'
-                }}>
-                  -15%
-                </span>
-              </p>
-            </SelectChartButton>
-            <SelectChartButton onClick={() => {
-              handlePeriod('year')
-            }}>
-              <p>
-                Last year 
-                <span style={{
-                  color: '#10ff87'
-                }}>
-                  +35%
-                </span>
-              </p>
-            </SelectChartButton>
-          </Flex>
-        </ChartActions> 
+            <Percent>
+              <h1 style={{
+                color: percent >= 0 ? '#10ff87' : 'red'
+              }}>{percent !== null && Math.abs(percent)}%</h1>
+              {
+                percent && percent >= 0 ? <Icon as={BiUpArrow} color={'#10ff87'} width='2em' height='2em' /> :
+                <Icon as={BiDownArrow} color={'red'} width='2em' height='2em' />
+              }
+            </Percent>
+            Respect last {title}
+          </StatsWrapper>
+          <ChartActions>
+            Select chart type
+            <Row>
+              <SelectTypeChart onClick={() => {
+                setType('line')
+              }}>
+                Line chart
+              </SelectTypeChart>
+              <SelectTypeChart onClick={() => {
+                setType('bar')
+              }}>
+                Bar chart
+              </SelectTypeChart>
+            </Row>
+            <Flex mt='30px'>
+            Select period
+            </Flex>
+            <Flex flexWrap='wrap'>
+              <SelectChartButton onClick={() => {
+                handlePeriod('yesterday')
+              }}>
+                <p>
+                  Yesterday 
+                  <span style={{
+                    color: '#10ff87'
+                  }}>
+                    +2%
+                  </span>
+                </p>
+              </SelectChartButton>
+              <SelectChartButton onClick={() => {
+                handlePeriod('day')
+              }}>
+                <p>
+                  Today 
+                  <span style={{
+                    color: '#c70039'
+                  }}>
+                    -5%
+                  </span>
+                </p>
+              </SelectChartButton>
+              <SelectChartButton onClick={() => {
+                handlePeriod('month')
+              }}>
+                <p>
+                  Last month 
+                  <span style={{
+                    color: '#c70039'
+                  }}>
+                    -15%
+                  </span>
+                </p>
+              </SelectChartButton>
+              <SelectChartButton onClick={() => {
+                handlePeriod('year')
+              }}>
+                <p>
+                  Last year 
+                  <span style={{
+                    color: '#10ff87'
+                  }}>
+                    +35%
+                  </span>
+                </p>
+              </SelectChartButton>
+            </Flex>
+          </ChartActions> 
       </Column>
       {data.length > 0 ? (
-          <ChartWrapper>
+        <ChartWrapper>
             {type === 'bar' &&  <Bar options={options} data={dataChart} />}
             {type === 'line' &&  <Line options={options} data={dataChart} />}
           </ChartWrapper>

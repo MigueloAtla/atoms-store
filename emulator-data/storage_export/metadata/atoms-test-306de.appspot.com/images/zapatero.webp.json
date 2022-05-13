@@ -1,0 +1,19 @@
+{
+  "name": "images/zapatero.webp",
+  "bucket": "atoms-test-306de.appspot.com",
+  "contentType": "image/webp",
+  "metageneration": 1,
+  "generation": 1652118091122,
+  "storageClass": "STANDARD",
+  "etag": "someETag",
+  "contentDisposition": "inline",
+  "contentEncoding": "identity",
+  "downloadTokens": [
+    "0ad63fef-de94-47f0-bc7f-f2cd613c3e9b"
+  ],
+  "timeCreated": "2022-05-09T17:41:31.121Z",
+  "updated": "2022-05-09T17:41:31.123Z",
+  "size": 11012,
+  "md5Hash": "htxxpI/IzCSZ0L47sdu8Rg==",
+  "crc32c": "1823739305"
+}

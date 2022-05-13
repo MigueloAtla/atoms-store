@@ -1,0 +1,19 @@
+{
+  "name": "images/steel-mogu-cropped.png",
+  "bucket": "atoms-test-306de.appspot.com",
+  "contentType": "image/png",
+  "metageneration": 1,
+  "generation": 1652118515149,
+  "storageClass": "STANDARD",
+  "etag": "someETag",
+  "contentDisposition": "inline",
+  "contentEncoding": "identity",
+  "downloadTokens": [
+    "a4672ed2-baea-41bc-9bf6-431b35fc3585"
+  ],
+  "timeCreated": "2022-05-09T17:48:35.148Z",
+  "updated": "2022-05-09T17:48:35.148Z",
+  "size": 149664,
+  "md5Hash": "JyeK4u6Ar8ILUxt9BxfIDw==",
+  "crc32c": "650240587"
+}

@@ -43,7 +43,9 @@ const Icons = {
 }
 
 const Sidebar = () => {
-  const role = useStoreRole(state => state.role)
+  // uncomment THIS
+  // const role = useStoreRole(state => state.role)
+  const role = 'admin'
   const setSelectedSidebarMenu = useStore(state => state.setSelectedSidebarMenu)
   const toggleCollectionsPanel = useStore(state => state.toggleCollectionsPanel)
   const setToggleCollectionsPanel = useStore(

@@ -12,6 +12,8 @@ import {
 // hooks
 import useCart from '@/hooks/useCart'
 
+console.log('webhook ---------------------------')
+
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
 export const config = {

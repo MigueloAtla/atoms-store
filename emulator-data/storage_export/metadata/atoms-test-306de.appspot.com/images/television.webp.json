@@ -1,0 +1,19 @@
+{
+  "name": "images/television.webp",
+  "bucket": "atoms-test-306de.appspot.com",
+  "contentType": "image/webp",
+  "metageneration": 1,
+  "generation": 1652118164430,
+  "storageClass": "STANDARD",
+  "etag": "someETag",
+  "contentDisposition": "inline",
+  "contentEncoding": "identity",
+  "downloadTokens": [
+    "14b53610-9bd0-4076-94b8-3520f6f4affb"
+  ],
+  "timeCreated": "2022-05-09T17:42:44.429Z",
+  "updated": "2022-05-09T17:42:44.431Z",
+  "size": 24206,
+  "md5Hash": "uNZnmA2XaSiue2DZdGOdBw==",
+  "crc32c": "1710825953"
+}

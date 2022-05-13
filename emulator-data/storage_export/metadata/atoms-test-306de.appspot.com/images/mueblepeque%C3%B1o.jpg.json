@@ -1,0 +1,19 @@
+{
+  "name": "images/mueblepequeño.jpg",
+  "bucket": "atoms-test-306de.appspot.com",
+  "contentType": "image/jpeg",
+  "metageneration": 1,
+  "generation": 1652118534292,
+  "storageClass": "STANDARD",
+  "etag": "someETag",
+  "contentDisposition": "inline",
+  "contentEncoding": "identity",
+  "downloadTokens": [
+    "7a60a73f-7ed1-4d15-a5f2-e48bd9d51d38"
+  ],
+  "timeCreated": "2022-05-09T17:48:54.291Z",
+  "updated": "2022-05-09T17:48:54.291Z",
+  "size": 28983,
+  "md5Hash": "2cH+jQXkkaeThniE5rrMGw==",
+  "crc32c": "2798022402"
+}

@@ -26,11 +26,33 @@ const functions = firebase.functions()
 const auth = firebase.auth()
 const storage = firebase.storage()
 
+const EMULATORS_STARTED = 'EMULATORS_STARTED';
+function startEmulators() {
+  if (!global[EMULATORS_STARTED]) {
+    global[EMULATORS_STARTED] = true;
+    auth.useEmulator('http://localhost:9099')
+    db.useEmulator('localhost', '8081')
+    functions.useEmulator('localhost', '5001')
+    storage.useEmulator('localhost', '9199')
+  }
+  // if(typeof window === 'undefined' || !window['_init']) {
+  //   auth.useEmulator('http://localhost:9099')
+  //   db.useEmulator('localhost', '8081')
+  //   functions.useEmulator('localhost', '5001')
+  //   storage.useEmulator('localhost', '9199')
+  //   if(typeof window !== 'undefined') {
+  //     window['_init'] = true;
+  //  }
+  // }
+}
+
 if(process.env.NODE_ENV === 'development') {
-  auth.useEmulator('http://localhost:9099')
-  db.useEmulator('localhost', '8080')
-  functions.useEmulator('localhost', '5001')
-  storage.useEmulator('localhost', '9199')
+  // auth.useEmulator('http://localhost:9099')
+  // db.useEmulator('localhost', '8081')
+  // functions.useEmulator('localhost', '5001')
+  // storage.useEmulator('localhost', '9199')
+
+  startEmulators()
 }
 
 const mapUserFromFirebaseAuthToUser = user => {
@@ -84,7 +106,9 @@ export const addByCollectionType = (type, content) => {
   content = {
     ...content, 
     seen: false,
-    created: firebase.firestore.Timestamp.now()
+
+    // TESTING THIS FIELD *uncomment to test
+    // created: firebase.firestore.Timestamp.now()
   }
   console.log(content)
   return db.collection(type).add(
@@ -589,57 +613,6 @@ export const deleteFields = async (name, type) => {
   await Promise.all(batches)
 }
 
-export const addRelationToCollection = async (collection, relation) => {
-  console.log(collection)
-  console.log(relation)
-  await db
-    .collection('collectionList')
-    // .doc('OjUAtyfsIW6ECoryEovP')
-    // .update({
-    //   [`${collection}.relations`]: firebase.firestore.FieldValue.arrayUnion(
-    //     relation
-    //   )
-    // })
-    .limit(1)
-    .get()
-    .then(snapshot => {
-      snapshot.docs[0].ref.update({
-        [`${collection}.relations`]: firebase.firestore.FieldValue.arrayUnion(
-          relation
-        )
-      })
-    })
-
-  // db.collection(collection[Object.keys(collection)[0]].name)
-}
-
-export const createCollection = async collection => {
-  const collection_exists = await db
-    .collection('collectionList')
-    .limit(1)
-    .get()
-
-  console.log(collection_exists.empty)
-
-  // if true create the collection -> CollectionList
-  if (collection_exists.empty) {
-    await db.collection('collectionList').add(collection)
-  } else {
-    // else update:
-    await db
-      .collection('collectionList')
-      // .doc('OjUAtyfsIW6ECoryEovP')
-      // .update(collection)
-      .limit(1)
-      .get()
-      .then(snapshot => {
-        snapshot.docs[0].ref.update(collection)
-      })
-  }
-
-  db.collection(collection[Object.keys(collection)[0]].name)
-}
-
 // Create Junction: When link two docs
 // export const createJunction = async (fromId, toId, junction) => {
 //   const junctionRef = db.doc(`${junction}/${fromId}_${toId}`)
@@ -696,4 +669,74 @@ export const getDocByIDClient = async (collection, id) => {
   }
 
   return response
+}
+
+
+// DOCUMENTED-----------------------------------------------------------------------------
+/**
+ * Creates a Collection.
+ * @param {object} collection - The object with the schema to create the new collection.
+ */
+ export const createCollection = async collection => {
+  const collection_exists = await db
+    .collection('collectionList')
+    .limit(1)
+    .get()
+
+  console.log(collection_exists.empty)
+
+  // if true create the collection -> "CollectionList"
+  if (collection_exists.empty) {
+    await db.collection('collectionList').add(collection)
+  } else {
+    // else update the collectionList:
+    await db
+      .collection('collectionList')
+      .limit(1)
+      .get()
+      .then(snapshot => {
+        snapshot.docs[0].ref.update(collection)
+      })
+  }
+
+  db.collection(collection[Object.keys(collection)[0]].name)
+}
+
+/**
+ * Adds the relation data to the schema (in collectionList).
+ * @param {string} collection - Type name of the related collection.
+ * @param {object} relation - Data of the junction ({
+ *  display: {boolean} if related docs are displayed by default in the doc, 
+ *  name: {string} name of the junction,
+ * }).
+ */
+ export const addRelationToCollection = async (collection, relation) => {
+  await db
+    .collection('collectionList')
+    .limit(1)
+    .get()
+    .then(snapshot => {
+      snapshot.docs[0].ref.update({
+        [`${collection}.relations`]: firebase.firestore.FieldValue.arrayUnion(
+          relation
+        )
+      })
+    })
+
+  // db.collection(collection[Object.keys(collection)[0]].name)
+}
+
+/**
+ * Create a collection with relation data.
+ * See @func createCollection and @func addRelationToCollection for more info.
+ * @param {object} collection - The object with the schema to create the new collection.
+ * @param {array} relation_entries - The array with the relations for the collection.
+ */
+export const createCollecitonWithRelations = async (collection, relation_entries) => {
+  createCollection(collection)
+  relation_entries.map(relation => {
+    const spliceRelations = relation.name.split('_')
+    let type2 = spliceRelations[2]
+    addRelationToCollection(type2, relation)
+  })
 }

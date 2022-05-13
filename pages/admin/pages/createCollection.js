@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useHistory } from 'react-router-dom'
 
-import { addRelationToCollection, createCollection } from '@/firebase/client'
+import { createCollecitonWithRelations } from '@/firebase/client'
 
 // Chackra UI Components
 import {
@@ -93,12 +93,7 @@ export default function CreateCollection () {
     })
 
     try {
-      createCollection(formData)
-      relation_entries.map(relation => {
-        const spliceRelations = relation.name.split('_')
-        let type2 = spliceRelations[2]
-        addRelationToCollection(type2, relation)
-      })
+      createCollecitonWithRelations(formData, relation_entries)
       displayToast({
         title: 'Collection created successfully',
         description: 'Alright!'

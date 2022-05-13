@@ -1,0 +1,19 @@
+{
+  "name": "images/parahi-natural.jpg",
+  "bucket": "atoms-test-306de.appspot.com",
+  "contentType": "image/jpeg",
+  "metageneration": 1,
+  "generation": 1652118589329,
+  "storageClass": "STANDARD",
+  "etag": "someETag",
+  "contentDisposition": "inline",
+  "contentEncoding": "identity",
+  "downloadTokens": [
+    "ae02ebb9-3ffd-418d-a47d-151c306a0e8a"
+  ],
+  "timeCreated": "2022-05-09T17:49:49.328Z",
+  "updated": "2022-05-09T17:49:49.328Z",
+  "size": 50267,
+  "md5Hash": "uSgVVFnjYUM4oWdgw2yQbg==",
+  "crc32c": "1126333049"
+}

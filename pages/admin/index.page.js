@@ -15,11 +15,12 @@ export default function Admin () {
   const router = useRouter()
   const smallImageEditor = useStore(state => state.smallImageEditor)
 
-  useEffect(() => {
-    if (!loading && !allowed) {
-      router.push('/')
-    }
-  }, [role, loading, router])
+  // uncomment THIS
+  // useEffect(() => {
+  //   if (!loading && !allowed) {
+  //     router.push('/')
+  //   }
+  // }, [role, loading, router])
 
   return (
     <ChakraProvider>
@@ -29,7 +30,8 @@ export default function Admin () {
             <Spinner size='xl' />
           </Flex>
         ) : (
-          allowed && <AdminLayout />
+          // allowed && 
+          <AdminLayout />
         )}
       </Styles>
     </ChakraProvider>

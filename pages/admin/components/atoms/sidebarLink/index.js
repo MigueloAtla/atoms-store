@@ -11,7 +11,9 @@ import useStoreRole from '@/store/store'
 import sidebarconfig from '@/admin/sidebarconfig.json'
 
 const SidebarLink = ({ children, menu, ...props }) => {
-  const role = useStoreRole(state => state.role)
+  // uncomment THIS
+  // const role = useStoreRole(state => state.role)
+  const role = 'admin'
   const selectedSidebarMenu = useStore(state => state.selectedSidebarMenu)
 
   return (

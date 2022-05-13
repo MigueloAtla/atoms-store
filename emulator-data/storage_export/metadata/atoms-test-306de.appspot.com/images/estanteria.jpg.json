@@ -1,0 +1,19 @@
+{
+  "name": "images/estanteria.jpg",
+  "bucket": "atoms-test-306de.appspot.com",
+  "contentType": "image/jpeg",
+  "metageneration": 1,
+  "generation": 1652118249903,
+  "storageClass": "STANDARD",
+  "etag": "someETag",
+  "contentDisposition": "inline",
+  "contentEncoding": "identity",
+  "downloadTokens": [
+    "5f6d6866-b031-47ae-9f15-e3c1ef569e37"
+  ],
+  "timeCreated": "2022-05-09T17:44:09.902Z",
+  "updated": "2022-05-09T17:44:09.903Z",
+  "size": 38242,
+  "md5Hash": "AkPgae/f32W4e/TaI35UnQ==",
+  "crc32c": "2259353157"
+}
