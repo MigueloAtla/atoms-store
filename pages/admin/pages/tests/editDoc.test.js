@@ -7,7 +7,7 @@ import {
   fireEvent
 } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
-import Edit from '../editDoc'
+import Edit from '../editDoc/editDoc'
 import { MemoryRouter } from 'react-router-dom'
 import { ThemeProvider } from 'styled-components'
 import { theme } from '@/theme'
@@ -174,7 +174,7 @@ const mockCollection = [
 // jest.mock('next/image', () => ({ src, alt }) => <img src={src} alt={alt} />)
 
 jest.mock('@/firebase/client.js', () => ({
-  fetchOneByType: jest.fn(() => {
+  getDoc: jest.fn(() => {
     return Promise.resolve(content)
   }),
   getSchemaByType: jest.fn(() => {

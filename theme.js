@@ -410,7 +410,6 @@ const selectComponentType = (element, markupContent, Wrapper = null) => {
     case 'blockquote':
       element.content.length > 0 &&
         element.content.map(listItem => {
-          console.log(listItem)
           selectComponentType(
             listItem,
             markupContent,
@@ -419,7 +418,6 @@ const selectComponentType = (element, markupContent, Wrapper = null) => {
         })
       break
     default:
-      console.log(element.type)
       if (element.type !== 'text') {
         const Comp = components[element.type]
         markupContent.push(function Default () {
@@ -439,7 +437,6 @@ export const getComponents = doc => {
       // Richt text mapping
       if (value.type === 'richtext') {
         const markupContent = []
-        console.log(value.value.content)
         value.value.content?.length > 0 &&
           value.value.content.map(element => {
             selectComponentType(element, markupContent)
@@ -471,7 +468,6 @@ export const getComponents = doc => {
 
 export const getValues = doc => {
   let values = {}
-  console.log(doc)
   if (doc) {
     for (let [key, value] of Object.entries(doc)) {
       if (key === 'id') values = { ...values, id: doc.id }

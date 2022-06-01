@@ -18,6 +18,7 @@ import {
 const TypeInput = ({ obj, name, onSubmit, editorContent, haveEditor }) => {
   const { register, errors } = useFormContext()
   let { type, value, isRequired } = obj
+
   switch (type) {
     case 'longtext':
       return (

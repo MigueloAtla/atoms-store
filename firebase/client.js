@@ -1,10 +1,17 @@
 // import * as firebaseall from 'firebase'
+import { event } from '../events'
 import firebase from 'firebase/app'
 import 'firebase/auth'
 import 'firebase/firestore'
 import 'firebase/storage'
 import 'firebase/functions'
 import _ from 'lodash'
+
+// Utils
+import { sortDoc, sortSchema } from 'utils'
+import { getTypes } from '@/admin/utils/utils'
+
+// var emitter = new EventEmitter()
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_ANALYTICS_ID_API_KEY,
@@ -102,20 +109,6 @@ export const signOut = () => {
   return firebase.auth().signOut()
 }
 
-export const addByCollectionType = (type, content) => {
-  content = {
-    ...content, 
-    seen: false,
-
-    // TESTING THIS FIELD *uncomment to test
-    // created: firebase.firestore.Timestamp.now()
-  }
-  console.log(content)
-  return db.collection(type).add(
-    content
-    // createdAt: firebase.firestore.Timestamp.fromDate(new Date())
-  )
-}
 export const addByCollectionTypeWithCustomID = (type, ids, content) => {
   return db
     .collection(type)
@@ -136,14 +129,6 @@ export const deleteRelatedDoc = (collection, id) => {
     .delete()
 }
 
-export const addByCollectionTypeWithCustomIDBatched = (type, ids, content) => {
-  const batch = db.batch()
-  ids.map((id, i) => {
-    let docRef = db.collection(type).doc(id)
-    batch.set(docRef, content[i])
-  })
-  batch.commit()
-}
 export const addPost = ({ content }) => {
   return db.collection('posts').add({
     content,
@@ -231,6 +216,7 @@ export const getImagesData = async () => {
   let metadataPromises = result.items.map(imageRef => imageRef.getMetadata())
   let metadata = await Promise.all(metadataPromises)
   let urls = await Promise.all(urlPromises)
+  event.dispatch('onImagesLoaded')
   return { metadata, urls }
 }
 
@@ -247,22 +233,6 @@ export const deleteImage = name => {
     })
 }
 
-export const getCollection = collection => {
-  return db
-    .collection(collection)
-    .get()
-    .then(snapshot => {
-      return snapshot.docs.map(doc => {
-        const data = doc.data()
-        const id = doc.id
-        return {
-          id,
-          ...data
-        }
-      })
-    })
-}
-
 export const getByPeriod = (collection, date1, date2) => {
   return db
     .collection(collection)
@@ -272,23 +242,6 @@ export const getByPeriod = (collection, date1, date2) => {
     .then(snapshot => {
       return snapshot.docs.map(doc => {
         return doc.data()
-      })
-    })
-}
-
-export const getCollections = () => {
-  return db
-    .collection('collectionList')
-    .get()
-    .then(snapshot => {
-      return snapshot.docs.map(doc => {
-        const result = doc.data()
-        // const names = Object.keys(result)
-        let collections = []
-        for (const [key, value] of Object.entries(result)) {
-          collections.push({ name: key, page: value.page })
-        }
-        return collections
       })
     })
 }
@@ -309,38 +262,7 @@ export const fetchPosts = () => {
     })
 }
 
-export const fetchRelatedDocs = async (id, junction, type, type2) => {
-  const junctions = await db
-    .collection(`${junction}`)
-    .where(`${type}Id`, '==', id)
-    .get()
 
-  const products = await Promise.all(
-    junctions.docs
-      .filter(doc => doc.exists)
-      .map(doc => {
-        return db.doc(`${type2}/${doc.data()[`${type2}Id`]}`).get()
-      })
-  )
-
-  return products
-    .filter(doc => doc.exists)
-    .map(doc => {
-      return { id: doc.id, ...doc.data() }
-    })
-}
-
-export const getSchemaByType = type => {
-  return db
-    .collection('collectionList')
-    .get()
-    .then(snapshot => {
-      return snapshot.docs.map(doc => {
-        let data = doc.data()
-        return data[type].schema
-      })
-    })
-}
 // export const getRelationsListByType = type => {
 //   return db
 //     .collection('collectionList')
@@ -352,17 +274,6 @@ export const getSchemaByType = type => {
 //       })
 //     })
 // }
-export const getFullSchemaByType = type => {
-  return db
-    .collection('collectionList')
-    .get()
-    .then(snapshot => {
-      return snapshot.docs.map(doc => {
-        let data = doc.data()
-        return data[type]
-      })
-    })
-}
 
 // export const getCollectionSchema = collection => {
 //   console.log(collection)
@@ -388,15 +299,7 @@ export const getFullSchemaByType = type => {
 //   // })
 // }
 
-export const fetchOneByType = (id, type) => {
-  return db
-    .collection(type)
-    .doc(id)
-    .get()
-    .then(snapshot => {
-      return snapshot.data()
-    })
-}
+
 export const fetchPost = id => {
   return db
     .collection('posts')
@@ -406,11 +309,6 @@ export const fetchPost = id => {
       // console.log(snapshot)
       return snapshot.data()
     })
-}
-
-export const getAllUsers = () => {
-  const getUsers = functions.httpsCallable('getAllUsers')
-  return getUsers()
 }
 
 export const makeAdmin = adminEmail => {
@@ -473,7 +371,9 @@ export const updateOneByType = (id, type, formData) => {
 export const updateSeenFieldByType = (id, type) => {
   db.collection(type)
     .doc(id)
-    .update({'seen': true})
+
+    // TESTING FIELD
+    // .update({'seen': true})
 }
 
 // substract amount of product
@@ -673,6 +573,120 @@ export const getDocByIDClient = async (collection, id) => {
 
 
 // DOCUMENTED-----------------------------------------------------------------------------
+
+/**
+ * Get all users.
+ * @return {array} - The users list.
+ */
+export const getAllUsers = async () => {
+  const getUsers = functions.httpsCallable('getAllUsers')
+  console.log('before users are loaded')
+  const users = await getUsers()
+  event.dispatch('onUsersLoaded')
+  return users
+}
+
+/**
+ * Get the list of collections.
+ * @return {object} Schema of the requested collection.
+ */
+export const getCollections = () => {
+  return db
+    .collection('collectionList')
+    .get()
+    .then(snapshot => {
+      return snapshot.docs.map(doc => {
+        const result = doc.data()
+        // const names = Object.keys(result)
+        let collections = []
+        for (const [key, value] of Object.entries(result)) {
+          collections.push({ name: key, page: value.page })
+        }
+        event.dispatch('onCollectionsListLoaded')
+        return collections
+      })
+    })
+}
+
+/**
+ * Get the Docs in a collection.
+ * @param {string} Collection - Name of the collection.
+ * @return {array} Docs in collection.
+ */
+export const getCollection = async collection => {
+  const snapshot = await db.collection(collection).get()
+  const docs = snapshot.docs.map(doc => {
+    const data = doc.data()
+      const id = doc.id
+      return {
+        id,
+        ...data
+      }
+  })
+  event.dispatch('onCollectionLoaded')
+  return docs
+}
+
+/**
+ * Get the Schema (types info) of a collection by given type.
+ * @param {string} type - Type of the requested collection.
+ * @return {object} Schema of the requested collection.
+ */
+export const getSchemaByType = type => {
+  return db
+    .collection('collectionList')
+    .get()
+    .then(snapshot => {
+      return snapshot.docs.map(doc => {
+        let data = doc.data()
+        event.dispatch('onSchemaLoaded')
+        return sortSchema(data[type].schema)
+      })
+    })
+}
+
+/**
+ * Get the Schema (types and metadata) of a collection by given type.
+ * @param {string} type - Type of the requested collection.
+ * @return {object} Schema of the requested collection.
+ */
+export const getFullSchemaByType = async type => {
+  const snapshot = await db.collection('collectionList').get()
+  const schema = snapshot.docs.map(doc => {
+    let data = doc.data()
+    return data[type]
+  })
+  event.dispatch('onSchemaLoaded')
+  return schema
+  // return db
+  //   .collection('collectionList')
+  //   .get()
+  //   .then(snapshot => {
+  //     return snapshot.docs.map(doc => {
+  //       let data = doc.data()
+  //       return data[type]
+  //     })
+  // })
+}
+
+/**
+ * Get One Doc by the given id and type.
+ * @param {string} id - Id of the Doc.
+ * @param {string} type - Type of the requested collection.
+ * @return {object} the Doc data.
+ */
+export const getDoc = (id, type) => {
+  return db
+    .collection(type)
+    .doc(id)
+    .get()
+    .then(snapshot => {
+      event.dispatch('onDocLoaded')
+      return sortDoc(snapshot.data())
+      // return snapshot.data()
+    })
+}
+
 /**
  * Creates a Collection.
  * @param {object} collection - The object with the schema to create the new collection.
@@ -739,4 +753,265 @@ export const createCollecitonWithRelations = async (collection, relation_entries
     let type2 = spliceRelations[2]
     addRelationToCollection(type2, relation)
   })
+  event.dispatch('onCollectionCreated')
+}
+
+/**
+ * Create a doc in a collection by the specified type.
+ * @param {string} type - Type of the collection.
+ * @param {object} content - The content of the collection.
+ */
+export const addByCollectionType = (type, content) => {
+  content = {
+    ...content, 
+
+    // TESTING THIS FIELD
+    // seen: false,
+
+    // TESTING THIS FIELD *uncomment to test
+    // created: firebase.firestore.Timestamp.now()
+  }
+  const doc = db.collection(type).add(
+    content
+    // createdAt: firebase.firestore.Timestamp.fromDate(new Date())
+  )
+  event.dispatch('onDocCreated', doc)
+  return doc
+
+}
+
+/**
+ * TODO: better explanation.
+ * Adds an array of docs from a related collection to the current doc. )
+ * @param {string} type - Type of the collection.
+ * @param {string} ids - The content of the collection.
+ * @param {object} content - The content of the collection.
+ */
+export const addByCollectionTypeWithCustomIDBatched = (type, ids, content) => {
+  const batch = db.batch()
+  ids.map((id, i) => {
+    let docRef = db.collection(type).doc(id)
+    batch.set(docRef, content[i])
+  })
+  batch.commit()
+}
+
+/**
+ * Create a doc in a collection by the specified type, 
+ * and add the previous selected doc from a related collection.
+ * See @func addByCollectionType and @func addByCollectionTypeWithCustomIDBatched for more info.
+ * @param {string} type - Type of the collection.
+ * @param {object} content - The content of the collection.
+ * @param {array} selectedRowIds - Array with the related doc in the collection.
+ */
+export const addByCollectionTypeWithRelatedDocs = (type, content, selectedRowIds) => { 
+  // Create the Doc and get the generated ID
+  addByCollectionType(type, content).then(function (docRef) {
+    let newId = docRef.id
+
+    // map selectedRowIds
+    console.log('selectedRowIds: ', selectedRowIds)
+    selectedRowIds.map(s => {
+      let idsArr = []
+      let docsContent = []
+      Object.keys(s).map(entry => {
+        const spliceRelations = entry.split('_')
+        s[entry].map(({ id: currentId }) => {
+          let type1
+          let type2
+          let composedId
+
+          // Compose ids
+          if (spliceRelations[1] === type) {
+            composedId = `${newId}_${currentId}`
+            type1 = spliceRelations[1]
+            type2 = spliceRelations[2]
+          } else {
+            composedId = `${currentId}_${newId}`
+            type1 = spliceRelations[2]
+            type2 = spliceRelations[1]
+          }
+          idsArr.push(composedId)
+
+          // Prepare content of Doc
+          docsContent.push({
+            [`${type1}Id`]: newId,
+            [`${type2}Id`]: currentId
+          })
+        })
+
+        // Create Doc and junction collection if no exists yet
+        addByCollectionTypeWithCustomIDBatched(entry, idsArr, docsContent)
+      })
+    })
+  })
+}
+
+/**
+ * Updates a doc in a collection by the specified type and id, 
+ * and the list of selected docs from a related collection.
+ * See @func updateOneByType and @func addByCollectionTypeWithCustomIDBatched for more info.
+ * @param {string} id - Id of the Doc to update.
+ * @param {string} type - Type of the collection.
+ * @param {object} content - The content of the collection.
+ * @param {array} selectedRowIds - Array with the related doc in the collection.
+ */
+export const updateDocByTypeWithRelatedDocs = (id, type, content, selectedRowIds) => {
+  let updateDoc = new Promise((resolve, reject) => {
+    updateOneByType(id, type, content)
+
+    selectedRowIds.map(s => {
+      let idsArr = []
+      let docsContent = []
+      Object.keys(s).map(entry => {
+        const spliceRelations = entry.split('_')
+        s[entry].map(({ id: currentId }) => {
+          let type1
+          let type2
+          let composedId
+
+          // Compose ids
+          if (spliceRelations[1] === type) {
+            composedId = `${id}_${currentId}`
+            type1 = spliceRelations[1]
+            type2 = spliceRelations[2]
+          } else {
+            composedId = `${currentId}_${id}`
+            type1 = spliceRelations[2]
+            type2 = spliceRelations[1]
+          }
+          idsArr.push(composedId)
+
+          // Prepare content of Doc
+          docsContent.push({
+            [`${type1}Id`]: id,
+            [`${type2}Id`]: currentId
+          })
+        })
+
+        // Create doc and junction collection if no exists yet
+        addByCollectionTypeWithCustomIDBatched(entry, idsArr, docsContent)
+      })
+    
+    })
+    resolve("update")
+  })
+  updateDoc.then(() => {
+    event.dispatch('onDocUpdated', 'Document updated')
+  })
+  .catch((error) => {
+    console.log('error: ', error)
+  })
+}
+
+/**
+ * Fetches related docs from a doc by the specified type and id. 
+ * @param {string} id - Id of the Doc to update.
+ * @param {string} junction - Name of the junction.
+ * @param {string} type - Type of the collection.
+ * @param {string} type2 - Type of the related collection.
+ */
+export const fetchRelatedDocs = async (id, junction, type, type2) => {
+  const junctions = await db
+    .collection(`${junction}`)
+    .where(`${type}Id`, '==', id)
+    .get()
+
+  const relatedDocs = await Promise.all(
+    junctions.docs
+      .filter(doc => doc.exists)
+      .map(doc => {
+        return db.doc(`${type2}/${doc.data()[`${type2}Id`]}`).get()
+      })
+  )
+
+  return relatedDocs
+    .filter(doc => doc.exists)
+    .map(doc => {
+      return { id: doc.id, ...doc.data() }
+    })
+}
+
+/**
+ * Controller: Add hidden relations to the current relations when pushes show relation button. 
+ * @param {string} id - Id of the current Doc.
+ * @param {string} junction - Name of the junction.
+ * @param {string} type - Type of the collection.
+ * @param {array} relations - State with the current relations.
+ * @return {array} newState - New state with the new relations.
+ */
+export const getAndMapHiddenRelatedDocs = async (id, junction, type, relations) => {
+  const { type1, type2 } = getTypes(junction, type)
+  const relationsFetched = await fetchRelatedDocs(id, junction, type1, type2)
+  const prevState = relations
+  const newState = prevState.map(collection => {
+    if (collection.collection === type2) {
+      return {
+        content: [...relationsFetched],
+        collection: type2,
+        junctionName: junction
+      }
+    } else return collection
+  })
+  return newState
+}
+
+/**
+ * Controller: gets the related docs from the schema data. 
+ * @param {array} relations - relations schema part.
+ * @param {string} id - Id of the current Doc.
+ * @param {string} type - Type of the collection.
+ * @return {promises array} resolved - related docs.
+ */
+export const getRelatedDocsFromSchema = async (relations, id, type) => {
+  if (relations?.length > 0) {
+    let relatedDocs = []
+    const promises = []
+    relations.forEach((junction, i) => {
+      const { type2 } = getTypes(junction.name, type)
+      if (junction.display === true) {
+        const promise = new Promise(async (resolve, reject) => {
+          const { type1, type2 } = getTypes(junction.name, type)
+          relatedDocs = await fetchRelatedDocs(
+            id,
+            junction.name,
+            type1,
+            type2
+          )
+          resolve({
+            content: [...relatedDocs],
+            collection: type2,
+            junctionName: junction.name
+          })
+        })
+        promises.push(promise)
+      } else {
+        const promise = new Promise(async (resolve, reject) => {
+          resolve({ junctionName: junction.name, collection: type2 })
+        })
+        promises.push(promise)
+      }
+    })
+    if (promises.length > 0) {
+      return await Promise.all(promises)
+    }
+  }
+}
+
+/**
+ * Controller: gets the relations from the schema data. 
+ * @param {string} type - Type of the collection.
+ * @return {promises array} relatedCollections - schema data about relations.
+ */
+export const getRelationsSchema = async (type) => {
+  const data = await getFullSchemaByType(type)
+  if (data.length > 0 && data[0].relations?.length > 0) {
+    const relatedCollections = []
+    data[0].relations.forEach((junction) => {
+      const { type2 } = getTypes(junction.name, type)
+      relatedCollections.push({ type: type2, junction: junction.name })
+    })
+    console.log(relatedCollections)
+    return relatedCollections
+  }
 }

@@ -10,21 +10,21 @@ import * as S from './styles'
 
 // Pages
 import Home from './pages/home'
-import UserPage from './pages/user'
-import CreateDoc from './pages/createDoc'
-import EditDoc from './pages/editDoc'
-import CreateCollection from './pages/createCollection'
-import DocsInCollection from './pages/docsInCollection'
-import Collections from './pages/collections'
-import EditCollection from './pages/editCollection'
-import UsersPage from './pages/users'
+import UserPage from './pages/user/user'
+import CreateDoc from './pages/createDoc/createDoc'
+import EditDoc from './pages/editDoc/editDoc'
+import CreateCollection from './pages/createCollection/createCollection'
+import DocsInCollection from './pages/docsInCollection/docsInCollection'
+import Collections from './pages/collections/collections'
+import EditCollection from './pages/editCollection/editCollection'
+import UsersPage from './pages/users/users'
 
 // custom admin pages
 // import StoreAdminPage from '../customAdminPages/store'
 import StoreAdminPage from '@/admin/customAdminPages/ecommerce'
 
 // Components
-import MediaLibrary from './pages/mediaLibrary'
+import MediaLibrary from './pages/mediaLibrary/mediaLibrary'
 import Sidebar from '@/admin/components/sidebar'
 
 // State

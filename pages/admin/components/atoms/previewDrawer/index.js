@@ -13,7 +13,7 @@ import Preview from '@/admin/components/preview'
 import { useDisclosure } from '@chakra-ui/hooks'
 import styled from 'styled-components'
 
-const PreviewDrawer = ({ onClick, content }) => {
+const PreviewDrawer = ({ content, onClick }) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   return (

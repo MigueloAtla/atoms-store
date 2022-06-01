@@ -13,3 +13,28 @@ export const getTypes = (junction, type) => {
   }
   return { type1, type2 }
 }
+
+export const docArrayToObject = (docArray) => {
+  const docObject = {}
+  docArray.map((doc, i) => {
+    docObject[doc[0]] = doc[1]
+  })
+  return docObject
+}
+export const docObjectToArray = (docObject) => {
+  const docArray = []
+  for (let key in docObject) {
+    docArray.push([key, docObject[key]])
+  }
+  return docArray
+}
+
+export const getDocTitle = (content) => {
+  return content
+    ? content.title
+      ? content.title.value
+      : content.name
+      ? content.name.value
+      : 'Unknown document'
+    : ''
+}

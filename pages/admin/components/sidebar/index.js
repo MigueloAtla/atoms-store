@@ -44,16 +44,13 @@ const Icons = {
 
 const Sidebar = () => {
   // uncomment THIS
-  // const role = useStoreRole(state => state.role)
-  const role = 'admin'
-  const setSelectedSidebarMenu = useStore(state => state.setSelectedSidebarMenu)
-  const toggleCollectionsPanel = useStore(state => state.toggleCollectionsPanel)
-  const setToggleCollectionsPanel = useStore(
-    state => state.setToggleCollectionsPanel
-  )
-  const setSelectedCollectionName = useStore(
-    state => state.setSelectedCollectionName
-  )
+  const role = useStoreRole(state => state.role)
+  const { 
+    setSelectedSidebarMenu, 
+    toggleCollectionsPanel, 
+    setToggleCollectionsPanel, 
+    setSelectedCollectionName
+  } = useStore(state => state)
       
   const [scale, setScale] = useState(1)
   const [rotate, setRotate] = useState(0)
@@ -65,9 +62,6 @@ const Sidebar = () => {
         templateCols='1fr'
         templateRows='200px 1fr 120px'
         height='100%'
-        // style={{
-        //   width: '90px'
-        // }}
       >
         {Areas => (
           <>

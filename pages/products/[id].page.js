@@ -56,7 +56,6 @@ export default function Product ({ product }) {
 
 export async function getStaticProps ({ params: { id } }) {
   const product = await getDocByID('products', id)
-  console.log(product)
 
   return {
     props: {
@@ -67,7 +66,6 @@ export async function getStaticProps ({ params: { id } }) {
 
 export async function getStaticPaths () {
   const products = await getCollection('products')
-  console.log(products)
   return {
     paths:
       products &&
