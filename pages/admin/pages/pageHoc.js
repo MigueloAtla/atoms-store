@@ -174,6 +174,19 @@ const withPageHoc = ({
       })
       return () => event.unsubscribe('onDocUpdated')
     }, [])
+
+    // after docs are deleted
+    useEffect(() => {
+      event.subscribe('onDocsDeleted', (event) => {
+        rest.setRerender && rest.setRerender(s => !s)
+        displayToast({
+          title: events.delete.msg,
+          description: events.delete.description
+        })
+        restEvents.delete && restEvents.delete()
+      })
+      return () => event.unsubscribe('onDocsDeleted')
+    }, [])
     
     // UI with loading state and transition animation
 

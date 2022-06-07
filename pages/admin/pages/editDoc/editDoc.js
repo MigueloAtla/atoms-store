@@ -1,6 +1,3 @@
-// React/Next
-import { useHistory } from 'react-router-dom'
-
 // Firebase
 import {
   getAndMapHiddenRelatedDocs
@@ -12,6 +9,7 @@ import DocFormFieldWrapper from '@/admin/components/layouts/docFormFieldWrapper'
 import { Box, Button } from '@chakra-ui/react'
 import AddRelatedDocModal from '@/admin/components/addRelatedDocModal'
 import AddedRelatedDocs from '@/admin/components/addedRelatedDocs'
+import { RelatedDocs } from '@/admin/components/relatedDocs'
 import DocForm from '@/admin/components/docForm'
 import * as Buttons from './buttons'
 
@@ -44,7 +42,6 @@ const Edit = ({
   removeList,
   setRemoveList
 }) => {
-  let history = useHistory()
 
   const showRelatedDocs = async junction => {
     // adds to the related docs array the hidden ones
@@ -69,21 +66,21 @@ const Edit = ({
 
           {/* Showing related Docs */}
           {relations.length > 0 &&
-            relations.map((relation, i) => {
+            relations.map((rel, i) => {
               return (
                 <DocFormFieldWrapper key={i}>
                   <Label w='100%'>
-                    {capitalizeFirstLetter(relation.collection)}
+                    {capitalizeFirstLetter(rel.collection)}
                   </Label>
-                  {'content' in relation ? (
+                  {'content' in rel ? (
                     <div>
                       
                       {/* modal to show the related type docs */}
                       <AddRelatedDocModal
-                        collection={relation.collection}
+                        collection={rel.collection}
                         type={type}
-                        junctionName={relation.junctionName}
-                        content={relation.content}
+                        junctionName={rel.junctionName}
+                        content={rel.content}
                         id={id}
                         setSelectedRowIds={setSelectedRowIds}
                       />
@@ -91,76 +88,28 @@ const Edit = ({
                       {/* related docs, selected from the modal, before save to db */}
                       <AddedRelatedDocs
                         selectedRowIds={selectedRowIds}
-                        relatedDocType={relation.collection}
+                        relatedDocType={rel.collection}
                         type={type}
                         setSelectedRowIds={setSelectedRowIds}
                       />
 
                       {/* related docs already added on db  */}
-                      {relation.content.map(doc => {
-                        let composedId
-                        const spliceRelations = relation.junctionName.split(
-                          '_'
-                        )
-                        if (spliceRelations[1] === type) {
-                          composedId = `${id}_${doc.id}`
-                        } else {
-                          composedId = `${doc.id}_${id}`
-                        }
-                        const ids = removeList.map(el => el.id)
-
-                        return (
-                          <div
-                            key={doc.id}
-                            onClick={e => {
-                              history.push(
-                                `/admin/${relation.collection}/${doc.id}`
-                              )
-                            }}
-                            style={{
-                              backgroundColor: ids.includes(composedId) ? '#000' : '#fff',
-                            }}
-                          >
-                            {Object.keys(doc).map((docField, i) => {
-                              if (docField !== 'id') {
-                                return (
-                                  <p key={i}>
-                                    {docField}: {doc[docField].value}
-                                  </p>
-                                )
-                              }
-                            })}
-                            {ids.includes(composedId) ? <Button
-                              onClick={e => {
-                                e.stopPropagation()
-                                let filtered_removelist = removeList.filter(el => el.id !== composedId)
-                                setRemoveList(() => [...filtered_removelist])
-                              }}
-                            >
-                              Undo Delete
-                            </Button>
-                            :
-                            <Button
-                              onClick={e => {
-                                e.stopPropagation()
-                                setRemoveList((prevState) => [...prevState, {id: composedId, junction: relation.junctionName}])
-                              }}
-                            >
-                              Delete
-                            </Button>
-                            }
-                          </div>
-                        )
-                      })}
+                      <RelatedDocs 
+                        relation={rel} 
+                        removeList={removeList}
+                        setRemoveList={setRemoveList} 
+                        type={type} 
+                        id={id} 
+                      />
                     </div>
                   ) : (
                     <div>
                       <Button
                         onClick={() => {
-                          showRelatedDocs(relation.junctionName)
+                          showRelatedDocs(rel.junctionName)
                         }}
                       >
-                        show {relation.collection}
+                        show {rel.collection}
                       </Button>
                     </div>
                   )}

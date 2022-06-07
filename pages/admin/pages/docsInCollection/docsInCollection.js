@@ -21,7 +21,8 @@ import { useInitialHook } from './initialHook'
 const DocsInCollection = ({
   data, 
   columns,
-  type
+  type,
+  setRemoveList
 }) => {
   let history = useHistory()
   const setId = useStore(state => state.setId)
@@ -40,6 +41,7 @@ const DocsInCollection = ({
           data={data}
           type={type}
           onClick={onClick}
+          setRemoveList={setRemoveList}
         />
       ) : (
         <Flex w='100%' h='100%' justify='center' align='center'>
@@ -59,6 +61,10 @@ export default withPageHoc({
   buttons: Buttons,
   events: {
     load: 'collection',
+    delete: {
+      msg: 'Documents deleted successfully',
+      description: 'Alright!'
+    }
   },
   allowed_roles: ['admin', 'editor'],
 })(DocsInCollection)

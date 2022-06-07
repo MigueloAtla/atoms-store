@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import {
-  deletePost,
+  deleteDoc,
   fetchRelatedDocs,
   getFullSchemaByType,
   deleteRelatedDoc
@@ -65,7 +65,7 @@ const DeleteRowButton = ({
       onClick={e => {
         e.stopPropagation()
         deleteRelations()
-        deletePost(id, selectedCollectionName)
+        deleteDoc(id, selectedCollectionName)
         setRerender(s => !s)
       }}
     >

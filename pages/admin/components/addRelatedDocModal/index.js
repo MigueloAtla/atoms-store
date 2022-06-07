@@ -31,6 +31,8 @@ const AddRelatedDocModal = ({
   const selectedRowOnTable = useRef([])
   const { data, columns } = usePrepareTable({ collection: relatedCollection })
 
+  console.log('relatedCollection', relatedCollection)
+
   const getRelationCollection = () => {
     getCollection(collection).then(r => {
       setRelatedCollection(r)

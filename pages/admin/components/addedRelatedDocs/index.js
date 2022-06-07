@@ -9,8 +9,10 @@ const AddedRelatedDocs = ({
 }) => {
   return (
     <div>
-      {selectedRowIds.length > 0 &&
-        selectedRowIds.map((selected, i) => {
+      {selectedRowIds.length > 0 && (
+      <>
+        <div>Will be added: </div>
+        {selectedRowIds.map((selected, i) => {
           return Object.keys(selected).map(key => {
             let spliceRelations = key.split('_')
             let type1, type2
@@ -25,18 +27,19 @@ const AddedRelatedDocs = ({
               return selected[key].map((s, i) => {
                 return (
                   <Flex
-                    key={i}
-                    height='50px'
-                    mt='20px'
-                    justifyContent='space-between'
+                  key={i}
+                  height='50px'
+                  mt='20px'
                   >
-                    {Object.keys(s).map((subkey, i) => {
+                    <div>{s.id}</div>
+
+                    {/* {Object.keys(s).map((subkey, i) => {
                       return (
                         <div key={i}>
                           <div>{s[subkey]}</div>
                         </div>
                       )
-                    })}
+                    })} */}
                     <Button
                       height='30px'
                       onClick={() => {
@@ -63,7 +66,10 @@ const AddedRelatedDocs = ({
               })
             }
           })
-        })}
+        })
+      }
+      </>
+      )}
     </div>
   )
 }

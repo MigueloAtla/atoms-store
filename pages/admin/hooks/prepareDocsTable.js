@@ -3,6 +3,7 @@ import { Box } from '@chakra-ui/react'
 import styled from 'styled-components'
 import Img from 'react-cool-img'
 import DeleteRowButton from '@/admin/atoms/deleteRowButton'
+import SelectForDeleteRelationButton from '@/admin/atoms/selectForDeleteRelationButton'
 
 const usePrepareTable = ({ collection, deleteCol = false }) => {
   // Prepare columns
@@ -19,12 +20,12 @@ const usePrepareTable = ({ collection, deleteCol = false }) => {
         accessor: f
       })
     })
-    deleteCol &&
-      arr.push({
-        Header: 'Delete',
-        accesor: 'id',
-        Cell: DeleteRowButton
-      })
+    // deleteCol &&
+    //   arr.push({
+    //     Header: 'Delete',
+    //     accesor: 'id',
+    //     Cell: DeleteRowButton
+    //   })
   }
 
   const columns = useMemo(() => arr, [arr])

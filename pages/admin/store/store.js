@@ -15,6 +15,10 @@ const store = set => ({
   mediaLibraryView: 'table',
   selectedSidebarMenu: 'home',
   toggleCollectionsPanel: false,
+  removeList: [],
+  composedId: '',
+  relation: {},
+  composedId: '',
   // actions
   setCollections: data => set({ collections: data }),
   setCollectionData: data => set({ collectionData: data }),
@@ -31,9 +35,13 @@ const store = set => ({
   },
   setMediaLibraryView: data => set({ mediaLibraryView: data }),
   setSelectedSidebarMenu: data => set({ selectedSidebarMenu: data }),
-  setToggleCollectionsPanel: data => set({ toggleCollectionsPanel: data })
+  setToggleCollectionsPanel: data => set({ toggleCollectionsPanel: data }),
+  setRemoveList: data => set({ removeList: data }),
+  setComposedId: data => set({ composedId: data }),
+  setRelation: data => set({ relation: data }),
+  setComposedId: data => set({ composedId: data })
 })
 
-const useStore = create(devtools(store))
+const useStore = create(store)
 
 export default useStore

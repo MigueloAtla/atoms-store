@@ -135,17 +135,6 @@ export const addPost = ({ content }) => {
     createdAt: firebase.firestore.Timestamp.fromDate(new Date())
   })
 }
-export const deletePost = (id, collection) => {
-  db.collection(collection)
-    .doc(id)
-    .delete()
-    .then(() => {
-      console.log('Document successfully deleted!')
-    })
-    .catch(error => {
-      console.error('Error removing document: ', error)
-    })
-}
 
 export const uploadImage = file => {
   const ref = firebase.storage().ref(`images/${file.name}`)
@@ -685,6 +674,35 @@ export const getDoc = (id, type) => {
       return sortDoc(snapshot.data())
       // return snapshot.data()
     })
+}
+
+/**
+ * Deletes a Document.
+ * @param {string} id - Id of the Document.
+ * @param {string} collection - Name of the collection.
+ */
+export const deleteDoc = (id, collection) => {
+  db.collection(collection)
+    .doc(id)
+    .delete()
+    .then(() => {
+      console.log('Document successfully deleted!')
+    })
+    .catch(error => {
+      console.error('Error removing document: ', error)
+    })
+}
+
+/**
+ * Deletes a list of Documents.
+ * @param {array} docs - List of Documents.
+ * @param {string} collection - Name of the collection.
+ */
+export const deleteDocs = (docs, collection) => {
+  docs.forEach(id => {
+    deleteDoc(id, collection)
+  })
+  event.dispatch('onDocsDeleted')
 }
 
 /**

@@ -1,11 +1,12 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 
 import {
   useTable,
   useFilters,
   useGlobalFilter,
   useAsyncDebounce,
-  usePagination
+  usePagination,
+  useRowSelect
 } from 'react-table'
 
 // import { useHistory } from 'react-router-dom'
@@ -80,7 +81,11 @@ function Table ({
   clickRowData = 'id',
   rowHeight = '100px',
   footer = true,
-  fixedFooter = true
+  fixedFooter = true,
+  setRemoveList= () => {},
+  junctionName = '',
+  id = '',
+  styleType = ''
   }) {
   const filterTypes = React.useMemo(
     () => ({
@@ -105,6 +110,32 @@ function Table ({
     []
   )
 
+  const IndeterminateCheckbox = React.forwardRef(
+    ({ indeterminate, ...rest }, ref) => {
+      const defaultRef = React.useRef()
+      const resolvedRef = ref || defaultRef
+  
+      React.useEffect(() => {
+        resolvedRef.current.indeterminate = indeterminate
+      }, [resolvedRef, indeterminate])
+  
+      return (
+        <>
+          <input 
+            type="checkbox" 
+            ref={resolvedRef} 
+            {...rest} 
+            style={{
+              position: 'absolute',
+              left: 'calc(50% - 6px)',
+              top: 'calc(50% - 6px)'
+            }}
+          />
+        </>
+      )
+    }
+  )
+
   const {
     getTableProps,
     getTableBodyProps,
@@ -124,7 +155,8 @@ function Table ({
     nextPage,
     previousPage,
     setPageSize,
-    state: { pageIndex, pageSize }
+    selectedFlatRows,
+    state: { pageIndex, pageSize, selectedRowIds }
   } = useTable(
     {
       columns,
@@ -139,12 +171,73 @@ function Table ({
     },
     useFilters, // useFilters!
     useGlobalFilter, // useGlobalFilter!
-    usePagination
+    usePagination,
+    useRowSelect,
+    hooks => {
+      hooks.visibleColumns.push(columns => [
+        // Let's make a column for selection
+        {
+          id: 'selection',
+          // The header can use the table's getToggleAllRowsSelectedProps method
+          // to render a checkbox
+          Header: ({ getToggleAllRowsSelectedProps }) => (
+            <div>
+              <IndeterminateCheckbox {...getToggleAllRowsSelectedProps()} />
+            </div>
+          ),
+          // The cell can use the individual row's getToggleRowSelectedProps method
+          // to the render a checkbox
+          Cell: ({ row }) => (
+            <div>
+              <IndeterminateCheckbox {...row.getToggleRowSelectedProps()} />
+            </div>
+          ),
+        },
+        ...columns,
+      ])
+    }
   )
+
+  useEffect(() => {
+    if(junctionName !== '') {
+
+      const spliceRelations = junctionName.split(
+        '_'
+        )
+      const values = selectedFlatRows.map(row => {
+        if (spliceRelations[1] === type) {
+          return { id: `${id}_${row.values.id}`, junction: junctionName }
+        } else {
+          return { id: `${row.values.id}_${id}`, junction: junctionName }
+        }
+      })
+      
+      if(values.length === 0) setRemoveList([])
+      else setRemoveList((prevState) => [...prevState, ...values])
+    
+    }
+    else {
+      const values = selectedFlatRows.map(row => row.values.id)
+      setRemoveList([...values])
+    }
+  }, [selectedRowIds])
+
+  // table styled
+  const TableStyledComp = styleType === 'relatedDocs' ? 
+    styled(TableStyled)`
+      padding: 0;
+      margin: 0;
+      border: 1px solid #c6c6c6;
+      border-radius: 5px;
+      width: 100%;
+    ` : 
+    styled(TableStyled)`
+      // some specific styles
+    `
 
   return (
     <>
-      <TableStyled rowHeight={rowHeight} compact={compact}>
+      <TableStyledComp rowHeight={rowHeight} compact={compact}>
         <GlobalFilter
           preGlobalFilteredRows={preGlobalFilteredRows}
           globalFilter={state.globalFilter}
@@ -249,7 +342,7 @@ function Table ({
             ))}
           </Select>
         </PaginationStyled>}
-      </TableStyled>
+      </TableStyledComp>
     </>
   )
 }
