@@ -41,11 +41,11 @@ export const TableStyled = styled.div`
       height: 50px;
       box-shadow: 0px 3px 3px rgb(0 0 0 / 5%);
       tr {
-        background-color: white;
+        /* background-color: white; */
         th {
           position: sticky;
           top: 0;
-          color: black;
+          /* color: black; */
           text-transform: capitalize;
           text-align: left;
           :last-child {
@@ -57,7 +57,7 @@ export const TableStyled = styled.div`
 
     tbody {
       tr {
-        background-color: white;
+        /* background-color: white; */
         height: ${({rowHeight}) => rowHeight};
         :last-child {
           td {
@@ -67,12 +67,12 @@ export const TableStyled = styled.div`
         cursor: pointer;
         :hover {
           /* background-color: #efefef; */
-          background: rgb(236, 236, 241);
+          /* background: rgb(236, 236, 241);
           background: linear-gradient(
             314deg,
             rgba(236, 236, 241, 1) 0%,
             rgba(210, 210, 210, 1) 100%
-          );
+          ); */
         }
       }
     }

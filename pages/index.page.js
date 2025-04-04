@@ -2,7 +2,7 @@ import Head from 'next/head'
 import Img from 'react-cool-img'
 
 import { makeAdmin } from 'firebase/client'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useUser } from '@/hooks/useUser'
 
 export default function Home () {

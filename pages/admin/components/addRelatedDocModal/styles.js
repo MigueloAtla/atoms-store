@@ -7,7 +7,7 @@ export const ModalStyled = styled(Modal)`
 `
 
 export const ModalContentStyled = styled(ModalContent)`
-  background-color: #ffffffd1;
+  /* background-color: #ffffffd1; */
   backdrop-filter: blur(10px);
   overflow: hidden;
   margin: 0;

@@ -27,13 +27,13 @@
       {
         "type": "link",
         "route": "/admin/collections",
-        "menu": "collectionslist",
+        "menu": "collections",
         "icon": "AddIcon"
       },
       {
         "type": "link",
         "route": "/admin/media-library",
-        "menu": "medialibrary",
+        "menu": "media-library",
         "icon": "FaImages"
       },
       {

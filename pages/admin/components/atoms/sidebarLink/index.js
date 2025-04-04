@@ -14,10 +14,10 @@ const SidebarLink = ({ children, menu, ...props }) => {
   // uncomment THIS
   // const role = useStoreRole(state => state.role)
   const role = 'admin'
-  const selectedSidebarMenu = useStore(state => state.selectedSidebarMenu)
+  const { selectedMenuName } = useStore(state => state)
 
   return (
-    <SidebarLinkStyled text={sidebarconfig[role].display.text} active={menu === selectedSidebarMenu ? 1 : 0} {...props}>
+    <SidebarLinkStyled text={sidebarconfig[role].display.text} active={menu === selectedMenuName ? 1 : 0} {...props}>
       {children}
     </SidebarLinkStyled>
   )

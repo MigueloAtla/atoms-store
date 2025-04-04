@@ -1,10 +1,16 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
+import {
+  Tr
+} from '@chakra-ui/react'
 
 export default function TableTr ({ onClick, row }) {
   // const [scale, setScale] = useState(1)
   return (
-    <tr
+    <Tr bg='secondary_bg'
+    _hover={{
+      background: 'hover',
+    }}
       // onMouseDown={() => {
       //   setScale(0.97)
       // }}
@@ -33,12 +39,12 @@ export default function TableTr ({ onClick, row }) {
           </TdStyled>
         )
       })}
-    </tr>
+    </Tr>
   )
 }
 
+
 const TdStyled = styled.td`
-  // background-color: ${({seen}) => seen === false && '#18282b'};
   max-width: 100px;
   max-height: 100px;
   overflow: hidden;

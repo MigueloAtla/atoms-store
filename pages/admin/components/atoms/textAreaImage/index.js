@@ -82,7 +82,8 @@ const TextAreaImage = ({ name, isRequired }) => {
         <ModalMediaLibrary setImgURL={setImgURL} />
       </Box>
       <Box>
-        <TextAreaImageStyled
+        <TextAreaImageStyled bg={ drag === DRAG_IMAGE_STATES.DRAG_OVER ? 'background' : 'secondary_bg'}
+
           data-testid='dropimage'
           drag={drag}
           rows='2'

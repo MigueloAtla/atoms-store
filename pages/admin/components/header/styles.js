@@ -1,7 +1,9 @@
 import styled from 'styled-components'
+import { Flex } from '@chakra-ui/react'
 
-export const HeaderStyled = styled.header`
-  background-color: #ffffffed;
+export const HeaderStyled = styled(Flex)`
+  user-select: none;
+  /* background-color: #ffffffed; */
   display: grid;
   grid-template-columns: 80px 1fr auto;
   gap: 6px;

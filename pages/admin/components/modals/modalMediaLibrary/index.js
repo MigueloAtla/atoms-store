@@ -58,7 +58,7 @@ const ModalImages = ({ setImgURL }) => {
       </Button>
       <Modal onClose={onClose} isOpen={isOpen} isCentered>
         <ModalOverlay />
-        <ModalContentStyled minW='50vw'>
+        <ModalContentStyled bg='backdrop_bg' minW='50vw'>
           <ModalHeader>Images in Media Library</ModalHeader>
           <ModalCloseButton />
           <ModalBody my='50' mx='10' bg='#efefef5e' p='40px' borderRadius='5px'>
@@ -123,7 +123,7 @@ const ImageWrapper = styled(Box)`
   }
 `
 const ModalContentStyled = styled(ModalContent)`
-  background-color: #ffffffd1;
+  /* background-color: #ffffffd1; */
   backdrop-filter: blur(10px);
   overflow: hidden;
 `

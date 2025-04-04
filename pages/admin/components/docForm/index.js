@@ -47,7 +47,7 @@ const DocForm = ({
             let expanded = expandedEditor && isEditor
             return (
               name !== 'seen' &&
-              <DocFormFieldWrapper key={i} $expanded={expanded ? 1 : 0}>
+              <DocFormFieldWrapper bg='secondary_bg' key={i} $expanded={expanded ? 1 : 0}>
                 <Label w='100%' key={i}>
                   {capitalizeFirstLetter(name)}
                 </Label>

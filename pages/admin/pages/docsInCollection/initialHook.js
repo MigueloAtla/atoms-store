@@ -33,9 +33,9 @@ export const useInitialHook = () => {
     getCollection(type).then(c => {
       setCollectionData(c)
     })
-    if (selectedCollectionName === '') {
-      setSelectedCollectionName(type)
-    }
+    // if (selectedCollectionName === '') {
+    //   setSelectedCollectionName(type)
+    // }
   }, [rerender])
 
   return {

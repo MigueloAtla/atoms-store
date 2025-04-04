@@ -3,7 +3,7 @@ import { Box, Flex } from '@chakra-ui/layout'
 import styled from 'styled-components'
 
 const DocFormFieldWrapper = styled(Box)`
-  background-color: white;
+  // background-color: white;
   border-radius: 10px;
   padding: 20px;
   // margin-top: ${({ $expanded }) => $expanded === 0 && '30px'};

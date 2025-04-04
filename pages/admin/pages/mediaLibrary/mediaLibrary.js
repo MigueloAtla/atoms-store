@@ -67,6 +67,7 @@ const MediaLibrary = ({
               images.urls.map((image, i) => {
                 return (
                   <ImageWrapperStyled
+                    bg='secondary_bg'
                     key={i}
                     direction='column'
                     p='10px'
@@ -99,7 +100,7 @@ const MediaLibrary = ({
 
       <Drawer onClose={onClose} isOpen={isOpen} size={'xs'}>
         <OverlayStyled />
-        <ContentStyled w='100%' maxW='calc(50vw)'>
+        <ContentStyled bg="backdrop_bg" w='100%' maxW='calc(50vw)'>
           <DrawerBody p='0'>
             {isOpen && (
               <>
@@ -157,7 +158,7 @@ const ImageWrapperStyled = styled(Flex)`
   padding: 10px;
   width: 200px;
   cursor: pointer;
-  background-color: white;
+  /* background-color: white; */
   margin: 20px;
   border-radius: 10px;
   padding: 20px;
@@ -175,7 +176,7 @@ const ImageExpanded = styled(Flex)`
 `
 
 const ContentStyled = styled(DrawerContent)`
-  background-color: #ffffffde;
+  /* background-color: #ffffffde; */
   backdrop-filter: blur(5px);
 `
 const OverlayStyled = styled(DrawerOverlay)`

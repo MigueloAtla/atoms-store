@@ -11,7 +11,7 @@ import LoaderScreen from '@/admin/atoms/loadScreen'
 
 // hooks
 import { useDisplayToast } from '@/admin/hooks/toast'
-import { useHistory } from 'react-router-dom'
+import { useHistory, useLocation } from 'react-router-dom'
 import useRole from '@/admin/hooks/useRole'
 
 // store
@@ -45,11 +45,16 @@ const withPageHoc = ({
 
     const { 
       loading,
-      setLoading  
+      setLoading,
+      selectedCollectionName,
+      setSelectedCollectionName,
+      selectedMenuName,
+      setSelectedMenuName
     } = useStore(state => state)
     
     const displayToast = useDisplayToast()
     const history = useHistory()
+    let location = useLocation()
     
     const { isAllowed } = useRole(allowed_roles)
 
@@ -78,15 +83,27 @@ const withPageHoc = ({
       ...restEvents
     } = events.hook({...rest, ...restForm})
 
+    // useEffect(() => {
+    //   console.log('selectedCollectionName', selectedCollectionName)
+    // }, [selectedCollectionName])
+
     useEffect(() => {
       !isAllowed(allowed_roles) && history.push('/admin') 
       events.load !== null && setLoading(true)
+      
+      if(selectedMenuName === '') {
+        let menu = location.pathname.replace('/admin/', '').replace(/\/\w+/, '')
+        setSelectedMenuName(menu)
+      }
+
+      if (selectedCollectionName === '') {
+        setSelectedCollectionName(rest.type)
+      }
     }, [])
 
     // after users are loaded
     useEffect(() => {
       event.subscribe('onUsersLoaded', () => {
-        console.log('after users are loaded')
         events.load === 'users' && setLoading(false)
         // restEvents.load && restEvents.load()
       })

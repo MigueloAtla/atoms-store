@@ -10,6 +10,11 @@ function MyApp ({ Component, pageProps }) {
     <ThemeProvider theme={theme}>
       {!pathname.includes('/admin') && <Header />}
       <Component {...pageProps} />
+      <style jsx global>{`
+        .firebase-emulator-warning {
+          display: none !important;
+        }
+      `}</style>
     </ThemeProvider>
   )
 }

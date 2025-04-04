@@ -18,7 +18,8 @@ const Header = ({ back, title, children, width }) => {
   let history = useHistory()
 
   return (
-    <HeaderStyled
+    <HeaderStyled 
+      bg='backdrop_bg'
       width={toggleCollectionsPanel ? 201 : 91}
       expanded={expandedEditor}
       data-testid='header'

@@ -401,8 +401,11 @@ export const updateSchema = async data => {
 }
 // Update docs
 export const updateDocs = async (new_data, old_data, type) => {
+  console.log("🚀 ~ file: client.js:404 ~ updateDocs ~ type:", type)
+  console.log("🚀 ~ file: client.js:404 ~ updateDocs ~ old_data:", old_data)
+  console.log("🚀 ~ file: client.js:404 ~ updateDocs ~ new_data:", new_data)
   // update Schema
-  console.log(new_data)
+  
   await db
     .collection('collectionList')
     .limit(1)
@@ -449,8 +452,6 @@ export const deleteFields = async (name, type) => {
 
   const deleted = await db
     .collection('collectionList')
-    // .doc('OjUAtyfsIW6ECoryEovP')
-    // .get()
     .limit(1)
     .get()
     .then(snapshot => {
@@ -471,10 +472,6 @@ export const deleteFields = async (name, type) => {
   // update test ** need to update test.schema
   await db
     .collection('collectionList')
-    // .doc('OjUAtyfsIW6ECoryEovP')
-    // .update({
-    //   [type]: new_data
-    // })
     .limit(1)
     .get()
     .then(snapshot => {
@@ -806,6 +803,9 @@ export const addByCollectionType = (type, content) => {
  * @param {object} content - The content of the collection.
  */
 export const addByCollectionTypeWithCustomIDBatched = (type, ids, content) => {
+  console.log("🚀 ~ file: client.js:812 ~ addByCollectionTypeWithCustomIDBatched ~ content:", content)
+  console.log("🚀 ~ file: client.js:812 ~ addByCollectionTypeWithCustomIDBatched ~ ids:", ids)
+  console.log("🚀 ~ file: client.js:812 ~ addByCollectionTypeWithCustomIDBatched ~ type:", type)
   const batch = db.batch()
   ids.map((id, i) => {
     let docRef = db.collection(type).doc(id)
@@ -959,6 +959,10 @@ export const fetchRelatedDocs = async (id, junction, type, type2) => {
  * @return {array} newState - New state with the new relations.
  */
 export const getAndMapHiddenRelatedDocs = async (id, junction, type, relations) => {
+  console.log("🚀 ~ file: client.js:968 ~ getAndMapHiddenRelatedDocs ~ relations:", relations)
+  console.log("🚀 ~ file: client.js:968 ~ getAndMapHiddenRelatedDocs ~ type:", type)
+  console.log("🚀 ~ file: client.js:968 ~ getAndMapHiddenRelatedDocs ~ junction:", junction)
+  console.log("🚀 ~ file: client.js:968 ~ getAndMapHiddenRelatedDocs ~ id:", id)
   const { type1, type2 } = getTypes(junction, type)
   const relationsFetched = await fetchRelatedDocs(id, junction, type1, type2)
   const prevState = relations

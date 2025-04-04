@@ -13,12 +13,14 @@ const store = set => ({
   smallImageEditor: false,
   expandedEditor: false,
   mediaLibraryView: 'table',
-  selectedSidebarMenu: 'home',
+  selectedSidebarMenu: '',
   toggleCollectionsPanel: false,
   removeList: [],
   composedId: '',
   relation: {},
   composedId: '',
+  selectedMenuName: '',
+  colorTheme: '',
   // actions
   setCollections: data => set({ collections: data }),
   setCollectionData: data => set({ collectionData: data }),
@@ -39,7 +41,9 @@ const store = set => ({
   setRemoveList: data => set({ removeList: data }),
   setComposedId: data => set({ composedId: data }),
   setRelation: data => set({ relation: data }),
-  setComposedId: data => set({ composedId: data })
+  setComposedId: data => set({ composedId: data }),
+  setSelectedMenuName: data => set({ selectedMenuName: data }),
+  setColorTheme: data => set({ colorTheme: data }),
 })
 
 const useStore = create(store)

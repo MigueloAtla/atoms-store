@@ -7,7 +7,19 @@ import {
   useGlobalFilter,
   useAsyncDebounce
 } from 'react-table'
-import { Input, InputGroup } from '@chakra-ui/react'
+import { 
+  Input, 
+  InputGroup,
+  Table as TableComp,
+  Thead,
+  Tbody,
+  Tfoot,
+  Tr,
+  Th,
+  Td,
+  TableCaption,
+  TableContainer,
+ } from '@chakra-ui/react'
 import { useHistory } from 'react-router-dom'
 
 // Define a default UI for filtering
@@ -167,16 +179,16 @@ const Table = ({ columns, data, onSelectRow, type, setSelectedLength }) => {
         globalFilter={state.globalFilter}
         setGlobalFilter={setGlobalFilter}
       />
-      <table {...getTableProps()}>
+      <TableComp {...getTableProps()}>
         <thead>
           {headerGroups.map((headerGroup, i) => (
-            <tr key={i} {...headerGroup.getHeaderGroupProps()}>
+            <Tr bg='secondary_bg' key={i} {...headerGroup.getHeaderGroupProps()}>
               {headerGroup.headers.map((column, i) => (
                 <th key={i} {...column.getHeaderProps()}>
                   {column.render('Header')}
                 </th>
               ))}
-            </tr>
+            </Tr>
           ))}
         </thead>
         <tbody {...getTableBodyProps()}>
@@ -184,7 +196,8 @@ const Table = ({ columns, data, onSelectRow, type, setSelectedLength }) => {
           {rows.slice(0, 10).map((row, i) => {
             prepareRow(row)
             return (
-              <tr
+              <Tr
+                bg='secondary_bg'
                 key={i}
                 {...row.getRowProps()}
                 onClick={e => {
@@ -205,11 +218,11 @@ const Table = ({ columns, data, onSelectRow, type, setSelectedLength }) => {
                     </td>
                   )
                 })}
-              </tr>
+              </Tr>
             )
           })}
         </tbody>
-      </table>
+      </TableComp>
     </TableStyled>
   )
 }
@@ -251,7 +264,7 @@ export const TableStyled = styled.div`
       table-layout: fixed;
       display: table;
       tr {
-        background-color: white;
+        /* background-color: white; */
         display: table;
         table-layout: fixed;
         width: 100%;
@@ -278,7 +291,7 @@ export const TableStyled = styled.div`
       scrollbar-width: none; /* for Firefox */
       overflow-y: scroll;
       tr {
-        background-color: white;
+        /* background-color: white; */
         height: 60px;
         display: table;
         table-layout: fixed;

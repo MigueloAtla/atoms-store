@@ -13,6 +13,17 @@ import {
 import { Input, HStack, Select } from '@chakra-ui/react'
 import { IconButton } from '@chakra-ui/react'
 import {
+  Table as TableComp,
+  Thead,
+  Tbody,
+  Tfoot,
+  Tr,
+  Th,
+  Td,
+  TableCaption,
+  TableContainer,
+} from '@chakra-ui/react'
+import {
   ChevronLeftIcon,
   ChevronRightIcon,
   ArrowLeftIcon,
@@ -243,8 +254,8 @@ function Table ({
           globalFilter={state.globalFilter}
           setGlobalFilter={setGlobalFilter}
         />
-        <table {...getTableProps()}>
-          <thead>
+        <TableComp {...getTableProps()}>
+          <Thead bg='secondary_bg'>
             {headerGroups.map((headerGroup, i) => (
               <tr key={i} {...headerGroup.getHeaderGroupProps()}>
                 {headerGroup.headers.map((column, i) => {
@@ -256,7 +267,7 @@ function Table ({
                 })}
               </tr>
             ))}
-          </thead>
+          </Thead>
           <tbody {...getTableBodyProps()}>
             {page.map((row, i) => {
               prepareRow(row)
@@ -276,10 +287,16 @@ function Table ({
               )
             })}
           </tbody>
-        </table>
+        </TableComp>
         {
           footer &&
-          <PaginationStyled spacing='24px' justify='center' fixedFooter={fixedFooter}>
+          <PaginationStyled 
+            bg='secondary_bg'
+            borderTop='1px solid'
+            borderColor='background'
+            spacing='24px' 
+            justify='center' 
+            fixedFooter={fixedFooter}>
           <IconButton
             size='xs'
             outlineColor='#11101d'
@@ -356,10 +373,10 @@ const PaginationStyled = styled(HStack)`
   left: ${({fixedFooter}) => fixedFooter ? '66px': '0'};
   right: ${({fixedFooter}) => fixedFooter ? '0': 'unset'};
 
-  background-color: white;
+  /* background-color: white; */
   margin: 0 10px;
   /* margin-top: 24px; */
   /* width: 100%; */
   height: 40px;
-  border-top: 1px solid #bcbcbc;
+  /* border-top: 1px solid; */
 `

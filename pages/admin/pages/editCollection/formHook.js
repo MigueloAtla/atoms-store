@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useForm, useFieldArray } from 'react-hook-form'
 
 export const useFormHook = ({
-  schema
+  schema, type
 }) => {
   const [fieldArr, setFieldArr] = useState([])
   useEffect(() => {

@@ -1,5 +1,4 @@
 // React / Next
-import React, { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 
 // Firebase
@@ -7,6 +6,7 @@ import { getCollection } from '@/firebase/client'
 
 // Styles
 import * as S from './styles'
+import styled from 'styled-components'
 
 // Components
 import { Flex, Text, Divider } from '@chakra-ui/react'
@@ -17,17 +17,20 @@ import useStore from '@/admin/store/store'
 const CollectionsList = () => {
   const collections = useStore(state => state.collections)
   const setCollectionData = useStore(state => state.setCollectionData)
-  const setSelectedCollectionName = useStore(
-    state => state.setSelectedCollectionName
-  )
-  const selectedCollectionName = useStore(state => state.selectedCollectionName)
-  const setSelectedSidebarMenu = useStore(state => state.setSelectedSidebarMenu)
+  const { 
+    setSelectedCollectionName, 
+    setSelectedMenuName,
+    setSelectedSidebarMenu,
+    selectedCollectionName,
+    selectedMenuName } = useStore(state => state)
+  // const selectedCollectionName = useStore(state => state.selectedCollectionName)
+  // const setSelectedSidebarMenu = useStore(state => state.setSelectedSidebarMenu)
 
   return (
     <Flex direction='column' height='100%' width='100%'>
-      <Text color='white' fontWeight='bold' my='10px' textAlign='center'>
+      <CollectionListSectionTitle>
         Pages
-      </Text>
+      </CollectionListSectionTitle>
       {collections !== undefined &&
         collections.length > 0 &&
         collections.map((collection, i) => {
@@ -39,12 +42,14 @@ const CollectionsList = () => {
                 onClick={() => {
                   setSelectedCollectionName(collection.name)
                   setSelectedSidebarMenu('collections')
+                  setSelectedMenuName(collection.name)
                 }}
               >
                 <CollectionsListItem
                   collection={collection.name}
                   setCollectionData={setCollectionData}
                   selectedCollectionName={selectedCollectionName}
+                  selectedMenuName={selectedMenuName}
                   key={i}
                 />
               </Link>
@@ -52,9 +57,9 @@ const CollectionsList = () => {
           }
         })}
       <Divider mt='30px' />
-      <Text color='white' fontWeight='bold' my='10px' textAlign='center'>
+      <CollectionListSectionTitle>
         Collections
-      </Text>
+      </CollectionListSectionTitle>
       {collections !== undefined &&
         collections.length > 0 &&
         collections.map((collection, i) => {
@@ -79,10 +84,19 @@ const CollectionsList = () => {
   )
 }
 
+const CollectionListSectionTitle = styled(Text)`
+  user-select: none;
+  color: white;
+  font-weight: bold;
+  margin: 10px 0;
+  text-align: center;
+`
+
 const CollectionsListItem = ({
   collection,
   setCollectionData,
-  selectedCollectionName
+  selectedCollectionName,
+  selectedMenuName
 }) => {
   const setLoading = useStore(state => state.setLoading)
   const handleClick = () => {
@@ -94,7 +108,7 @@ const CollectionsListItem = ({
   }
   return (
     <S.CollectionsListItem
-      active={collection === selectedCollectionName}
+      active={collection === selectedMenuName}
       onClick={handleClick}
     >
       {collection}

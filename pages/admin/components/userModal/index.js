@@ -17,7 +17,7 @@ export const UserModal = ({ onClose, isOpen, openUser, onSubmit, register }) => 
   return (
     <Modal onClose={onClose} isOpen={isOpen} isCentered>
     <ModalOverlay />
-      <ModalContentStyled minW='50vw'>
+      <ModalContentStyled bg='backdrop_bg' minW='50vw'>
         <ModalHeader>User</ModalHeader>
         <ModalCloseButton />
         <ModalBody my='50' mx='10'>
@@ -41,7 +41,7 @@ export const UserModal = ({ onClose, isOpen, openUser, onSubmit, register }) => 
 
 
 const ModalContentStyled = styled(ModalContent)`
-  background-color: #ffffffd1;
+  /* background-color: #ffffffd1; */
   backdrop-filter: blur(10px);
   overflow: hidden;
 `

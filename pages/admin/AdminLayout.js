@@ -26,6 +26,7 @@ import StoreAdminPage from '@/admin/customAdminPages/ecommerce'
 // Components
 import MediaLibrary from './pages/mediaLibrary/mediaLibrary'
 import Sidebar from '@/admin/components/sidebar'
+import { Box, Flex } from '@chakra-ui/react'
 
 // State
 import useStore from './store/store'
@@ -54,7 +55,15 @@ export default function AdminLayout () {
 
   return (
     <Router>
-      <S.Layout
+      <S.Layout bg='background'>
+        <S.Sidebar>
+          <Sidebar />
+        </S.Sidebar>
+        <S.ContentLayout>
+          <AdminRoutes />
+        </S.ContentLayout>
+      </S.Layout>
+      {/* <S.Layout
         areas={areas.layout}
         templateCols={`${toggleCollectionsPanel ? 'auto' : 'auto'} 1fr`}
         templateRows='1fr'
@@ -76,7 +85,7 @@ export default function AdminLayout () {
             </Areas.Content>
           </>
         )}
-      </S.Layout>
+      </S.Layout> */}
     </Router>
   )
 }
@@ -95,7 +104,7 @@ const AdminRoutes = () => (
     <Route path='/admin/user-profile'>
       <UserPage />
     </Route>
-    <Route path='/admin/new-collection'>
+    <Route path='/admin/collections/create'>
       <CreateCollection />
     </Route>
     <Route path='/admin/collections'>

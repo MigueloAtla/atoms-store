@@ -64,7 +64,7 @@ const AddRelatedDocModal = ({
         isCentered
       >
         <ModalOverlay />
-        <ModalContentStyled minW='50vw' h='90vh'>
+        <ModalContentStyled minW='50vw' h='90vh' bg='backdrop_bg'>
           <ModalHeader>Select a {collection}</ModalHeader>
           <ModalCloseButton />
           <ModalBody>

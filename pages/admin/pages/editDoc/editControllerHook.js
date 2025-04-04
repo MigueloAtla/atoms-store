@@ -23,23 +23,14 @@ export const useControllerHook = () => {
   const [preview, setPreview] = useState()
 
   const { 
-    selectedCollectionName, 
     imgURL, 
     globalId,
-    // loading,
-    setSelectedCollectionName, 
     setImgURL, 
-    // setLoading  
   } = useStore(state => state)
 
   const { id, type } = useParams()
   
   useEffect(() => {
-    // hook for name selection
-    if (selectedCollectionName === '') {
-      setSelectedCollectionName(type)
-    }
-    // setLoading(true)
     getDoc(id, type).then(res => {
       setContentFormatted(res)
       setContent(docArrayToObject(res))
@@ -51,8 +42,9 @@ export const useControllerHook = () => {
     getFullSchemaByType(type).then(data => {
       // set preview functionality
       setPreview(data[0].page)
+
       // get relations data from the schema
-      getRelatedDocsFromSchema(data[0].relations, id, type).then(res => {
+      data[0].relations.length > 0 && getRelatedDocsFromSchema(data[0].relations, id, type).then(res => {
         setRelations([...res])
       })
     })

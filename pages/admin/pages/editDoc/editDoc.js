@@ -68,7 +68,7 @@ const Edit = ({
           {relations.length > 0 &&
             relations.map((rel, i) => {
               return (
-                <DocFormFieldWrapper key={i}>
+                <DocFormFieldWrapper bg='secondary_bg' key={i}>
                   <Label w='100%'>
                     {capitalizeFirstLetter(rel.collection)}
                   </Label>
@@ -141,7 +141,6 @@ export default withPageHoc({
     }
   },
   allowed_roles: ['admin', 'editor'],
-  // useLoading: true
 })(Edit)
 
   

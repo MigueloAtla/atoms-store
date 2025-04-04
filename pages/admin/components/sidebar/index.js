@@ -43,13 +43,13 @@ const Icons = {
 }
 
 const Sidebar = () => {
-  // uncomment THIS
   const role = useStoreRole(state => state.role)
   const { 
     setSelectedSidebarMenu, 
     toggleCollectionsPanel, 
     setToggleCollectionsPanel, 
-    setSelectedCollectionName
+    setSelectedCollectionName,
+    setSelectedMenuName
   } = useStore(state => state)
       
   const [scale, setScale] = useState(1)
@@ -82,10 +82,11 @@ const Sidebar = () => {
                     sidebarconfig[role].home && (
                       <SidebarLink
                         to={`/admin`}
-                        menu='home'
+                        menu=''
                         onClick={() => {
                           setSelectedCollectionName('')
                           setSelectedSidebarMenu('home')
+                          setSelectedMenuName('')
                         }}
                       >
                         {
@@ -151,6 +152,7 @@ const Sidebar = () => {
                           onClick={() => {
                             setSelectedCollectionName('')
                             setSelectedSidebarMenu(menu)
+                            setSelectedMenuName(menu)
                           }}
                         >
                             {
